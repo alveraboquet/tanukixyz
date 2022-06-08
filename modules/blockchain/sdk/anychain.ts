@@ -77,7 +77,7 @@ class AnychainBlockSyncService implements IBlockSyncProvider {
           {
             chain: this.chainConfig.name,
             network: 'mainnet',
-            blockNumber: startBlock,
+            block: startBlock,
           },
           {
             $set: {
