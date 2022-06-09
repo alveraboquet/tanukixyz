@@ -71,37 +71,49 @@ class AnychainBlockSyncService implements IBlockSyncProvider {
     while (startBlock <= latestBlockNumber) {
       const startExeTime = new Date().getTime();
 
-      const blockInfo = await this.summarizeBlockInfo(startBlock);
-      if (blockInfo) {
-        await blockCollection.updateOne(
-          {
+      try {
+        const blockInfo = await this.summarizeBlockInfo(startBlock);
+        if (blockInfo) {
+          await blockCollection.updateOne(
+            {
+              chain: this.chainConfig.name,
+              network: 'mainnet',
+              block: startBlock,
+            },
+            {
+              $set: {
+                ...blockInfo,
+              },
+            },
+            {
+              upsert: true,
+            }
+          );
+        }
+
+        const endExeTime = new Date().getTime();
+        const elapsed = (endExeTime - startExeTime) / 1000;
+        logger.onInfo({
+          source: this.name,
+          message: 'synced chain block',
+          props: {
             chain: this.chainConfig.name,
             network: 'mainnet',
-            block: startBlock,
+            blockNumber: startBlock,
+            elapsed: `${elapsed.toFixed(2)}s`,
           },
-          {
-            $set: {
-              ...blockInfo,
-            },
+        });
+      } catch (e: any) {
+        logger.onWarn({
+          source: this.name,
+          message: 'failed to sync chain block, skipped it',
+          props: {
+            chain: this.chainConfig.name,
+            network: 'mainnet',
+            blockNumber: startBlock,
           },
-          {
-            upsert: true,
-          }
-        );
+        });
       }
-
-      const endExeTime = new Date().getTime();
-      const elapsed = (endExeTime - startExeTime) / 1000;
-      logger.onInfo({
-        source: this.name,
-        message: 'synced chain block',
-        props: {
-          chain: this.chainConfig.name,
-          network: 'mainnet',
-          blockNumber: startBlock,
-          elapsed: `${elapsed.toFixed(2)}s`,
-        },
-      });
 
       startBlock += 1;
     }
