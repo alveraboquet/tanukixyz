@@ -126,6 +126,10 @@ class AnychainBlockSyncService implements IBlockSyncProvider {
     const dailyDataCollection = await providers.database.getCollection(envConfig.database.collections.globalDataDaily);
     const dateDataCollection = await providers.database.getCollection(envConfig.database.collections.globalDataDate);
 
+    // create custom indies for blockchain module queries
+    dailyDataCollection.createIndex({ module: 1, chain: 1, network: 1 }, { background: true });
+    dateDataCollection.createIndex({ module: 1, chain: 1, network: 1, date: 1 }, { background: true });
+
     // firstly, we need to update daily data
     const dailyData: ChainDateData = await helpers.summarizeBlockDataDaily(this.chainConfig, {
       block: blockCollection,

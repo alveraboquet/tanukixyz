@@ -86,7 +86,6 @@ class DatabaseProvider implements Provider {
     stateCollection.createIndex({ name: 1 }, { background: true });
     dataDailyCollection.createIndex({ module: 1 }, { background: true });
     dataDateCollection.createIndex({ module: 1, name: 1, date: 1 }, { background: true });
-    dataDateCollection.createIndex({ module: 1, chain: 1, date: 1 }, { background: true });
   }
 }
 
