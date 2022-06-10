@@ -1,11 +1,11 @@
 import { Router } from 'express';
 
 import envConfig from '../../core/env';
+import { getTodayUTCTimestamp } from '../../core/helper';
 import logger from '../../core/logger';
 import { ShareProviders } from '../../core/types';
 import { getCache, setCache } from '../caching';
 import { removeIdFields, writeResponseData, writeResponseError } from '../helpers';
-import {getTodayUTCTimestamp} from "../../core/helper";
 
 export function getRouter(providers: ShareProviders): Router {
   const router = Router({ mergeParams: true });
@@ -74,9 +74,7 @@ export function getRouter(providers: ShareProviders): Router {
       toDate = Math.floor(new Date(request.query['toDate'].toString()).getTime() / 1000);
     }
 
-    const dateMetricCollection = await providers.database.getCollection(
-      envConfig.database.collections.globalDataDate
-    );
+    const dateMetricCollection = await providers.database.getCollection(envConfig.database.collections.globalDataDate);
 
     try {
       const documents: Array<any> = await dateMetricCollection
@@ -87,7 +85,7 @@ export function getRouter(providers: ShareProviders): Router {
             $lte: toDate,
           },
         })
-        .sort({date: -1})
+        .sort({ date: -1 })
         .toArray();
       writeResponseData(response, {
         status: 200,
@@ -109,7 +107,7 @@ export function getRouter(providers: ShareProviders): Router {
         error: e.message,
       });
     }
-  })
+  });
 
   return router;
 }

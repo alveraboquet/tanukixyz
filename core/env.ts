@@ -14,6 +14,7 @@ const envConfig = {
       globalDataDate: 'tanukixyz.data.date',
 
       blockchainBlockSync: 'tanukixyz.chain.blocks',
+      lendingEventSync: 'tanukixyz.lending.events',
     },
   },
   apiKeys: {
