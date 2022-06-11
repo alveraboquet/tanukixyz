@@ -83,7 +83,7 @@ export const LendingConfigs: { [key: string]: LendingConfig } = {
     ],
   },
   aurigami: {
-    name: 'benqi',
+    name: 'aurigami',
     configs: [
       {
         chainConfig: getChainConfig('aurora'),
