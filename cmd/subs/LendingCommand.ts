@@ -20,6 +20,16 @@ export class LendingCommand extends BasicCommand {
         });
         break;
       }
+      case 'aggregator': {
+        const providers = await super.getProviders();
+        await lendingModule.runAggregator({
+          providers,
+          project: argv.project,
+          initialDate: argv.initialDate,
+          forceSync: argv.force ? argv.force : false,
+        });
+        break;
+      }
       default: {
         console.info(`Unsupported service ${service}`);
         process.exit(0);
@@ -38,6 +48,16 @@ export class LendingCommand extends BasicCommand {
         type: 'string',
         default: '',
         describe: 'Run with a specify project',
+      },
+      initialDate: {
+        type: 'number',
+        default: 0,
+        describe: 'The initial date to start to sync data',
+      },
+      force: {
+        type: 'boolean',
+        default: false,
+        describe: 'Force sync data from initial initial date',
       },
     });
   }

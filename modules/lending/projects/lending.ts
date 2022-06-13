@@ -5,11 +5,14 @@ import logger from '../../../core/logger';
 import { ChainConfig } from '../../../core/types';
 import {
   ILendingProvider,
-  LendingConfig,
+  LendingConfig, LendingData,
   LendingPool,
   RunLendingAggregatorArgv,
   RunLendingCollectorArgv,
 } from '../types';
+import {Collection} from "mongodb";
+import {getTimestamp} from "../../../core/helper";
+import * as helpers from '../helpers';
 
 class LendingProvider implements ILendingProvider {
   public readonly name: string = 'lending.provider';
@@ -30,8 +33,67 @@ class LendingProvider implements ILendingProvider {
     return [];
   }
 
-  runAggregator(options: RunLendingAggregatorArgv): Promise<any> {
-    return Promise.resolve(undefined);
+  public async runAggregator(options: RunLendingAggregatorArgv): Promise<any> {
+    const { providers, initialDate, forceSync } = options;
+
+    const eventCollection = await providers.database.getCollection(envConfig.database.collections.lendingEventSync);
+    const dailyDataCollection: Collection = await providers.database.getCollection(
+      envConfig.database.collections.globalDataDaily
+    );
+
+    // firstly, we update daily data
+    const dailyData: LendingData = {
+      supplyVolumeUSD: 0,
+      withdrawVolumeUSD: 0,
+      borrowVolumeUSD: 0,
+      repayVolumeUSD: 0,
+      addressCount: 0,
+      transactionCount: 0,
+    }
+
+    const currentTimestamp = getTimestamp();
+    const last24HoursTimestamp = currentTimestamp - 24 * 60 * 60;
+
+    for (let configIdx = 0; configIdx < this.lendingConfig.configs.length; configIdx++) {
+      const last24HoursEvents = await eventCollection.find({
+        protocol: this.lendingConfig.name,
+        chain: this.lendingConfig.configs[configIdx].chainConfig.name,
+        timestamp: {
+          $gte: last24HoursTimestamp,
+          $lte: currentTimestamp,
+        }
+      }) .toArray();
+
+      const summarizeData: LendingData = await helpers.summarizeDataEvents(this.lendingConfig, last24HoursEvents);
+      dailyData.supplyVolumeUSD += summarizeData.supplyVolumeUSD;
+      dailyData.withdrawVolumeUSD += summarizeData.withdrawVolumeUSD;
+      dailyData.borrowVolumeUSD += summarizeData.borrowVolumeUSD;
+      dailyData.repayVolumeUSD += summarizeData.repayVolumeUSD;
+      dailyData.addressCount += summarizeData.addressCount;
+      dailyData.transactionCount += summarizeData.transactionCount;
+    }
+
+    await dailyDataCollection.updateOne({
+      module: 'lending',
+      name: this.lendingConfig.name
+    }, {
+      $set: {
+        module: 'lending',
+        name: this.lendingConfig.name,
+        ...dailyData
+      }
+    }, {
+      upsert: true,
+    })
+
+    logger.onInfo({
+      source: this.name,
+      message: 'updated lending daily data',
+      props: {
+        protocol: this.lendingConfig.name,
+        volumeUSD: dailyData.supplyVolumeUSD + dailyData.borrowVolumeUSD + dailyData.borrowVolumeUSD + dailyData.repayVolumeUSD,
+      }
+    })
   }
 
   public async runCollector(options: RunLendingCollectorArgv): Promise<any> {

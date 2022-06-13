@@ -19,6 +19,15 @@ export interface LendingConfig {
   }>;
 }
 
+export interface LendingData {
+  supplyVolumeUSD: number;
+  withdrawVolumeUSD: number;
+  borrowVolumeUSD: number;
+  repayVolumeUSD: number;
+  addressCount: number;
+  transactionCount: number;
+}
+
 export interface RunLendingCollectorArgv {
   providers: ShareProviders;
 }

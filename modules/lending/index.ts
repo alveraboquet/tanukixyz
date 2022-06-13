@@ -8,9 +8,49 @@ interface RunLendingCollectorArgv {
   project: string;
 }
 
+interface RunLendingAggregatorArgv {
+  providers: ShareProviders;
+  project: string;
+  initialDate: number;
+  forceSync: boolean;
+}
+
 class LendingModuleService implements IModuleService {
-  public async runAggregator(argv: any): Promise<any> {
-    return Promise.resolve(undefined);
+  public async runAggregator(argv: RunLendingAggregatorArgv): Promise<any> {
+    if (argv.project !== '') {
+      const provider = LendingProviders[argv.project];
+      if (provider) {
+        while (true) {
+          await provider.runAggregator({
+            providers: argv.providers,
+            initialDate: argv.initialDate,
+            forceSync: argv.forceSync,
+          });
+
+          await sleep(10 * 60); // sleep 10 minutes
+        }
+      } else {
+        console.info(`module:lending project ${argv.project} not found`);
+      }
+    } else {
+      // collector all projects
+      const providers = getLendingProviderList();
+
+      while (true) {
+        for (let i = 0; i < providers.length; i++) {
+          const provider = LendingProviders[providers[i]];
+          if (provider) {
+            await provider.runAggregator({
+              providers: argv.providers,
+              initialDate: argv.initialDate,
+              forceSync: argv.forceSync,
+            });
+          }
+        }
+
+        await sleep(10 * 60); // sleep 10 minutes
+      }
+    }
   }
 
   public async runCollector(argv: RunLendingCollectorArgv): Promise<any> {
