@@ -89,6 +89,13 @@ export async function summarizeDataEvents(lendingConfig: LendingConfig, allEvent
           .toNumber();
         break;
       }
+      case 'Deposit': {
+        summarizeData.supplyVolumeUSD += new BigNumber(allEvents[eventIdx].eventData.amount)
+          .dividedBy(new BigNumber(10).pow(allEvents[eventIdx].underlyingDecimals))
+          .multipliedBy(historyPrice)
+          .toNumber();
+        break;
+      }
       case 'Redeem': {
         summarizeData.withdrawVolumeUSD += new BigNumber(allEvents[eventIdx].eventData.redeemAmount)
           .dividedBy(new BigNumber(10).pow(allEvents[eventIdx].underlyingDecimals))

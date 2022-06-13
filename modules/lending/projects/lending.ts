@@ -4,14 +4,12 @@ import Web3 from 'web3';
 import envConfig from '../../../core/env';
 import { getTimestamp, getTodayUTCTimestamp } from '../../../core/helper';
 import logger from '../../../core/logger';
-import { ChainConfig } from '../../../core/types';
 import { InitialDateData } from '../constants';
 import * as helpers from '../helpers';
 import {
   ILendingProvider,
   LendingConfig,
   LendingData,
-  LendingPool,
   RunLendingAggregatorArgv,
   RunLendingCollectorArgv,
 } from '../types';
@@ -26,12 +24,7 @@ class LendingProvider implements ILendingProvider {
   }
 
   // override this function
-  public async getPoolEvents(
-    chainConfig: ChainConfig,
-    poolConfig: LendingPool,
-    fromBlock: number,
-    toBlock: number
-  ): Promise<Array<any>> {
+  public async getPoolEvents(props: any): Promise<Array<any>> {
     return [];
   }
 
@@ -181,10 +174,7 @@ class LendingProvider implements ILendingProvider {
           protocol: this.lendingConfig.name,
           date: new Date(startDate * 1000).toISOString().split('T')[0],
           volumeUSD:
-            dateData.supplyVolumeUSD +
-            dateData.borrowVolumeUSD +
-            dateData.borrowVolumeUSD +
-            dateData.repayVolumeUSD,
+            dateData.supplyVolumeUSD + dateData.borrowVolumeUSD + dateData.borrowVolumeUSD + dateData.repayVolumeUSD,
         },
       });
 
@@ -230,12 +220,12 @@ class LendingProvider implements ILendingProvider {
           const startExeTime = Math.floor(new Date().getTime() / 1000);
 
           const toBlock = startBlock + STEP > latestBlock ? latestBlock : startBlock + STEP;
-          const events = await this.getPoolEvents(
-            lendingConfig.chainConfig,
-            lendingConfig.pools[i],
-            startBlock,
-            toBlock
-          );
+          const events = await this.getPoolEvents({
+            chainConfig: lendingConfig.chainConfig,
+            poolConfig: lendingConfig.pools[i],
+            fromBlock: startBlock,
+            toBlock: toBlock,
+          });
           const operations: Array<any> = [];
           for (let eventIdx = 0; eventIdx < events.length; eventIdx++) {
             operations.push({

@@ -10,12 +10,25 @@ export interface LendingPool {
   underlyingCoingeckoId: string;
 }
 
+export interface AaveLendingPoolConfig {
+  abi: any;
+  address: string;
+  genesisBlock: number;
+}
+
 export interface LendingConfig {
   name: string;
   configs: Array<{
     chainConfig: ChainConfig;
     birthday: number;
+
+    // compound-liked lendings use separate lending pool for every asset
+    // this config used for both compound-liked and aave-liked lendings
     pools: Array<LendingPool>;
+
+    // aave-liked lendings use single entry lending pool for all assets
+    // this config used for aave liked lendings only
+    lendingPool?: AaveLendingPoolConfig;
   }>;
 }
 
@@ -39,12 +52,7 @@ export interface RunLendingAggregatorArgv {
 }
 export interface ILendingProvider extends Provider {
   // query last contract events
-  getPoolEvents: (
-    chainConfig: ChainConfig,
-    poolConfig: LendingPool,
-    fromBlock: number,
-    toBlock: number
-  ) => Promise<any>;
+  getPoolEvents: (props: any) => Promise<any>;
 
   // start the collector process
   runCollector: (options: RunLendingCollectorArgv) => Promise<any>;

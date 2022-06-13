@@ -5,6 +5,13 @@ import { ChainConfig } from '../../../core/types';
 import { LendingConfig, LendingPool } from '../types';
 import LendingProvider from './lending';
 
+interface CompoundGetPoolEventsProps {
+  chainConfig: ChainConfig;
+  poolConfig: LendingPool;
+  fromBlock: number;
+  toBlock: number;
+}
+
 class CompoundProvider extends LendingProvider {
   public readonly name: string = 'compound.provider';
 
@@ -12,12 +19,9 @@ class CompoundProvider extends LendingProvider {
     super(lendingConfig);
   }
 
-  public async getPoolEvents(
-    chainConfig: ChainConfig,
-    poolConfig: LendingPool,
-    fromBlock: number,
-    toBlock: number
-  ): Promise<Array<any>> {
+  public async getPoolEvents(props: CompoundGetPoolEventsProps): Promise<Array<any>> {
+    const { chainConfig, poolConfig, fromBlock, toBlock } = props;
+
     const web3 = new Web3(chainConfig.nodeRpcs.event ? chainConfig.nodeRpcs.event : chainConfig.nodeRpcs.default);
     const contract = new web3.eth.Contract(poolConfig.abi, poolConfig.poolAddress);
 
