@@ -1,18 +1,20 @@
+import { Collection } from 'mongodb';
 import Web3 from 'web3';
 
 import envConfig from '../../../core/env';
+import { getTimestamp, getTodayUTCTimestamp } from '../../../core/helper';
 import logger from '../../../core/logger';
 import { ChainConfig } from '../../../core/types';
+import { InitialDateData } from '../constants';
+import * as helpers from '../helpers';
 import {
   ILendingProvider,
-  LendingConfig, LendingData,
+  LendingConfig,
+  LendingData,
   LendingPool,
   RunLendingAggregatorArgv,
   RunLendingCollectorArgv,
 } from '../types';
-import {Collection} from "mongodb";
-import {getTimestamp} from "../../../core/helper";
-import * as helpers from '../helpers';
 
 class LendingProvider implements ILendingProvider {
   public readonly name: string = 'lending.provider';
@@ -40,6 +42,9 @@ class LendingProvider implements ILendingProvider {
     const dailyDataCollection: Collection = await providers.database.getCollection(
       envConfig.database.collections.globalDataDaily
     );
+    const dateDataCollection: Collection = await providers.database.getCollection(
+      envConfig.database.collections.globalDataDate
+    );
 
     // firstly, we update daily data
     const dailyData: LendingData = {
@@ -49,20 +54,22 @@ class LendingProvider implements ILendingProvider {
       repayVolumeUSD: 0,
       addressCount: 0,
       transactionCount: 0,
-    }
+    };
 
     const currentTimestamp = getTimestamp();
     const last24HoursTimestamp = currentTimestamp - 24 * 60 * 60;
 
     for (let configIdx = 0; configIdx < this.lendingConfig.configs.length; configIdx++) {
-      const last24HoursEvents = await eventCollection.find({
-        protocol: this.lendingConfig.name,
-        chain: this.lendingConfig.configs[configIdx].chainConfig.name,
-        timestamp: {
-          $gte: last24HoursTimestamp,
-          $lte: currentTimestamp,
-        }
-      }) .toArray();
+      const last24HoursEvents = await eventCollection
+        .find({
+          protocol: this.lendingConfig.name,
+          chain: this.lendingConfig.configs[configIdx].chainConfig.name,
+          timestamp: {
+            $gte: last24HoursTimestamp,
+            $lte: currentTimestamp,
+          },
+        })
+        .toArray();
 
       const summarizeData: LendingData = await helpers.summarizeDataEvents(this.lendingConfig, last24HoursEvents);
       dailyData.supplyVolumeUSD += summarizeData.supplyVolumeUSD;
@@ -73,27 +80,116 @@ class LendingProvider implements ILendingProvider {
       dailyData.transactionCount += summarizeData.transactionCount;
     }
 
-    await dailyDataCollection.updateOne({
-      module: 'lending',
-      name: this.lendingConfig.name
-    }, {
-      $set: {
+    await dailyDataCollection.updateOne(
+      {
         module: 'lending',
         name: this.lendingConfig.name,
-        ...dailyData
+      },
+      {
+        $set: {
+          module: 'lending',
+          name: this.lendingConfig.name,
+          ...dailyData,
+        },
+      },
+      {
+        upsert: true,
       }
-    }, {
-      upsert: true,
-    })
+    );
 
     logger.onInfo({
       source: this.name,
       message: 'updated lending daily data',
       props: {
         protocol: this.lendingConfig.name,
-        volumeUSD: dailyData.supplyVolumeUSD + dailyData.borrowVolumeUSD + dailyData.borrowVolumeUSD + dailyData.repayVolumeUSD,
+        volumeUSD:
+          dailyData.supplyVolumeUSD + dailyData.borrowVolumeUSD + dailyData.borrowVolumeUSD + dailyData.repayVolumeUSD,
+      },
+    });
+
+    // secondly, update date data
+    const today = getTodayUTCTimestamp();
+    let startDate = initialDate === 0 ? InitialDateData : initialDate;
+    if (!forceSync) {
+      const states = await dateDataCollection
+        .find({
+          module: 'lending',
+          name: this.lendingConfig.name,
+        })
+        .sort({ date: -1 })
+        .limit(1)
+        .toArray();
+      if (states.length > 0) {
+        startDate = states[0].date;
       }
-    })
+    }
+
+    while (startDate <= today) {
+      const dateData: LendingData = {
+        supplyVolumeUSD: 0,
+        withdrawVolumeUSD: 0,
+        borrowVolumeUSD: 0,
+        repayVolumeUSD: 0,
+        addressCount: 0,
+        transactionCount: 0,
+      };
+
+      for (let configIdx = 0; configIdx < this.lendingConfig.configs.length; configIdx++) {
+        const dateEvents = await eventCollection
+          .find({
+            protocol: this.lendingConfig.name,
+            chain: this.lendingConfig.configs[configIdx].chainConfig.name,
+            timestamp: {
+              $gte: startDate,
+              $lt: startDate + 24 * 60 * 60,
+            },
+          })
+          .toArray();
+
+        const summarizeData: LendingData = await helpers.summarizeDataEvents(this.lendingConfig, dateEvents);
+        dateData.supplyVolumeUSD += summarizeData.supplyVolumeUSD;
+        dateData.withdrawVolumeUSD += summarizeData.withdrawVolumeUSD;
+        dateData.borrowVolumeUSD += summarizeData.borrowVolumeUSD;
+        dateData.repayVolumeUSD += summarizeData.repayVolumeUSD;
+        dateData.addressCount += summarizeData.addressCount;
+        dateData.transactionCount += summarizeData.transactionCount;
+      }
+
+      await dateDataCollection.updateOne(
+        {
+          module: 'lending',
+          name: this.lendingConfig.name,
+          date: startDate,
+        },
+        {
+          $set: {
+            module: 'lending',
+            name: this.lendingConfig.name,
+            date: startDate,
+            ...dateData,
+          },
+        },
+        {
+          upsert: true,
+        }
+      );
+
+      logger.onInfo({
+        source: this.name,
+        message: 'updated lending date data',
+        props: {
+          protocol: this.lendingConfig.name,
+          date: new Date(startDate * 1000).toISOString().split('T')[0],
+          volumeUSD:
+            dateData.supplyVolumeUSD +
+            dateData.borrowVolumeUSD +
+            dateData.borrowVolumeUSD +
+            dateData.repayVolumeUSD,
+        },
+      });
+
+      startDate += 24 * 60 * 60;
+    }
   }
 
   public async runCollector(options: RunLendingCollectorArgv): Promise<any> {

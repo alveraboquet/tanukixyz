@@ -1,15 +1,17 @@
 import { getChainConfig } from '../../core/constants/chains';
+import { AurigamiAuroraPools } from './constants/aurigamiAuroraPools';
+import { BastionAuroraPools } from './constants/bastionAuroraPools';
+import { BenqiAvaxPools } from './constants/benqiAvaxPools';
 import { CompoundEthPools } from './constants/compoundEthPools';
+import { IronBankAvaxPools } from './constants/ironbankAvaxPools';
+import { IronBankEthPools } from './constants/ironbankEthPools';
+import { IronBankFtmPools } from './constants/ironbankFtmPools';
+import { ScreamFtmPools } from './constants/screamFtmPools';
+import { TraderJoeAvaxPools } from './constants/traderjoeAvaxPools';
+import { VenusBscPools } from './constants/venusBscPools';
 import { LendingConfig } from './types';
-import {IronBankEthPools} from "./constants/ironbankEthPools";
-import {IronBankFtmPools} from "./constants/ironbankFtmPools";
-import {IronBankAvaxPools} from "./constants/ironbankAvaxPools";
-import {VenusBscPools} from "./constants/venusBscPools";
-import {TraderJoeAvaxPools} from "./constants/traderjoeAvaxPools";
-import {BenqiAvaxPools} from "./constants/benqiAvaxPools";
-import {AurigamiAuroraPools} from "./constants/aurigamiAuroraPools";
-import {BastionAuroraPools} from "./constants/bastionAuroraPools";
-import {ScreamFtmPools} from "./constants/screamFtmPools";
+
+export const InitialDateData = 1609459200; // Fri Jan 01 2021 00:00:00 GMT+0000
 
 export const LendingConfigs: { [key: string]: LendingConfig } = {
   compound: {

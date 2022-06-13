@@ -245,8 +245,8 @@ export class UniswapV2Provider implements IDexProvider {
         props: {
           name: `dex:${this.config.name}`,
         },
-        error: e
-      })
+        error: e,
+      });
     }
 
     // get date data collection
@@ -303,7 +303,6 @@ export class UniswapV2Provider implements IDexProvider {
             liquidity: dateData.liquidityUSD,
           },
         });
-
       } catch (e: any) {
         logger.onError({
           source: this.name,
@@ -312,8 +311,8 @@ export class UniswapV2Provider implements IDexProvider {
             name: `dex:${this.config.name}`,
             date: new Date(startDate * 1000).toISOString().split('T')[0],
           },
-          error: e
-        })
+          error: e,
+        });
       }
       startDate += 24 * 60 * 60;
     }

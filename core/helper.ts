@@ -1,5 +1,6 @@
-import axios from "axios";
-import logger from "./logger";
+import axios from 'axios';
+
+import logger from './logger';
 
 export function normalizeAddress(address: string | undefined): string {
   return address ? address.toLowerCase() : '';
@@ -46,7 +47,7 @@ export async function getHistoryTokenPriceFromCoingecko(coingeckoId: string, tim
     props: {
       coingeckoId: coingeckoId,
       timestamp: timestamp,
-    }
+    },
   });
   return 0;
 }
