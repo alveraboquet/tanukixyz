@@ -206,37 +206,48 @@ export class UniswapV2Provider implements IDexProvider {
   public async runAggregator(argv: AggregatorArgv): Promise<void> {
     const { providers, initialDate, forceSync } = argv;
 
-    // don't care anytime, update daily data
-    const dailyData = await this.getDailyData();
-    // get date data collection
-    const dailyDataCollection: Collection = await providers.database.getCollection(
-      envConfig.database.collections.globalDataDaily
-    );
-    await dailyDataCollection.updateOne(
-      {
-        module: ModuleDatabaseIndex,
-        name: this.config.name,
-      },
-      {
-        $set: {
-          ...dailyData,
+    try {
+      // don't care anytime, update daily data
+      const dailyData = await this.getDailyData();
+      // get date data collection
+      const dailyDataCollection: Collection = await providers.database.getCollection(
+        envConfig.database.collections.globalDataDaily
+      );
+      await dailyDataCollection.updateOne(
+        {
+          module: ModuleDatabaseIndex,
+          name: this.config.name,
         },
-      },
-      {
-        upsert: true,
-      }
-    );
+        {
+          $set: {
+            ...dailyData,
+          },
+        },
+        {
+          upsert: true,
+        }
+      );
 
-    // log because i'm a bad dev
-    logger.onInfo({
-      source: this.name,
-      message: 'updated daily data',
-      props: {
-        name: `dex:${this.config.name}`,
-        volume: dailyData.volumeUSD,
-        liquidity: dailyData.liquidityUSD,
-      },
-    });
+      // log because i'm a bad dev
+      logger.onInfo({
+        source: this.name,
+        message: 'updated daily data',
+        props: {
+          name: `dex:${this.config.name}`,
+          volume: dailyData.volumeUSD,
+          liquidity: dailyData.liquidityUSD,
+        },
+      });
+    } catch (e: any) {
+      logger.onError({
+        source: this.name,
+        message: 'failed to update daily dex data, skipped',
+        props: {
+          name: `dex:${this.config.name}`,
+        },
+        error: e
+      })
+    }
 
     // get date data collection
     const dateDataCollection: Collection = await providers.database.getCollection(
@@ -264,34 +275,46 @@ export class UniswapV2Provider implements IDexProvider {
 
     const today = getTodayUTCTimestamp();
     while (startDate <= today) {
-      const dateData = await this.getDateData(startDate);
-      await dateDataCollection.updateOne(
-        {
-          module: ModuleDatabaseIndex,
-          name: this.config.name,
-          date: startDate,
-        },
-        {
-          $set: {
-            ...dateData,
+      try {
+        const dateData = await this.getDateData(startDate);
+        await dateDataCollection.updateOne(
+          {
+            module: ModuleDatabaseIndex,
+            name: this.config.name,
+            date: startDate,
           },
-        },
-        {
-          upsert: true,
-        }
-      );
+          {
+            $set: {
+              ...dateData,
+            },
+          },
+          {
+            upsert: true,
+          }
+        );
 
-      logger.onInfo({
-        source: this.name,
-        message: 'updated date data',
-        props: {
-          name: `dex:${this.config.name}`,
-          date: new Date(startDate * 1000).toISOString().split('T')[0],
-          volume: dateData.volumeUSD,
-          liquidity: dateData.liquidityUSD,
-        },
-      });
+        logger.onInfo({
+          source: this.name,
+          message: 'updated date data',
+          props: {
+            name: `dex:${this.config.name}`,
+            date: new Date(startDate * 1000).toISOString().split('T')[0],
+            volume: dateData.volumeUSD,
+            liquidity: dateData.liquidityUSD,
+          },
+        });
 
+      } catch (e: any) {
+        logger.onError({
+          source: this.name,
+          message: 'failed to update date dex data, skipped',
+          props: {
+            name: `dex:${this.config.name}`,
+            date: new Date(startDate * 1000).toISOString().split('T')[0],
+          },
+          error: e
+        })
+      }
       startDate += 24 * 60 * 60;
     }
   }
