@@ -5,7 +5,7 @@ import { ILendingProvider } from './types';
 
 export const LendingProviders: { [key: string]: ILendingProvider | null } = {
   compound: new CompoundProvider(LendingConfigs.compound),
-  aave: new AaveProvider(LendingConfigs.aave),
+  // aave: new AaveProvider(LendingConfigs.aave),
   ironbank: new CompoundProvider(LendingConfigs.ironbank),
   venus: new CompoundProvider(LendingConfigs.venus),
   benqi: new CompoundProvider(LendingConfigs.benqi),

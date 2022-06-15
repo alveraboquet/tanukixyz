@@ -28,6 +28,11 @@ class LendingProvider implements ILendingProvider {
     return [];
   }
 
+  // override this function
+  public async getLiquidityLocked(props: any): Promise<any> {
+    return 0;
+  }
+
   public async runAggregator(options: RunLendingAggregatorArgv): Promise<any> {
     const { providers, initialDate, forceSync } = options;
 
@@ -45,6 +50,7 @@ class LendingProvider implements ILendingProvider {
       withdrawVolumeUSD: 0,
       borrowVolumeUSD: 0,
       repayVolumeUSD: 0,
+      liquidityUSD: 0,
       addressCount: 0,
       transactionCount: 0,
     };
@@ -62,6 +68,7 @@ class LendingProvider implements ILendingProvider {
             $lte: currentTimestamp,
           },
         })
+        .sort({ timestamp: -1 }) // we can get the latest event by index 0
         .toArray();
 
       const summarizeData: LendingData = await helpers.summarizeDataEvents(this.lendingConfig, last24HoursEvents);
@@ -71,6 +78,17 @@ class LendingProvider implements ILendingProvider {
       dailyData.repayVolumeUSD += summarizeData.repayVolumeUSD;
       dailyData.addressCount += summarizeData.addressCount;
       dailyData.transactionCount += summarizeData.transactionCount;
+
+      if (last24HoursEvents.length > 0) {
+        for (let poolIdx = 0; poolIdx < this.lendingConfig.configs[configIdx].pools.length; poolIdx++) {
+          dailyData.liquidityUSD += await this.getLiquidityLocked({
+            chainConfig: this.lendingConfig.configs[configIdx].chainConfig,
+            poolConfig: this.lendingConfig.configs[configIdx].pools[poolIdx],
+            blockNumber: last24HoursEvents[0].blockNumber,
+            blockTime: last24HoursEvents[0].timestamp,
+          });
+        }
+      }
     }
 
     await dailyDataCollection.updateOne(
@@ -123,6 +141,7 @@ class LendingProvider implements ILendingProvider {
         withdrawVolumeUSD: 0,
         borrowVolumeUSD: 0,
         repayVolumeUSD: 0,
+        liquidityUSD: 0,
         addressCount: 0,
         transactionCount: 0,
       };
@@ -137,6 +156,7 @@ class LendingProvider implements ILendingProvider {
               $lt: startDate + 24 * 60 * 60,
             },
           })
+          .sort({ timestamp: -1 }) // we can get the latest event by index 0
           .toArray();
 
         const summarizeData: LendingData = await helpers.summarizeDataEvents(this.lendingConfig, dateEvents);
@@ -146,6 +166,17 @@ class LendingProvider implements ILendingProvider {
         dateData.repayVolumeUSD += summarizeData.repayVolumeUSD;
         dateData.addressCount += summarizeData.addressCount;
         dateData.transactionCount += summarizeData.transactionCount;
+
+        if (dateEvents.length > 0) {
+          for (let poolIdx = 0; poolIdx < this.lendingConfig.configs[configIdx].pools.length; poolIdx++) {
+            dateData.liquidityUSD += await this.getLiquidityLocked({
+              chainConfig: this.lendingConfig.configs[configIdx].chainConfig,
+              poolConfig: this.lendingConfig.configs[configIdx].pools[poolIdx],
+              blockNumber: dateEvents[0].blockNumber,
+              blockTime: dateEvents[0].timestamp,
+            });
+          }
+        }
       }
 
       await dateDataCollection.updateOne(

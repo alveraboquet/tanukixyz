@@ -37,6 +37,7 @@ export interface LendingData {
   withdrawVolumeUSD: number;
   borrowVolumeUSD: number;
   repayVolumeUSD: number;
+  liquidityUSD?: number;
   addressCount: number;
   transactionCount: number;
 }
@@ -53,6 +54,9 @@ export interface RunLendingAggregatorArgv {
 export interface ILendingProvider extends Provider {
   // query last contract events
   getPoolEvents: (props: any) => Promise<any>;
+
+  // get the liquidity locked in contract
+  getLiquidityLocked?: (props: any) => Promise<any>;
 
   // start the collector process
   runCollector: (options: RunLendingCollectorArgv) => Promise<any>;

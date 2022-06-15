@@ -20,7 +20,7 @@ interface AaveGetPoolEventsProps {
 }
 
 class AaveProvider extends LendingProvider {
-  public readonly name: string = 'aavev2.provider';
+  public readonly name: string = 'aave.provider';
 
   constructor(lendingConfig: LendingConfig) {
     super(lendingConfig);

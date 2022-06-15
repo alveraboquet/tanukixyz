@@ -1,6 +1,7 @@
+import BigNumber from 'bignumber.js';
 import Web3 from 'web3';
 
-import { normalizeAddress } from '../../../core/helper';
+import { getHistoryTokenPriceFromCoingecko, normalizeAddress } from '../../../core/helper';
 import { ChainConfig } from '../../../core/types';
 import { LendingConfig, LendingPool } from '../types';
 import LendingProvider from './lending';
@@ -12,11 +13,39 @@ interface CompoundGetPoolEventsProps {
   toBlock: number;
 }
 
+interface CompoundGetPoolLiquidity {
+  chainConfig: ChainConfig;
+  poolConfig: LendingPool;
+  blockNumber: number;
+  blockTime: number;
+}
+
 class CompoundProvider extends LendingProvider {
   public readonly name: string = 'compound.provider';
 
   constructor(lendingConfig: LendingConfig) {
     super(lendingConfig);
+  }
+
+  // compound liquidity = getCash + totalBorrows - totalReserves
+  public async getLiquidityLocked(props: CompoundGetPoolLiquidity): Promise<number> {
+    const { chainConfig, poolConfig, blockNumber, blockTime } = props;
+
+    const web3 = new Web3(chainConfig.nodeRpcs.archive ? chainConfig.nodeRpcs.archive : chainConfig.nodeRpcs.default);
+    const contract = new web3.eth.Contract(poolConfig.abi, poolConfig.poolAddress);
+
+    const totalCash = await contract.methods.getCash().call(blockNumber);
+    const totalBorrows = await contract.methods.totalBorrows().call(blockNumber);
+    const totalReserves = await contract.methods.totalReserves().call(blockNumber);
+
+    const underlyingLiquidity = new BigNumber(totalCash.toString())
+      .plus(new BigNumber(totalBorrows.toString()))
+      .minus(new BigNumber(totalReserves.toString()))
+      .dividedBy(new BigNumber(10).pow(poolConfig.underlyingDecimals))
+      .toNumber();
+    const underlyingPriceUSD = await getHistoryTokenPriceFromCoingecko(poolConfig.underlyingCoingeckoId, blockTime);
+
+    return underlyingLiquidity * underlyingPriceUSD;
   }
 
   public async getPoolEvents(props: CompoundGetPoolEventsProps): Promise<Array<any>> {
