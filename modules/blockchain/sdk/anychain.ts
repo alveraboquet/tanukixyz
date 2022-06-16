@@ -1,4 +1,3 @@
-import { Blockchains } from '../../../core/constants/chains';
 import envConfig from '../../../core/env';
 import { getTodayUTCTimestamp } from '../../../core/helper';
 import logger from '../../../core/logger';

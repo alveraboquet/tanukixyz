@@ -18,6 +18,7 @@ export interface ChainDateData extends CoreData {
   network: string;
   date: number;
   transferVolume: number;
+  transferVolumeUSD: number;
   uniqueAddress: number;
   totalTransaction: number;
 }

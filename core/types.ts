@@ -10,6 +10,7 @@ export interface EnvConfig {
       globalDataDaily: string;
       globalDataDate: string;
       blockchainBlockSync: string;
+      lendingEventSync: string;
     };
   };
   apiKeys: {
@@ -38,6 +39,13 @@ export interface ChainConfig {
     contractEventQueryBlockRange?: number;
   };
   blockSubgraph?: string;
+
+  // fee-paid token on chain transaction
+  // for some ethereum layer 2, this token should be ETH
+  nativeToken?: TokenConfig;
+
+  // governance or project token
+  platformToken?: TokenConfig;
 }
 
 export interface ShareProviders {
@@ -47,4 +55,12 @@ export interface ShareProviders {
 
 export interface CoreData {
   module: string;
+}
+
+export interface TokenConfig {
+  name: string;
+  symbol: string;
+
+  // for query price from coingecko
+  coingeckoId?: string;
 }

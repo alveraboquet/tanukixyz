@@ -1,4 +1,4 @@
-import { getTimestamp } from '../../core/helper';
+import {getHistoryTokenPriceFromCoingecko, getTimestamp} from '../../core/helper';
 import { ChainConfig } from '../../core/types';
 import { ChainDateData, CollectionProps } from './types';
 
@@ -18,6 +18,7 @@ async function summarizeBlockDataRange(
         $lt: toTime,
       },
     })
+    .sort({timestamp: -1})
     .toArray();
 
   const data: ChainDateData = {
@@ -30,6 +31,9 @@ async function summarizeBlockDataRange(
     uniqueAddress: 0,
     totalTransaction: 0,
     transferVolume: 0,
+
+    // will be updated at the end
+    transferVolumeUSD: 0,
   };
 
   const addresses: any = {};
@@ -43,6 +47,12 @@ async function summarizeBlockDataRange(
         addresses[blocks[i].uniqueAddress[addressIdx]] = true;
       }
     }
+  }
+
+  // get USD volume at that time
+  if (blocks.length > 0 && chain.nativeToken && chain.nativeToken.coingeckoId) {
+    const price = await getHistoryTokenPriceFromCoingecko(chain.nativeToken.coingeckoId, blocks[0].timestamp);
+    data.transferVolumeUSD = data.transferVolume * price;
   }
 
   return data;

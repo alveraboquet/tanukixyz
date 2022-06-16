@@ -1,5 +1,6 @@
 import envConfig from '../env';
 import { ChainConfig } from '../types';
+import {TokenList} from "./tokens";
 
 const ALCHEMY_KEY = envConfig.apiKeys.alchemy;
 const MORALIS_KEY = envConfig.apiKeys.moralis;
@@ -15,6 +16,7 @@ export const Blockchains: Array<ChainConfig> = [
       event: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_KEY}`,
     },
     blockSubgraph: 'https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks',
+    nativeToken: TokenList.ETH,
   },
   {
     network: 'mainnet',
@@ -23,6 +25,7 @@ export const Blockchains: Array<ChainConfig> = [
     nodeRpcs: {
       default: `https://btc.getblock.io/rest`,
     },
+    nativeToken: TokenList.BTC,
   },
   {
     network: 'mainnet',
@@ -34,6 +37,7 @@ export const Blockchains: Array<ChainConfig> = [
       event: 'https://api.avax.network/ext/bc/C/rpc',
     },
     blockSubgraph: 'https://api.thegraph.com/subgraphs/name/dasconnor/avalanche-blocks',
+    nativeToken: TokenList.AVAX,
   },
   {
     network: 'mainnet',
@@ -45,6 +49,7 @@ export const Blockchains: Array<ChainConfig> = [
       event: 'https://rpc.ankr.com/polygon',
     },
     blockSubgraph: 'https://api.thegraph.com/subgraphs/name/matthewlilley/polygon-blocks',
+    nativeToken: TokenList.MATIC,
   },
   {
     network: 'mainnet',
@@ -56,6 +61,7 @@ export const Blockchains: Array<ChainConfig> = [
       event: 'https://rpc.ankr.com/fantom',
     },
     blockSubgraph: 'https://api.thegraph.com/subgraphs/name/matthewlilley/fantom-blocks',
+    nativeToken: TokenList.FTM,
   },
   {
     network: 'mainnet',
@@ -67,6 +73,7 @@ export const Blockchains: Array<ChainConfig> = [
       event: 'https://bscrpc.com',
     },
     blockSubgraph: 'https://api.thegraph.com/subgraphs/name/matthewlilley/bsc-blocks',
+    nativeToken: TokenList.BNB,
   },
   {
     network: 'mainnet',
@@ -75,6 +82,7 @@ export const Blockchains: Array<ChainConfig> = [
     nodeRpcs: {
       default: 'https://archival-rpc.mainnet.near.org',
     },
+    nativeToken: TokenList.NEAR,
   },
   {
     network: 'mainnet',
@@ -92,6 +100,7 @@ export const Blockchains: Array<ChainConfig> = [
     nodeRpcs: {
       default: 'https://api.harmony.one',
     },
+    nativeToken: TokenList.ONE,
   },
   {
     network: 'mainnet',
@@ -109,6 +118,7 @@ export const Blockchains: Array<ChainConfig> = [
       default: 'https://evm.cronos.org',
     },
     blockSubgraph: 'https://graph.mm.finance/subgraphs/name/madmeerkat-finance/blocks',
+    nativeToken: TokenList.CRO,
   },
   {
     network: 'mainnet',
@@ -117,6 +127,7 @@ export const Blockchains: Array<ChainConfig> = [
     nodeRpcs: {
       default: 'https://forno.celo.org',
     },
+    nativeToken: TokenList.CELO,
   },
   {
     network: 'mainnet',
@@ -125,6 +136,7 @@ export const Blockchains: Array<ChainConfig> = [
     nodeRpcs: {
       default: 'https://arb1.arbitrum.io/rpc',
     },
+    nativeToken: TokenList.ETH,
   },
   {
     network: 'mainnet',
@@ -165,6 +177,7 @@ export const Blockchains: Array<ChainConfig> = [
     nodeRpcs: {
       default: 'https://rpc.fuse.io/',
     },
+    nativeToken: TokenList.FUSE,
   },
   {
     network: 'mainnet',
