@@ -3,6 +3,7 @@ import BitcoreBlockSyncService from './sdk/bitcore';
 import EvmBlockSyncService from './sdk/evm';
 import LitecoreBlockSyncService from './sdk/litecore';
 import NearBlockSyncService from './sdk/near';
+import TronBlockSyncService from './sdk/tron';
 import { IBlockSyncProvider } from './types';
 
 export const BlockSyncProviders: { [key: string]: IBlockSyncProvider | null } = {
@@ -12,6 +13,9 @@ export const BlockSyncProviders: { [key: string]: IBlockSyncProvider | null } = 
 
   // near family
   near: new NearBlockSyncService(getChainConfig('near')),
+
+  // tron family
+  tron: new TronBlockSyncService(getChainConfig('tron')),
 
   // evm family
   ethereum: new EvmBlockSyncService(getChainConfig('ethereum')),

@@ -167,3 +167,31 @@ export class NearChainProvider extends ChainProvider {
     return blockInfo;
   }
 }
+
+// use tron grid API
+export class TronChainProvider extends ChainProvider {
+  constructor(options: ChainProviderOptions) {
+    super(options);
+  }
+
+  public async getLatestBlockNumber(): Promise<number> {
+    const response = await axios.get(`${this._rpc}/wallet/getnowblock`);
+    return Number(response.data['block_header']['raw_data']['number']);
+  }
+
+  public async getBlockByNumber(blockNumber: number): Promise<any> {
+    const response = await axios.post(
+      `${this._rpc}/wallet/getblockbynum`,
+      {
+        num: blockNumber,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    return response.data;
+  }
+}

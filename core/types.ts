@@ -25,7 +25,7 @@ export interface EnvConfig {
   };
 }
 
-export type ChainFamily = 'bitcore' | 'evm' | 'near' | 'cosmos';
+export type ChainFamily = 'bitcore' | 'evm' | 'near' | 'cosmos' | 'tron';
 export type ChainNetwork = 'mainnet' | 'testnet';
 
 export interface ChainConfig {

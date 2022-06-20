@@ -4,7 +4,7 @@ import logger from '../../../core/logger';
 import { IChainProvider } from '../../../core/namespaces';
 import { ChainConfig } from '../../../core/types';
 import { EvmChainProvider } from '../../../providers';
-import { BitcoreChainProvider, NearChainProvider } from '../../../providers/blockchain';
+import { BitcoreChainProvider, NearChainProvider, TronChainProvider } from '../../../providers/blockchain';
 import { InitialBlockSync } from '../configs';
 import * as helpers from '../helpers';
 import { BlockInfo, ChainDateData, IBlockSyncProvider, RunAggregatorArgv, RunCollectorArgv } from '../types';
@@ -24,6 +24,10 @@ class AnychainBlockSyncService implements IBlockSyncProvider {
       }
       case 'near': {
         this.chainProvider = new NearChainProvider({ rpc: this.chainConfig.nodeRpcs.default });
+        break;
+      }
+      case 'tron': {
+        this.chainProvider = new TronChainProvider({ rpc: this.chainConfig.nodeRpcs.default });
         break;
       }
       default: {

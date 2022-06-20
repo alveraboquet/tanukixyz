@@ -278,6 +278,15 @@ export const Blockchains: Array<ChainConfig> = [
     },
     nativeToken: TokenList.LTC,
   },
+  {
+    network: 'mainnet',
+    family: 'tron',
+    name: 'tron',
+    nodeRpcs: {
+      default: `https://api.trongrid.io/`,
+    },
+    nativeToken: TokenList.TRX,
+  },
 ];
 
 export function getChainConfig(name: string): ChainConfig {

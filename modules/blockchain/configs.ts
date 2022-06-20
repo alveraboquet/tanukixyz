@@ -3,6 +3,7 @@ export const InitialBlockSync: { [key: string]: number } = {
   ethereum: 14850894,
   bitcoin: 738055,
   litecoin: 2263655, // May 16, 2022 2:32 AMUTC
+  tron: 41535500,
   avalanche: 15221749,
   polygon: 28811006,
   binance: 14850894,

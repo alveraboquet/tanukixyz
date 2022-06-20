@@ -61,4 +61,9 @@ export const TokenList: { [key: string]: TokenConfig } = {
     symbol: 'LTC',
     coingeckoId: 'litecoin',
   },
+  TRX: {
+    name: 'tron',
+    symbol: 'TRX',
+    coingeckoId: 'tron',
+  },
 };
