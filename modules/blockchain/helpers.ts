@@ -50,10 +50,10 @@ async function summarizeBlockDataRange(
   }
 
   // get USD volume at that time
-  // if (blocks.length > 0 && chain.nativeToken && chain.nativeToken.coingeckoId) {
-  //   const price = await getHistoryTokenPriceFromCoingecko(chain.nativeToken.coingeckoId, blocks[0].timestamp);
-  //   data.transferVolumeUSD = data.transferVolume * price;
-  // }
+  if (blocks.length > 0 && chain.nativeToken && chain.nativeToken.coingeckoId) {
+    const price = await getHistoryTokenPriceFromCoingecko(chain.nativeToken.coingeckoId, blocks[0].timestamp);
+    data.transferVolumeUSD = data.transferVolume * price;
+  }
 
   return data;
 }

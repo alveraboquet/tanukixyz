@@ -32,17 +32,16 @@ export async function getHistoryTokenPriceFromCoingecko(coingeckoId: string, tim
   const day = Number(dmy[2]) > 9 ? Number(dmy[2]) : `0${Number(dmy[2])}`;
   const month = Number(dmy[1]) > 9 ? Number(dmy[1]) : `0${Number(dmy[1])}`;
   try {
-    await sleep(1); // avoid coingecko limit
     const response = await axios.get(
-      `https://api.coingecko.com/api/v3/coins/${coingeckoId}/history?date=${day}-${month}-${dmy[0]}`
+      `https://oracle.tanukixyz.com/api/tokenstats?coingeckoId=${coingeckoId}&timestamp=${timestamp}`
     );
-    if (response.data) {
-      return Number(response.data['market_data']['current_price']['usd']);
+    if (response.data && response.data['data']) {
+      return Number(response.data['data']['priceUSD']);
     }
   } catch (e: any) {}
 
   logger.onDebug({
-    source: 'coingecko.helper',
+    source: 'helper',
     message: 'get history token price return zero',
     props: {
       coingeckoId: coingeckoId,
