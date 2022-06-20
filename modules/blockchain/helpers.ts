@@ -1,4 +1,4 @@
-import {getHistoryTokenPriceFromCoingecko, getTimestamp} from '../../core/helper';
+import { getHistoryTokenPriceFromCoingecko, getTimestamp } from '../../core/helper';
 import { ChainConfig } from '../../core/types';
 import { ChainDateData, CollectionProps } from './types';
 
@@ -18,7 +18,7 @@ async function summarizeBlockDataRange(
         $lt: toTime,
       },
     })
-    .sort({timestamp: -1})
+    .sort({ timestamp: -1 })
     .toArray();
 
   const data: ChainDateData = {

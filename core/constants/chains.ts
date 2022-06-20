@@ -1,6 +1,6 @@
 import envConfig from '../env';
 import { ChainConfig } from '../types';
-import {TokenList} from "./tokens";
+import { TokenList } from './tokens';
 
 const ALCHEMY_KEY = envConfig.apiKeys.alchemy;
 const MORALIS_KEY = envConfig.apiKeys.moralis;

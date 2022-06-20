@@ -1,4 +1,5 @@
 import DatabaseProvider from '../providers/database';
+import PolygonProvider from '../providers/polygon';
 import GraphProvider from '../providers/thegraph';
 
 export interface EnvConfig {
@@ -17,6 +18,7 @@ export interface EnvConfig {
     alchemy: string;
     getblock: string;
     moralis: string;
+    polygonio: string;
   };
   env: {
     timezone: string;
@@ -51,6 +53,7 @@ export interface ChainConfig {
 export interface ShareProviders {
   database: DatabaseProvider;
   subgraph: GraphProvider;
+  polygon: PolygonProvider;
 }
 
 export interface CoreData {
