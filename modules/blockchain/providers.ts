@@ -1,12 +1,14 @@
 import { getChainConfig } from '../../core/constants/chains';
 import BitcoreBlockSyncService from './sdk/bitcore';
 import EvmBlockSyncService from './sdk/evm';
+import LitecoreBlockSyncService from './sdk/litecore';
 import NearBlockSyncService from './sdk/near';
 import { IBlockSyncProvider } from './types';
 
 export const BlockSyncProviders: { [key: string]: IBlockSyncProvider | null } = {
   // bitcore family
   bitcoin: new BitcoreBlockSyncService(getChainConfig('bitcoin')),
+  litecoin: new LitecoreBlockSyncService(getChainConfig('litecoin')),
 
   // near family
   near: new NearBlockSyncService(getChainConfig('near')),

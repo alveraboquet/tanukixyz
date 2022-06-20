@@ -56,4 +56,9 @@ export const TokenList: { [key: string]: TokenConfig } = {
     symbol: 'FUSE',
     coingeckoId: 'fuse-network-token',
   },
+  LTC: {
+    name: 'litecoin',
+    symbol: 'LTC',
+    coingeckoId: 'litecoin',
+  },
 };

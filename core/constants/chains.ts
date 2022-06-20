@@ -269,6 +269,15 @@ export const Blockchains: Array<ChainConfig> = [
       default: 'api.cosmos.network',
     },
   },
+  {
+    network: 'mainnet',
+    family: 'bitcore',
+    name: 'litecoin',
+    nodeRpcs: {
+      default: `https://ltc.getblock.io/rest`,
+    },
+    nativeToken: TokenList.LTC,
+  },
 ];
 
 export function getChainConfig(name: string): ChainConfig {
