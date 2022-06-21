@@ -1,5 +1,6 @@
 import AaveV2LendingPoolAbi from '../../core/abi/aave/AaveV2LendingPool.json';
 import AaveV3LendingPoolAbi from '../../core/abi/aave/AaveV3LendingPool.json';
+import BorrowOperation from '../../core/abi/liquity/BorrowOperation.json';
 import { getChainConfig } from '../../core/constants/chains';
 import { AaveV2AvaxPools } from './constants/aavev2AvaxPools';
 import { AaveV2EthPools } from './constants/aavev2EthPools';
@@ -163,6 +164,25 @@ export const LendingConfigs: { [key: string]: LendingConfig } = {
         chainConfig: getChainConfig('aurora'),
         birthday: 1609459200, // Fri Jan 01 2021 00:00:00 GMT+0000
         pools: BastionAuroraPools,
+      },
+    ],
+  },
+  liquity: {
+    name: 'liquity',
+    configs: [
+      {
+        chainConfig: getChainConfig('ethereum'),
+        birthday: 1617580800, // Mon Apr 05 2021 00:00:00 GMT+0000
+        pools: [
+          {
+            abi: BorrowOperation,
+            poolAddress: '0x24179CD81c9e782A4096035f7eC97fB8B783e007',
+            genesisBlock: 12178582,
+            underlyingSymbol: 'ETH',
+            underlyingDecimals: 18,
+            underlyingCoingeckoId: 'ethereum',
+          },
+        ],
       },
     ],
   },

@@ -58,6 +58,9 @@ export interface ILendingProvider extends Provider {
   // get the liquidity locked in contract
   getLiquidityLocked?: (props: any) => Promise<any>;
 
+  // summarize events data
+  summarizeDataEvents?: (lendingConfig: LendingConfig, allEvents: Array<any>) => Promise<any>;
+
   // start the collector process
   runCollector: (options: RunLendingCollectorArgv) => Promise<any>;
 

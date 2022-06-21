@@ -33,6 +33,10 @@ class LendingProvider implements ILendingProvider {
     return 0;
   }
 
+  public async summarizeDataEvents(lendingConfig: LendingConfig, allEvents: Array<any>): Promise<any> {
+    return null;
+  }
+
   public async runAggregator(options: RunLendingAggregatorArgv): Promise<any> {
     const { providers, initialDate, forceSync } = options;
 
@@ -71,7 +75,7 @@ class LendingProvider implements ILendingProvider {
         .sort({ timestamp: -1 }) // we can get the latest event by index 0
         .toArray();
 
-      const summarizeData: LendingData = await helpers.summarizeDataEvents(this.lendingConfig, last24HoursEvents);
+      const summarizeData: LendingData = await this.summarizeDataEvents(this.lendingConfig, last24HoursEvents);
       dailyData.supplyVolumeUSD += summarizeData.supplyVolumeUSD;
       dailyData.withdrawVolumeUSD += summarizeData.withdrawVolumeUSD;
       dailyData.borrowVolumeUSD += summarizeData.borrowVolumeUSD;
@@ -159,7 +163,7 @@ class LendingProvider implements ILendingProvider {
           .sort({ timestamp: -1 }) // we can get the latest event by index 0
           .toArray();
 
-        const summarizeData: LendingData = await helpers.summarizeDataEvents(this.lendingConfig, dateEvents);
+        const summarizeData: LendingData = await this.summarizeDataEvents(this.lendingConfig, dateEvents);
         dateData.supplyVolumeUSD += summarizeData.supplyVolumeUSD;
         dateData.withdrawVolumeUSD += summarizeData.withdrawVolumeUSD;
         dateData.borrowVolumeUSD += summarizeData.borrowVolumeUSD;
