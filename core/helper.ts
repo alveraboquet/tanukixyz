@@ -27,10 +27,6 @@ export function getStartDayTimestamp(timestamp: number) {
 }
 
 export async function getHistoryTokenPriceFromCoingecko(coingeckoId: string, timestamp: number): Promise<number> {
-  const theDate = new Date(timestamp * 1000);
-  const dmy = theDate.toISOString().split('T')[0].split('-');
-  const day = Number(dmy[2]) > 9 ? Number(dmy[2]) : `0${Number(dmy[2])}`;
-  const month = Number(dmy[1]) > 9 ? Number(dmy[1]) : `0${Number(dmy[1])}`;
   try {
     const response = await axios.get(
       `https://oracle.tanukixyz.com/api/tokenstats?coingeckoId=${coingeckoId}&timestamp=${timestamp}`
