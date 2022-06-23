@@ -186,4 +186,17 @@ export const LendingConfigs: { [key: string]: LendingConfig } = {
       },
     ],
   },
+  euler: {
+    name: 'euler',
+    configs: [
+      {
+        chainConfig: getChainConfig('ethereum'),
+        birthday: 1639267200, // Sun Dec 12 2021 00:00:00 GMT+0000
+        pools: [],
+        graphConfig: {
+          lending: 'https://api.thegraph.com/subgraphs/name/euler-xyz/euler-mainnet',
+        },
+      },
+    ],
+  },
 };

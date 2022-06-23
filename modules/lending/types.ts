@@ -29,6 +29,11 @@ export interface LendingConfig {
     // aave-liked lendings use single entry lending pool for all assets
     // this config used for aave liked lendings only
     lendingPool?: AaveLendingPoolConfig;
+
+    // some project just sync data from the graph such as euler.finance
+    graphConfig?: {
+      lending: string;
+    };
   }>;
 }
 

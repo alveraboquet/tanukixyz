@@ -1,6 +1,7 @@
 import { LendingConfigs } from './constants';
 import AaveProvider from './projects/aave';
 import CompoundProvider from './projects/compound';
+import EulerProvider from './projects/euler';
 import LiquityProvider from './projects/liquity';
 import { ILendingProvider } from './types';
 
@@ -15,6 +16,7 @@ export const LendingProviders: { [key: string]: ILendingProvider | null } = {
   scream: new CompoundProvider(LendingConfigs.scream),
   aurigami: new CompoundProvider(LendingConfigs.aurigami),
   bastion: new CompoundProvider(LendingConfigs.bastion),
+  euler: new EulerProvider(LendingConfigs.euler),
 };
 
 export function getLendingProviderList() {
