@@ -10,6 +10,7 @@ export interface EnvConfig {
       globalState: string;
       globalDataDaily: string;
       globalDataDate: string;
+      globalContractEvents: string;
       blockchainBlockSync: string;
       lendingEventSync: string;
     };

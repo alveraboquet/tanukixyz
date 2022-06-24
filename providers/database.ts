@@ -82,10 +82,13 @@ class DatabaseProvider implements Provider {
     const stateCollection = await this.getCollection(envConfig.database.collections.globalState);
     const dataDailyCollection = await this.getCollection(envConfig.database.collections.globalDataDaily);
     const dataDateCollection = await this.getCollection(envConfig.database.collections.globalDataDate);
+    const eventCollection = await this.getCollection(envConfig.database.collections.globalContractEvents);
 
     stateCollection.createIndex({ name: 1 }, { background: true });
     dataDailyCollection.createIndex({ module: 1 }, { background: true });
     dataDateCollection.createIndex({ module: 1, name: 1, date: 1 }, { background: true });
+    eventCollection.createIndex({ contract: 1, event: 1, transactionId: 1 }, { background: true });
+    eventCollection.createIndex({ contract: 1, timestamp: 1 }, { background: true });
   }
 }
 

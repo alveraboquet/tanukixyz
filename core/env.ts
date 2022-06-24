@@ -14,6 +14,7 @@ const envConfig: EnvConfig = {
       globalState: 'tanukixyz.syncstate',
       globalDataDaily: 'tanukixyz.data.daily',
       globalDataDate: 'tanukixyz.data.date',
+      globalContractEvents: 'tanukixyz.contract.events',
 
       blockchainBlockSync: 'tanukixyz.chain.blocks',
       lendingEventSync: 'tanukixyz.lending.events',

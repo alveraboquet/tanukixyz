@@ -10,9 +10,10 @@ Tanuki is a blockchain and defi data and analytic platform. For more information
 
 ## Modules
 
-| Name           | What does it do?                                                       | Docs                              |
-| -------------- | ---------------------------------------------------------------------- | --------------------------------- |
-| API            | Http rest API server serve all data queries on the platform            | [API Docs](./docs/readme.md)      |
-| Blockchain     | Tracks blockchain metrics such as blocks, addresses, transactions, ... | [Documentation](./docs/readme.md) |
-| D-Exchange     | Tracks DEX metrics such liquidity, volume, fees, ...                   | [Documentation](./docs/readme.md) |
-| Borrow/Lending | Tracks lending metrics such liquidity, volume, ...                     | [Documentation](./docs/readme.md) |
+| Name           | What does it do?                                                       | Docs                                    |
+| -------------- | ---------------------------------------------------------------------- | --------------------------------------- |
+| API            | Http rest API server serve all data queries on the platform            | [API Docs](./docs/readme.md)            |
+| Event Indexer  | Index contract events from blockchains                                 | [API Docs](./modules/indexer/readme.md) |
+| Blockchain     | Tracks blockchain metrics such as blocks, addresses, transactions, ... | [Documentation](./docs/readme.md)       |
+| D-Exchange     | Tracks DEX metrics such liquidity, volume, fees, ...                   | [Documentation](./docs/readme.md)       |
+| Borrow/Lending | Tracks lending metrics such liquidity, volume, ...                     | [Documentation](./docs/readme.md)       |

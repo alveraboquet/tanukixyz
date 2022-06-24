@@ -2,6 +2,7 @@ import yargs from 'yargs/yargs';
 
 import { ChainCommand } from './subs/ChainCommand';
 import { DexCommand } from './subs/DexCommand';
+import { IndexerCommand } from './subs/IndexerCommand';
 import { LendingCommand } from './subs/LendingCommand';
 import { RestCommand } from './subs/RestCommand';
 
@@ -10,6 +11,7 @@ import { RestCommand } from './subs/RestCommand';
   const dexCmd = new DexCommand();
   const restCmd = new RestCommand();
   const lendingCmd = new LendingCommand();
+  const indexerCmd = new IndexerCommand();
 
   yargs(process.argv.slice(2))
     .scriptName('tanukixyz')
@@ -17,5 +19,6 @@ import { RestCommand } from './subs/RestCommand';
     .command(chainCmd.name, chainCmd.describe, chainCmd.setOptions, chainCmd.execute)
     .command(dexCmd.name, dexCmd.describe, dexCmd.setOptions, dexCmd.execute)
     .command(lendingCmd.name, lendingCmd.describe, lendingCmd.setOptions, lendingCmd.execute)
+    .command(indexerCmd.name, indexerCmd.describe, indexerCmd.setOptions, indexerCmd.execute)
     .help().argv;
 })();
