@@ -1,4 +1,5 @@
 import LiquityBorrowOperationAbi from '../../../core/abi/liquity/BorrowOperation.json';
+import LiquityTroveManagerAbi from '../../../core/abi/liquity/TroveManager.json';
 import { getChainConfig } from '../../../core/constants/chains';
 import { IndexConfig } from '../types';
 
@@ -11,6 +12,13 @@ const LiquityConfigs: Array<IndexConfig> = [
     contractAddress: '0x24179CD81c9e782A4096035f7eC97fB8B783e007', // Borrow Operations
     contractBirthday: SyncFromBlock,
     events: ['TroveCreated', 'TroveUpdated', 'LUSDBorrowingFeePaid'],
+  },
+  {
+    chainConfig: getChainConfig('ethereum'),
+    contractAbi: LiquityTroveManagerAbi,
+    contractAddress: '0xa39739ef8b0231dbfa0dcda07d7e29faabcf4bb2', // Trove Manager
+    contractBirthday: SyncFromBlock,
+    events: ['TroveLiquidated', 'Liquidation'],
   },
 ];
 
