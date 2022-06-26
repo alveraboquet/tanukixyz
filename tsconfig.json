@@ -15,6 +15,6 @@
     "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */,
     "resolveJsonModule": true
   },
-  "include": ["core/**/*.ts", "providers/**/*.ts", "cmd/**/*.ts", "modules/**/*.ts", "scripts/**/*.ts"],
+  "include": ["core/**/*.ts", "providers/**/*.ts", "cmd/**/*.ts", "modules/**/*.ts", "scripts/**/*.ts", "restapi/**/*.ts"],
   "exclude": ["node_modules"]
 }
