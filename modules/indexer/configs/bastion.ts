@@ -4,7 +4,7 @@ import { IndexConfig } from '../types';
 const AuroraSyncFromBlock = 56403927; // Dec-31-2021 05:27:38 PM +UTC
 
 const BastionConfigs: Array<IndexConfig> = [
-  // avalanche
+  // aurora
   getCompoundPoolEtherIndexConfig('aurora', '0x4E8fE8fd314cFC09BDb0942c5adCC37431abDCD0', AuroraSyncFromBlock), // ETH
   getCompoundPoolTokenIndexConfig('aurora', '0xfa786baC375D8806185555149235AcDb182C033b', AuroraSyncFromBlock), // WBTC
   getCompoundPoolTokenIndexConfig('aurora', '0x8C14ea853321028a7bb5E4FB0d0147F183d3B677', AuroraSyncFromBlock), // NEAR

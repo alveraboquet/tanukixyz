@@ -32,7 +32,7 @@ export const AurigamiAuroraPools: Array<LendingPool> = [
     genesisBlock: 60501723,
     poolAddress: '0xaD5A2437Ff55ed7A8Cad3b797b3eC7c5a19B1c54',
     underlyingSymbol: 'USDT',
-    underlyingDecimals: 8,
+    underlyingDecimals: 6,
     underlyingCoingeckoId: 'tether',
   },
   {
