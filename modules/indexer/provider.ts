@@ -29,7 +29,7 @@ export class EventIndexerProvider implements Provider {
     let beautyEvents: Array<any> = [];
     for (let eventIdx = 0; eventIdx < this.config.events.length; eventIdx++) {
       beautyEvents = beautyEvents.concat(
-        await EventIndexerProvider.getEvent(this.config.events[eventIdx], this.config, fromBlock, toBlock)
+        await this.getEvent(this.config.events[eventIdx], this.config, fromBlock, toBlock)
       );
     }
 
@@ -40,17 +40,28 @@ export class EventIndexerProvider implements Provider {
     const eventCollection = await this.providers.database.getCollection(
       envConfig.database.collections.globalContractEvents
     );
+    const stateCollection = await this.providers.database.getCollection(envConfig.database.collections.globalState);
 
     let startBlock = this.config.contractBirthday;
-    const latestEventsFromDb = await eventCollection
+    const stateFromDb = await stateCollection
       .find({
-        contract: normalizeAddress(this.config.contractAddress),
+        name: `indexer-events-${this.config.chainConfig.name}-${normalizeAddress(this.config.contractAddress)}`,
       })
-      .sort({ timestamp: -1 })
       .limit(1)
       .toArray();
-    if (latestEventsFromDb.length > 0) {
-      startBlock = startBlock > latestEventsFromDb[0].blockNumber ? startBlock : latestEventsFromDb[0].blockNumber;
+    if (stateFromDb.length > 0) {
+      startBlock = startBlock > stateFromDb[0].blockNumber ? startBlock : stateFromDb[0].blockNumber;
+    } else {
+      const latestEventsFromDb = await eventCollection
+        .find({
+          contract: normalizeAddress(this.config.contractAddress),
+        })
+        .sort({ timestamp: -1 })
+        .limit(1)
+        .toArray();
+      if (latestEventsFromDb.length > 0) {
+        startBlock = startBlock > latestEventsFromDb[0].blockNumber ? startBlock : latestEventsFromDb[0].blockNumber;
+      }
     }
 
     const web3 = new Web3(this.config.chainConfig.nodeRpcs.default);
@@ -84,15 +95,31 @@ export class EventIndexerProvider implements Provider {
         await eventCollection.bulkWrite(operations);
       }
 
+      // save state to db
+      await stateCollection.updateOne(
+        {
+          name: `indexer-events-${this.config.chainConfig.name}-${normalizeAddress(this.config.contractAddress)}`,
+        },
+        {
+          $set: {
+            name: `indexer-events-${this.config.chainConfig.name}-${normalizeAddress(this.config.contractAddress)}`,
+            blockNumber: toBlock,
+          },
+        },
+        {
+          upsert: true,
+        }
+      );
+
       const endExeTime = Math.floor(new Date().getTime() / 1000);
       const elapsed = endExeTime - startExeTime;
 
       logger.onInfo({
         source: this.name,
-        message: 'collected contract events',
+        message: `collected ${operations.length} contract events`,
         props: {
+          chain: this.config.chainConfig.name,
           contract: normalizeAddress(this.config.contractAddress),
-          events: operations.length,
           fromBlock: startBlock,
           toBlock: toBlock,
           elapsed: `${elapsed}s`,
@@ -103,7 +130,7 @@ export class EventIndexerProvider implements Provider {
     }
   }
 
-  private static async getEvent(
+  private async getEvent(
     event: string,
     config: IndexConfig,
     fromBlock: number,
@@ -120,7 +147,17 @@ export class EventIndexerProvider implements Provider {
       for (let i = 0; i < events.length; i++) {
         let timestamp = blockTimestamps[events[i].blockNumber];
         if (timestamp === undefined) {
-          const block = await web3.eth.getBlock(events[i].blockNumber, false);
+          const block = await web3.eth.getBlock(Number(events[i].blockNumber), false);
+          if (block === null) {
+            logger.onDebug({
+              source: this.name,
+              message: 'failed to get block data',
+              props: {
+                chain: config.chainConfig.name,
+                blockNumber: events[i].blockNumber,
+              },
+            });
+          }
           blockTimestamps[events[i].blockNumber] = block.timestamp;
           timestamp = block.timestamp;
         }
@@ -142,9 +179,11 @@ export class EventIndexerProvider implements Provider {
         source: this.name,
         message: 'failed to get contract events, skipped',
         props: {
+          chain: config.chainConfig.name,
           contract: normalizeAddress(config.contractAddress),
           fromBlock: fromBlock,
           toBlock: toBlock,
+          error: e.message,
         },
       });
       return [];

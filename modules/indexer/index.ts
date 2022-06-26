@@ -50,6 +50,7 @@ class IndexerModule {
       source: 'module.indexer',
       message: 'start events indexer service',
       props: {
+        chain: config.chainConfig.name,
         contract: normalizeAddress(config.contractAddress),
         events: config.events.toString(),
       },
