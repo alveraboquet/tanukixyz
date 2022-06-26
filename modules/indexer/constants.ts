@@ -1,3 +1,4 @@
+import AurigamiConfigs from './configs/aurigami';
 import BastionConfigs from './configs/bastion';
 import BenqiConfigs from './configs/benqi';
 import CompoundConfigs from './configs/compound';
@@ -17,6 +18,7 @@ const IndexConfigs: { [key: string]: Array<IndexConfig> } = {
   traderjoe: TraderJoeConfigs,
   benqi: BenqiConfigs,
   bastion: BastionConfigs,
+  aurigami: AurigamiConfigs,
 };
 
 export default IndexConfigs;
