@@ -33,7 +33,7 @@ export const Blockchains: Array<ChainConfig> = [
     name: 'avalanche',
     nodeRpcs: {
       default: 'https://api.avax.network/ext/bc/C/rpc',
-      archive: `https://speedy-nodes-nyc.moralis.io/${MORALIS_KEY}/avalanche/mainnet`,
+      archive: `https://rpc.ankr.com/avalanche`,
       event: 'https://api.avax.network/ext/bc/C/rpc',
     },
     blockSubgraph: 'https://api.thegraph.com/subgraphs/name/dasconnor/avalanche-blocks',
@@ -45,7 +45,7 @@ export const Blockchains: Array<ChainConfig> = [
     name: 'polygon',
     nodeRpcs: {
       default: 'https://rpc.ankr.com/polygon',
-      archive: `https://speedy-nodes-nyc.moralis.io/${MORALIS_KEY}/polygon/mainnet`,
+      archive: `https://rpc.ankr.com/polygon`,
       event: 'https://rpc.ankr.com/polygon',
     },
     blockSubgraph: 'https://api.thegraph.com/subgraphs/name/matthewlilley/polygon-blocks',
@@ -69,7 +69,7 @@ export const Blockchains: Array<ChainConfig> = [
     name: 'binance',
     nodeRpcs: {
       default: 'https://bscrpc.com',
-      archive: `https://speedy-nodes-nyc.moralis.io/${MORALIS_KEY}/bsc/mainnet`,
+      archive: `https://bscrpc.com`,
       event: 'https://bscrpc.com',
     },
     blockSubgraph: 'https://api.thegraph.com/subgraphs/name/matthewlilley/bsc-blocks',
