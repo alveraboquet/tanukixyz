@@ -23,7 +23,6 @@ const envConfig: EnvConfig = {
   apiKeys: {
     alchemy: String(process.env.TANUKI_ALCHEMY_API_KEY),
     getblock: String(process.env.TANUKI_GETBLOCK_API_KEY),
-    moralis: String(process.env.TANUKI_MORALIS_API_KEY),
     polygonio: String(process.env.TANUKI_POLYGONIO_API_KEY),
   },
   env: {

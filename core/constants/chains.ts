@@ -3,7 +3,6 @@ import { ChainConfig } from '../types';
 import { TokenList } from './tokens';
 
 const ALCHEMY_KEY = envConfig.apiKeys.alchemy;
-const MORALIS_KEY = envConfig.apiKeys.moralis;
 
 export const Blockchains: Array<ChainConfig> = [
   {
@@ -69,7 +68,7 @@ export const Blockchains: Array<ChainConfig> = [
     name: 'binance',
     nodeRpcs: {
       default: 'https://bscrpc.com',
-      archive: `https://bscrpc.com`,
+      archive: `https://rpc.ankr.com/bsc`,
       event: 'https://bscrpc.com',
     },
     blockSubgraph: 'https://api.thegraph.com/subgraphs/name/matthewlilley/bsc-blocks',

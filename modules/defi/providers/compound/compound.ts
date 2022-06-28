@@ -134,17 +134,29 @@ class CompoundProvider extends DefiProvider {
         }
       }
 
-      // count liquidity
-      const contract = new web3.eth.Contract(CompoundLendAbi as any, poolConfig.poolAddress);
-      const totalCash = await contract.methods.getCash().call(events[0].blockNumber);
-      const totalBorrows = await contract.methods.totalBorrows().call(events[0].blockNumber);
-      const totalReserves = await contract.methods.totalReserves().call(events[0].blockNumber);
-      const underlyingLiquidity = new BigNumber(totalCash.toString())
-        .plus(new BigNumber(totalBorrows.toString()))
-        .minus(new BigNumber(totalReserves.toString()))
-        .dividedBy(new BigNumber(10).pow(poolConfig.underlyingDecimals))
-        .toNumber();
-      dateData.totalValueLockedUSD += underlyingLiquidity * historyPrice;
+      try {
+        // count liquidity
+        const contract = new web3.eth.Contract(CompoundLendAbi as any, poolConfig.poolAddress);
+        const totalCash = await contract.methods.getCash().call(events[0].blockNumber);
+        const totalBorrows = await contract.methods.totalBorrows().call(events[0].blockNumber);
+        const totalReserves = await contract.methods.totalReserves().call(events[0].blockNumber);
+        const underlyingLiquidity = new BigNumber(totalCash.toString())
+          .plus(new BigNumber(totalBorrows.toString()))
+          .minus(new BigNumber(totalReserves.toString()))
+          .dividedBy(new BigNumber(10).pow(poolConfig.underlyingDecimals))
+          .toNumber();
+        dateData.totalValueLockedUSD += underlyingLiquidity * historyPrice;
+      } catch (e: any) {
+        logger.onDebug({
+          source: this.name,
+          message: 'cannot query history tvl',
+          props: {
+            chain: poolConfig.chainConfig.name,
+            contract: normalizeAddress(poolConfig.poolAddress),
+            error: e.message,
+          }
+        })
+      }
     }
 
     return dateData;

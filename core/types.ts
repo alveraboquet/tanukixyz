@@ -18,7 +18,6 @@ export interface EnvConfig {
   apiKeys: {
     alchemy: string;
     getblock: string;
-    moralis: string;
     polygonio: string;
   };
   env: {
