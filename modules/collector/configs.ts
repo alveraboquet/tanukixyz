@@ -1,5 +1,7 @@
 import { AurigamiConfigs } from '../../configs/protocols/aurigami';
+import { BalancerConfigs } from '../../configs/protocols/balancer';
 import { BastionConfigs } from '../../configs/protocols/bastion';
+import { BeetsConfigs } from '../../configs/protocols/beets';
 import { BenqiConfigs } from '../../configs/protocols/benqi';
 import { CompoundConfigs } from '../../configs/protocols/compound';
 import { CreamConfigs } from '../../configs/protocols/cream';
@@ -12,6 +14,7 @@ import { SushiswapConfigs } from '../../configs/protocols/sushiswap';
 import { TraderJoeExchangeConfigs, TraderJoeLendingConfigs } from '../../configs/protocols/traderjoe';
 import { UniswapV2Configs } from '../../configs/protocols/uniswap';
 import { VenusConfigs } from '../../configs/protocols/venus';
+import { BalancerProvider } from './providers/balancer/balancer';
 import CollectorProvider from './providers/collector';
 import CompoundProvider from './providers/compound/compound';
 import EulerProvider from './providers/euler/euler';
@@ -41,4 +44,6 @@ export const Providers: { [key: string]: CollectorProvider } = {
   sushiswap: new SushiswapProvider(SushiswapConfigs),
   spookyswap: new UniswapV2Provider(SpookyswapConfigs),
   pancakeswap: new PancakeswapProvider(PancakeswapConfigs),
+  balancer: new BalancerProvider(BalancerConfigs),
+  beets: new BalancerProvider(BeetsConfigs),
 };

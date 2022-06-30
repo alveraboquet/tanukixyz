@@ -93,3 +93,13 @@ export interface AaveProtocolConfig {
   tokenomics?: TokenConfig;
   pools: Array<EventIndexConfig>;
 }
+
+export interface BalancerProtocolConfig {
+  name: string;
+  tokenomics?: TokenConfig;
+  subgraphs: Array<{
+    version: 1 | 2;
+    chainConfig: ChainConfig;
+    exchange: string;
+  }>;
+}

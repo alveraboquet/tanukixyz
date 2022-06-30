@@ -5,6 +5,7 @@ import { BenqiConfigs } from '../../configs/protocols/benqi';
 import { CompoundConfigs } from '../../configs/protocols/compound';
 import { CreamConfigs } from '../../configs/protocols/cream';
 import { IronBankConfigs } from '../../configs/protocols/ironbank';
+import { LidoConfigs } from '../../configs/protocols/lido';
 import { LiquityConfigs } from '../../configs/protocols/liquity';
 import { TraderJoeLendingConfigs } from '../../configs/protocols/traderjoe';
 import { VenusConfigs } from '../../configs/protocols/venus';
@@ -21,6 +22,7 @@ const IndexConfigs: { [key: string]: Array<EventIndexConfig> } = {
   benqi: BenqiConfigs.pools,
   bastion: BastionConfigs.pools,
   aurigami: AurigamiConfigs.pools,
+  lido: LidoConfigs.stakingContract,
 };
 
 export default IndexConfigs;

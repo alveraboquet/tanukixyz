@@ -107,28 +107,28 @@ class CompoundProvider extends CollectorProvider {
         switch (events[i].event) {
           case 'Mint': {
             dateData.volumeInUseUSD += new BigNumber(events[i].returnValues.mintAmount)
-              .dividedBy(new BigNumber(10).pow(poolConfig.underlying.chains[this.configs.chainConfig.name].decimals))
+              .dividedBy(new BigNumber(10).pow(poolConfig.underlying.chains[poolConfig.chainConfig.name].decimals))
               .multipliedBy(historyPrice)
               .toNumber();
             break;
           }
           case 'Redeem': {
             dateData.volumeInUseUSD += new BigNumber(events[i].returnValues.redeemAmount)
-              .dividedBy(new BigNumber(10).pow(poolConfig.underlying.chains[this.configs.chainConfig.name].decimals))
+              .dividedBy(new BigNumber(10).pow(poolConfig.underlying.chains[poolConfig.chainConfig.name].decimals))
               .multipliedBy(historyPrice)
               .toNumber();
             break;
           }
           case 'Borrow': {
             dateData.volumeInUseUSD += new BigNumber(events[i].returnValues.borrowAmount)
-              .dividedBy(new BigNumber(10).pow(poolConfig.underlying.chains[this.configs.chainConfig.name].decimals))
+              .dividedBy(new BigNumber(10).pow(poolConfig.underlying.chains[poolConfig.chainConfig.name].decimals))
               .multipliedBy(historyPrice)
               .toNumber();
             break;
           }
           case 'RepayBorrow': {
             dateData.volumeInUseUSD += new BigNumber(events[i].returnValues.repayAmount)
-              .dividedBy(new BigNumber(10).pow(poolConfig.underlying.chains[this.configs.chainConfig.name].decimals))
+              .dividedBy(new BigNumber(10).pow(poolConfig.underlying.chains[poolConfig.chainConfig.name].decimals))
               .multipliedBy(historyPrice)
               .toNumber();
           }
@@ -144,7 +144,7 @@ class CompoundProvider extends CollectorProvider {
         const underlyingLiquidity = new BigNumber(totalCash.toString())
           .plus(new BigNumber(totalBorrows.toString()))
           .minus(new BigNumber(totalReserves.toString()))
-          .dividedBy(new BigNumber(10).pow(poolConfig.underlying.chains[this.configs.chainConfig.name].decimals))
+          .dividedBy(new BigNumber(10).pow(poolConfig.underlying.chains[poolConfig.chainConfig.name].decimals))
           .toNumber();
         dateData.totalValueLockedUSD += underlyingLiquidity * historyPrice;
       } catch (e: any) {

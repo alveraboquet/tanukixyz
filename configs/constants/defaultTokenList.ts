@@ -895,4 +895,14 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
       },
     },
   },
+  BAL: {
+    symbol: 'BAL',
+    coingeckoId: 'balancer',
+    chains: {
+      ethereum: {
+        decimals: 18,
+        address: '',
+      },
+    },
+  },
 };
