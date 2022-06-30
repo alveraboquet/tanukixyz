@@ -1,9 +1,9 @@
 import { Router } from 'express';
 
-import envConfig from '../../core/env';
-import { getTodayUTCTimestamp } from '../../core/helper';
-import logger from '../../core/logger';
-import { ShareProviders } from '../../core/types';
+import envConfig from '../../configs/env';
+import { getTodayUTCTimestamp } from '../../lib/helper';
+import logger from '../../lib/logger';
+import { ShareProviders } from '../../lib/types';
 import { getCache, setCache } from '../caching';
 import { removeIdFields, writeResponseData, writeResponseError } from '../helpers';
 

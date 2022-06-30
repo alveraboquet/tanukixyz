@@ -13,16 +13,16 @@ export class IndexerCommand extends BasicCommand {
     const providers = await super.getProviders();
     await indexerModule.run({
       providers,
-      project: argv.project,
+      protocol: argv.protocol,
     });
   }
 
   public setOptions(yargs: any) {
     return yargs.option({
-      project: {
+      protocol: {
         type: 'string',
         default: '',
-        describe: 'Run command with specify project name, ex: uniswap',
+        describe: 'Run command with specify protocol name, ex: uniswap',
       },
     });
   }

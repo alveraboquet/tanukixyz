@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import { ShareProviders } from '../core/types';
+import { ShareProviders } from '../lib/types';
 import * as metricRouter from './routes/metrics';
 
 export function getRouter(providers: ShareProviders): Router {

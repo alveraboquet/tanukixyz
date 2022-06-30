@@ -11,8 +11,6 @@
   },
   "dependencies": {
     "@polkadot/api": "^8.3.1",
-    "@solana/web3.js": "^1.37.1",
-    "@terra-money/terra.js": "^3.0.11",
     "@trivago/prettier-plugin-sort-imports": "^3.2.0",
     "@types/chai": "^4.3.1",
     "@types/cors": "^2.8.12",

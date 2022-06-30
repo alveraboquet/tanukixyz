@@ -1,8 +1,7 @@
-import { YargsCommand } from '../core/namespaces';
-import { ShareProviders } from '../core/types';
-import { DatabaseProvider, GraphProvider, PolygonProvider } from '../providers';
+import { DatabaseProvider, GraphProvider } from '../lib/providers';
+import { ShareProviders } from '../lib/types';
 
-export class BasicCommand implements YargsCommand {
+export class BasicCommand {
   public readonly name: string = 'command';
   public readonly describe: string = 'Basic command';
 
@@ -12,7 +11,6 @@ export class BasicCommand implements YargsCommand {
     const providers: ShareProviders = {
       database: new DatabaseProvider(),
       subgraph: new GraphProvider(),
-      polygon: new PolygonProvider(),
     };
 
     await providers.database.connect();

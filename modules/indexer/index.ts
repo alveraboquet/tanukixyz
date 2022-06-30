@@ -1,25 +1,25 @@
-import { normalizeAddress, sleep } from '../../core/helper';
-import logger from '../../core/logger';
-import { ShareProviders } from '../../core/types';
-import IndexConfigs from './constants';
+import { EventIndexConfig } from '../../configs/types';
+import { normalizeAddress, sleep } from '../../lib/helper';
+import logger from '../../lib/logger';
+import { ShareProviders } from '../../lib/types';
+import IndexConfigs from './configs';
 import { EventIndexerProvider } from './provider';
-import { IndexConfig } from './types';
 
 export interface RunIndexerArgv {
   providers: ShareProviders;
-  project: string;
+  protocol: string;
 }
 
 class IndexerModule {
   public async run(argv: RunIndexerArgv): Promise<void> {
-    if (argv.project !== '') {
-      const configs = IndexConfigs[argv.project];
+    if (argv.protocol !== '') {
+      const configs = IndexConfigs[argv.protocol];
       if (!configs) {
         logger.onError({
           source: 'module.indexer',
-          message: 'project not found',
+          message: 'protocol not found',
           props: {
-            project: argv.project,
+            project: argv.protocol,
           },
         });
         process.exit(0);
@@ -45,7 +45,7 @@ class IndexerModule {
     }
   }
 
-  private static async startWithConfig(providers: ShareProviders, config: IndexConfig): Promise<void> {
+  private static async startWithConfig(providers: ShareProviders, config: EventIndexConfig): Promise<void> {
     logger.onInfo({
       source: 'module.indexer',
       message: 'start events indexer service',

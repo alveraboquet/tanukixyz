@@ -2,7 +2,7 @@ import cors from 'cors';
 import express from 'express';
 import path from 'path';
 
-import logger from '../../core/logger';
+import logger from '../../lib/logger';
 import getRouter from '../../restapi';
 import { BasicCommand } from '../basic';
 

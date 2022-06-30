@@ -1,11 +1,11 @@
 import Web3 from 'web3';
 
-import envConfig from '../../core/env';
-import { normalizeAddress } from '../../core/helper';
-import logger from '../../core/logger';
-import { Provider } from '../../core/namespaces';
-import { ShareProviders } from '../../core/types';
-import { EventRawData, IndexConfig } from './types';
+import envConfig from '../../configs/env';
+import { EventIndexConfig } from '../../configs/types';
+import { normalizeAddress } from '../../lib/helper';
+import logger from '../../lib/logger';
+import { ContractEventRawData } from '../../lib/types';
+import { Provider, ShareProviders } from '../../lib/types';
 
 export interface StartEventIndexerProps {}
 export interface GetEventsProps {
@@ -16,14 +16,14 @@ export interface GetEventsProps {
 export class EventIndexerProvider implements Provider {
   public readonly name: string = 'provider.indexer';
   public readonly providers: ShareProviders;
-  public readonly config: IndexConfig;
+  public readonly config: EventIndexConfig;
 
-  constructor(providers: ShareProviders, config: IndexConfig) {
+  constructor(providers: ShareProviders, config: EventIndexConfig) {
     this.providers = providers;
     this.config = config;
   }
 
-  public async getEvents(props: GetEventsProps): Promise<Array<EventRawData>> {
+  public async getEvents(props: GetEventsProps): Promise<Array<ContractEventRawData>> {
     const { fromBlock, toBlock } = props;
 
     let beautyEvents: Array<any> = [];
@@ -69,22 +69,22 @@ export class EventIndexerProvider implements Provider {
     while (startBlock <= currentBlockNumber) {
       const startExeTime = Math.floor(new Date().getTime() / 1000);
       const toBlock = startBlock + 2000 > currentBlockNumber ? currentBlockNumber : startBlock + 2000;
-      const eventRawData: Array<EventRawData> = await this.getEvents({
+      const allEvents: Array<ContractEventRawData> = await this.getEvents({
         fromBlock: startBlock,
         toBlock,
       });
       const operations: Array<any> = [];
-      for (let i = 0; i < eventRawData.length; i++) {
+      for (let i = 0; i < allEvents.length; i++) {
         operations.push({
           updateOne: {
             filter: {
               contract: normalizeAddress(this.config.contractAddress),
-              event: eventRawData[i].event,
-              transactionId: eventRawData[i].transactionId,
+              event: allEvents[i].event,
+              transactionId: allEvents[i].transactionId,
             },
             update: {
               $set: {
-                ...eventRawData[i],
+                ...allEvents[i],
               },
             },
             upsert: true,
@@ -132,10 +132,10 @@ export class EventIndexerProvider implements Provider {
 
   private async getEvent(
     event: string,
-    config: IndexConfig,
+    config: EventIndexConfig,
     fromBlock: number,
     toBlock: number
-  ): Promise<Array<EventRawData>> {
+  ): Promise<Array<ContractEventRawData>> {
     const web3 = new Web3(config.chainConfig.nodeRpcs.default);
     const contract = new web3.eth.Contract(config.contractAbi, config.contractAddress);
 
@@ -143,7 +143,7 @@ export class EventIndexerProvider implements Provider {
       const events = await contract.getPastEvents(event, { fromBlock, toBlock });
 
       const blockTimestamps: any = {};
-      const beautyEvents: Array<EventRawData> = [];
+      const beautyEvents: Array<ContractEventRawData> = [];
       for (let i = 0; i < events.length; i++) {
         let timestamp = blockTimestamps[events[i].blockNumber];
         if (timestamp === undefined) {

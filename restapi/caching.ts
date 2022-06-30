@@ -1,5 +1,5 @@
 // simple utility memory cache data
-import { getTimestamp } from '../core/helper';
+import { getTimestamp } from '../lib/helper';
 
 interface Caching {
   [index: string]: {
