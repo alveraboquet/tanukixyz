@@ -5,6 +5,7 @@ import { CompoundProtocolConfig } from '../types';
 
 export const IronBankConfigs: CompoundProtocolConfig = {
   name: 'ironbank',
+  tokenomics: DefaultTokenList.IB,
   pools: [
     // ethereum
     getCompoundPoolConfig(

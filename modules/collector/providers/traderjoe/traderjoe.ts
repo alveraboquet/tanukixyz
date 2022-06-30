@@ -3,9 +3,10 @@ import { CompoundProtocolConfig, UniswapProtocolConfig } from '../../../../confi
 import { ProtocolDateData } from '../../types';
 import CollectorProvider, { GetProtocolDateDataProps } from '../collector';
 import CompoundProvider from '../compound/compound';
-import { UniswapV2Provider } from '../uniswap/uniswapv2';
+import { SushiswapProvider } from '../sushiswap/sushiswap';
 
 export interface TraderjoeProtocolConfig {
+  name: string;
   exchange: UniswapProtocolConfig;
   lending: CompoundProtocolConfig;
 }
@@ -13,13 +14,13 @@ export interface TraderjoeProtocolConfig {
 class TraderjoeProvider extends CollectorProvider {
   public readonly name: string = 'provider.traderjoe';
 
-  private exchangeProvider: UniswapV2Provider;
+  private exchangeProvider: SushiswapProvider;
   private lendingProvider: CompoundProvider;
 
   constructor(configs: TraderjoeProtocolConfig) {
     super(configs);
 
-    this.exchangeProvider = new UniswapV2Provider(this.configs.exchange);
+    this.exchangeProvider = new SushiswapProvider(this.configs.exchange);
     this.lendingProvider = new CompoundProvider(this.configs.lending);
   }
 

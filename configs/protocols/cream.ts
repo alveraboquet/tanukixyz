@@ -5,6 +5,7 @@ import { CompoundProtocolConfig } from '../types';
 
 export const CreamConfigs: CompoundProtocolConfig = {
   name: 'cream',
+  tokenomics: DefaultTokenList.CREAM,
   pools: [
     // polygon
     getCompoundPoolConfig(

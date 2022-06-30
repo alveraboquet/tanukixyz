@@ -4,6 +4,7 @@ import { getTodayUTCTimestamp } from '../../../lib/helper';
 import logger from '../../../lib/logger';
 import { ShareProviders } from '../../../lib/types';
 import { ICollectorProvider, ProtocolDateData } from '../types';
+import TokenomicsProvider from './tokenomics';
 
 export interface GetProtocolDateDataProps {
   date: number;
@@ -59,6 +60,12 @@ class CollectorProvider implements ICollectorProvider {
       });
       // make sure use the right module code
       dateData.module = DefiProtocolModuleCode;
+
+      // get tokenomics
+      if (this.configs.tokenomics) {
+        const tokenomicsProvider = new TokenomicsProvider(this.configs.tokenomics);
+        dateData.tokenomics = await tokenomicsProvider.getTokenomicsStats(startDate);
+      }
 
       // save to database
       await dateCollection.updateOne(

@@ -5,6 +5,7 @@ import { CompoundProtocolConfig } from '../types';
 
 export const CompoundConfigs: CompoundProtocolConfig = {
   name: 'compound',
+  tokenomics: DefaultTokenList.COMP,
   pools: [
     getCompoundPoolConfig(
       'ethereum',

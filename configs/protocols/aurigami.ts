@@ -5,6 +5,7 @@ import { CompoundProtocolConfig } from '../types';
 
 export const AurigamiConfigs: CompoundProtocolConfig = {
   name: 'aurigami',
+  tokenomics: DefaultTokenList.PLY,
   pools: [
     getCompoundPoolConfig(
       'aurora',

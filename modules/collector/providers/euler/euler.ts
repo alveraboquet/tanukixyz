@@ -31,7 +31,7 @@ class EulerProvider extends CollectorProvider {
     // query date data
     const metaBlock = await providers.subgraph.queryMetaLatestBlock(this.configs.graphEndpoint);
     const blockAtDate = await providers.subgraph.queryBlockAtTimestamp(
-      this.configs.chainConfig.blockSubgraph as string,
+      this.configs.chainConfig.subgraph.blockSubgraph as string,
       date
     );
     const blockNumber = blockAtDate < metaBlock ? blockAtDate : metaBlock;

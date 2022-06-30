@@ -1,5 +1,10 @@
 import { Provider } from '../../lib/types';
 
+export interface ProtocolTokenomics {
+  priceUSD: number;
+  marketCapUSD: number;
+}
+
 export interface ProtocolDateData {
   module: string;
   date: number;
@@ -9,6 +14,8 @@ export interface ProtocolDateData {
   volumeInUseUSD: number;
   userCount: number;
   transactionCount: number;
+
+  tokenomics?: ProtocolTokenomics;
 }
 
 export interface ICollectorProvider extends Provider {

@@ -1,11 +1,13 @@
 import BorrowOperationAbi from '../abi/liquity/BorrowOperation.json';
 import TroveManagerAbi from '../abi/liquity/TroveManager.json';
 import { getChainConfig } from '../chains';
+import { DefaultTokenList } from '../constants/defaultTokenList';
 import { GenesisBlocks } from '../constants/genesisBlocks';
 import { LiquityProtocolConfig } from '../types';
 
 export const LiquityConfigs: LiquityProtocolConfig = {
   name: 'liquity',
+  tokenomics: DefaultTokenList.LQTY,
   chainConfig: getChainConfig('ethereum'),
   borrowOperation: {
     chainConfig: getChainConfig('ethereum'),

@@ -1,8 +1,10 @@
+import { DefaultTokenList } from '../constants/defaultTokenList';
 import { UniswapProtocolConfig } from '../types';
 
 export const UniswapV2Configs: UniswapProtocolConfig = {
   name: 'uniswap',
   subgraphs: ['https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2'],
+  tokenomics: DefaultTokenList.UNI,
 };
 
 export const UniswapV1Configs: UniswapProtocolConfig = {

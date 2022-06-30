@@ -31,6 +31,7 @@ export const Providers: { [key: string]: CollectorProvider } = {
   benqi: new CompoundProvider(BenqiConfigs),
   venus: new CompoundProvider(VenusConfigs),
   traderjoe: new TraderjoeProvider({
+    name: 'traderjoe',
     exchange: TraderJoeExchangeConfigs,
     lending: TraderJoeLendingConfigs,
   }),

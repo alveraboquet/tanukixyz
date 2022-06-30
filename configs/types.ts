@@ -63,28 +63,33 @@ export interface CompoundLendingPoolConfig extends EventIndexConfig {
 
 export interface CompoundProtocolConfig {
   name: string;
+  tokenomics?: TokenConfig;
   pools: Array<CompoundLendingPoolConfig>;
 }
 
 export interface EulerProtocolConfig {
   name: string;
   chainConfig: ChainConfig;
+  tokenomics?: TokenConfig;
   graphEndpoint: string;
 }
 
 export interface LiquityProtocolConfig {
   name: string;
   chainConfig: ChainConfig;
+  tokenomics?: TokenConfig;
   borrowOperation: EventIndexConfig;
   troveManager: EventIndexConfig;
 }
 
 export interface UniswapProtocolConfig {
   name: string;
+  tokenomics?: TokenConfig;
   subgraphs: Array<string>;
 }
 
 export interface AaveProtocolConfig {
   name: string;
+  tokenomics?: TokenConfig;
   pools: Array<EventIndexConfig>;
 }

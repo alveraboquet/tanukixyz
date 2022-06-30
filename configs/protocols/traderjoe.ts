@@ -5,6 +5,7 @@ import { CompoundProtocolConfig, UniswapProtocolConfig } from '../types';
 
 export const TraderJoeLendingConfigs: CompoundProtocolConfig = {
   name: 'traderjoe',
+  tokenomics: DefaultTokenList.JOE,
   pools: [
     getCompoundPoolConfig(
       'avalanche',

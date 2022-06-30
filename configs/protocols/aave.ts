@@ -2,11 +2,13 @@ import AaveV1Abi from '../abi/aave/AaveV1LendingPool.json';
 import AaveV2Abi from '../abi/aave/AaveV2LendingPool.json';
 import AaveV3Abi from '../abi/aave/AaveV3LendingPool.json';
 import { getChainConfig } from '../chains';
+import { DefaultTokenList } from '../constants/defaultTokenList';
 import { GenesisBlocks } from '../constants/genesisBlocks';
 import { AaveProtocolConfig } from '../types';
 
 export const AaveConfigs: AaveProtocolConfig = {
   name: 'aave',
+  tokenomics: DefaultTokenList.AAVE,
   pools: [
     // v1 - ethereum
     {

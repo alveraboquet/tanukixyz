@@ -5,6 +5,7 @@ import { CompoundProtocolConfig } from '../types';
 
 export const BenqiConfigs: CompoundProtocolConfig = {
   name: 'benqi',
+  tokenomics: DefaultTokenList.QI,
   pools: [
     getCompoundPoolConfig(
       'avalanche',

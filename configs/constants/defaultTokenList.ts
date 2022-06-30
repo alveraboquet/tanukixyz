@@ -835,4 +835,64 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
       },
     },
   },
+  PLY: {
+    symbol: 'PLY',
+    coingeckoId: 'aurigami',
+    chains: {
+      aurora: {
+        decimals: 18,
+        address: '',
+      },
+    },
+  },
+  EUL: {
+    symbol: 'EUL',
+    coingeckoId: 'euler',
+    chains: {
+      ethereum: {
+        decimals: 18,
+        address: '',
+      },
+    },
+  },
+  IB: {
+    symbol: 'IB',
+    coingeckoId: 'iron-bank',
+    chains: {
+      fantom: {
+        decimals: 18,
+        address: '',
+      },
+    },
+  },
+  LQTY: {
+    symbol: 'LQTY',
+    coingeckoId: 'liquity',
+    chains: {
+      ethereum: {
+        decimals: 18,
+        address: '',
+      },
+    },
+  },
+  BOO: {
+    symbol: 'BOO',
+    coingeckoId: 'spookyswap',
+    chains: {
+      fantom: {
+        decimals: 18,
+        address: '',
+      },
+    },
+  },
+  JOE: {
+    symbol: 'JOE',
+    coingeckoId: 'joe',
+    chains: {
+      avalanche: {
+        decimals: 18,
+        address: '',
+      },
+    },
+  },
 };

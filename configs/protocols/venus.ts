@@ -5,6 +5,7 @@ import { CompoundProtocolConfig } from '../types';
 
 export const VenusConfigs: CompoundProtocolConfig = {
   name: 'venus',
+  tokenomics: DefaultTokenList.XVS,
   pools: [
     getCompoundPoolConfig(
       'binance',

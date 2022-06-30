@@ -5,6 +5,7 @@ import { CompoundProtocolConfig } from '../types';
 
 export const BastionConfigs: CompoundProtocolConfig = {
   name: 'bastion',
+  tokenomics: DefaultTokenList.BSTN,
   pools: [
     getCompoundPoolConfig(
       'aurora',
