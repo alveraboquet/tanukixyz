@@ -36,13 +36,12 @@ class BitcoreBlockscanProvider extends BlockscanProvider {
 
     const blockInfo: BlockscanBlockInfo = {
       chain: this.chainConfig.name,
-      network: this.chainConfig.network,
-      block: block.height,
-      timestamp: block.time,
-      totalTxn: block.tx.length,
+      blockNumber: block.height,
+      blockTime: block.time,
+      transactionCount: block.tx.length,
 
-      uniqueAddress: [],
-      volume: 0,
+      addressList: [],
+      transferVolume: 0,
     };
 
     const addresses: any = {};
@@ -55,10 +54,10 @@ class BitcoreBlockscanProvider extends BlockscanProvider {
         const outputs = transaction.vout;
         for (let outIdx = 0; outIdx < outputs.length; outIdx++) {
           if (outputs[outIdx].scriptPubKey.address && !addresses[outputs[outIdx].scriptPubKey.address]) {
-            blockInfo.uniqueAddress.push(outputs[outIdx].scriptPubKey.address);
+            blockInfo.addressList.push(outputs[outIdx].scriptPubKey.address);
             addresses[outputs[outIdx].scriptPubKey.address] = true;
           }
-          blockInfo.volume += outputs[outIdx].value;
+          blockInfo.transferVolume += outputs[outIdx].value;
         }
       }
     }

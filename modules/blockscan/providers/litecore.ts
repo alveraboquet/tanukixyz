@@ -36,13 +36,12 @@ class LitecoreBlockscanProvider extends BlockscanProvider {
 
     const blockInfo: BlockscanBlockInfo = {
       chain: this.chainConfig.name,
-      network: this.chainConfig.network,
-      block: block.height,
-      timestamp: block.time,
-      totalTxn: block.tx.length,
+      blockNumber: block.height,
+      blockTime: block.time,
+      transactionCount: block.tx.length,
 
-      uniqueAddress: [],
-      volume: 0,
+      addressList: [],
+      transferVolume: 0,
     };
 
     const addresses: any = {};
@@ -57,12 +56,12 @@ class LitecoreBlockscanProvider extends BlockscanProvider {
           if (outputs[outIdx].scriptPubKey.addresses) {
             for (let addrIdx = 0; addrIdx < outputs[outIdx].scriptPubKey.addresses.length; addrIdx++) {
               if (!addresses[outputs[outIdx].scriptPubKey.addresses[addrIdx]]) {
-                blockInfo.uniqueAddress.push(outputs[outIdx].scriptPubKey.addresses[addrIdx]);
+                blockInfo.addressList.push(outputs[outIdx].scriptPubKey.addresses[addrIdx]);
                 addresses[outputs[outIdx].scriptPubKey.addresses[addrIdx]] = true;
               }
             }
           }
-          blockInfo.volume += outputs[outIdx].value;
+          blockInfo.transferVolume += outputs[outIdx].value;
         }
       }
     }

@@ -35,6 +35,9 @@ class EvmBlockscanProvider extends BlockscanProvider {
       hash: block.hash,
       timestamp: parseInt(block.timestamp.toString(), 16),
       transactions: block.transactions,
+
+      baseFeePerGas: block.baseFeePerGas ? parseInt(block.baseFeePerGas.toString(), 16).toString() : null,
+      gasUsed: parseInt(block.gasUsed.toString(), 16).toString(),
     };
   }
 
@@ -42,26 +45,32 @@ class EvmBlockscanProvider extends BlockscanProvider {
     const block = await this.getBlockByNumber(blockNumber);
     const blockInfo: BlockscanBlockInfo = {
       chain: this.chainConfig.name,
-      network: this.chainConfig.network,
-      block: block.number,
-      timestamp: block.timestamp,
-      totalTxn: block.transactions.length,
+      blockNumber: block.number,
+      blockTime: block.timestamp,
+      transactionCount: block.transactions.length,
 
-      uniqueAddress: [],
-      volume: 0,
+      addressList: [],
+      transferVolume: 0,
     };
 
     const addresses: any = {};
     for (let i = 0; i < block.transactions.length; i++) {
       if (!addresses[normalizeAddress(block.transactions[i].from)]) {
-        blockInfo.uniqueAddress.push(normalizeAddress(block.transactions[i].from));
+        blockInfo.addressList.push(normalizeAddress(block.transactions[i].from));
         addresses[normalizeAddress(block.transactions[i].from)] = true;
       }
       if (!addresses[normalizeAddress(block.transactions[i].to)]) {
-        blockInfo.uniqueAddress.push(normalizeAddress(block.transactions[i].to));
+        blockInfo.addressList.push(normalizeAddress(block.transactions[i].to));
         addresses[normalizeAddress(block.transactions[i].to)] = true;
       }
-      blockInfo.volume += new BigNumber(block.transactions[i].value.toString()).dividedBy(1e18).toNumber();
+      blockInfo.transferVolume += new BigNumber(block.transactions[i].value.toString()).dividedBy(1e18).toNumber();
+    }
+
+    if (block.baseFeePerGas && block.gasUsed) {
+      blockInfo.burntFees = new BigNumber(block.baseFeePerGas)
+        .multipliedBy(new BigNumber(block.gasUsed))
+        .dividedBy(1e18)
+        .toNumber();
     }
 
     return blockInfo;

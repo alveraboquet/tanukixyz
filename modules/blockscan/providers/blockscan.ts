@@ -70,13 +70,12 @@ class BlockscanProvider implements Provider {
       const blockSynced = await blockCollection
         .find({
           chain: this.chainConfig.name,
-          network: 'mainnet',
         })
-        .sort({ block: -1 })
+        .sort({ blockNumber: -1 })
         .limit(1)
         .toArray();
       if (blockSynced.length > 0) {
-        startBlock = blockSynced[0].block;
+        startBlock = blockSynced[0].blockNumber;
       }
     }
 
@@ -90,8 +89,7 @@ class BlockscanProvider implements Provider {
           await blockCollection.updateOne(
             {
               chain: this.chainConfig.name,
-              network: this.chainConfig.network,
-              block: startBlock,
+              blockNumber: startBlock,
             },
             {
               $set: {
@@ -111,7 +109,6 @@ class BlockscanProvider implements Provider {
           message: 'collected block info',
           props: {
             chain: this.chainConfig.name,
-            network: this.chainConfig.network,
             blockNumber: startBlock,
             elapsed: `${elapsed.toFixed(2)}s`,
           },
@@ -122,7 +119,6 @@ class BlockscanProvider implements Provider {
           message: 'failed to collect block info, skipped it',
           props: {
             chain: this.chainConfig.name,
-            network: this.chainConfig.network,
             blockNumber: startBlock,
           },
         });

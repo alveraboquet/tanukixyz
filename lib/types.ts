@@ -1,4 +1,3 @@
-import { ChainNetwork } from '../configs/types';
 import { DatabaseProvider, GraphProvider } from './providers';
 
 export interface Provider {
@@ -22,10 +21,13 @@ export interface ContractEventRawData {
 
 export interface BlockscanBlockInfo {
   chain: string;
-  network: ChainNetwork;
-  block: number;
-  timestamp: number;
-  volume: number;
-  totalTxn: number;
-  uniqueAddress: Array<string>;
+  blockNumber: number;
+  blockTime: number;
+  transferVolume: number;
+  transactionCount: number;
+  addressList: Array<string>;
+
+  miner?: string;
+  collectedFees?: number;
+  burntFees?: number;
 }
