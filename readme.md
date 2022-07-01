@@ -16,3 +16,16 @@ Tanuki is a blockchain and defi data and analytic platform. For more information
 | Event Indexer | Index contract events from blockchains                                 | [Documentation](./docs/readme.md) |
 | Blockscan     | Tracks blockchain metrics such as blocks, addresses, transactions, ... | [Documentation](./docs/readme.md) |
 | Collector     | Collect DeFi protocol metrics such liquidity, volume, fees, ...        | [Documentation](./docs/readme.md) |
+
+## Getting Start
+
+```bash
+# install dependencies
+yarn
+
+# build typescript
+yarn compile
+
+# get start
+yarn start --help
+```

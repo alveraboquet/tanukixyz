@@ -17,9 +17,9 @@ class CollectorModule {
       if (!provider) {
         logger.onError({
           source: 'module.collector',
-          message: 'project not found',
+          message: 'protocol not found',
           props: {
-            project: argv.protocol,
+            protocol: argv.protocol,
           },
         });
         process.exit(0);

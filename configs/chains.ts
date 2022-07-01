@@ -55,7 +55,7 @@ export const Blockchains: Array<ChainConfig> = [
     family: 'evm',
     name: 'fantom',
     nodeRpcs: {
-      default: 'https://rpc.ftm.tools/',
+      default: AnkrPublicNodes.fantom,
       archive: AnkrPublicNodes.fantom,
     },
     subgraph: {
