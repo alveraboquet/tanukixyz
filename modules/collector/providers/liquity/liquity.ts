@@ -85,10 +85,12 @@ class LiquityProvider extends CollectorProvider {
             if (new BigNumber(debt).gte(new BigNumber(events[i].returnValues['_debt']))) {
               dateData.volumeInUseUSD += new BigNumber(debt.toString())
                 .minus(new BigNumber(events[i].returnValues['_debt']))
+                .dividedBy(1e18)
                 .toNumber();
             } else {
               dateData.volumeInUseUSD += new BigNumber(events[i].returnValues['_debt'])
                 .minus(new BigNumber(debt.toString()))
+                .dividedBy(1e18)
                 .toNumber();
             }
           }
