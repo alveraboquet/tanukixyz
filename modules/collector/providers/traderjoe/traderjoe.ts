@@ -33,6 +33,7 @@ class TraderjoeProvider extends CollectorProvider {
       name: 'traderjoe',
       date: props.date,
 
+      tokenomics: lendingData.tokenomics,
       revenueUSD: exchangeData.revenueUSD + lendingData.revenueUSD,
       totalValueLockedUSD: exchangeData.totalValueLockedUSD + lendingData.totalValueLockedUSD,
       volumeInUseUSD: exchangeData.volumeInUseUSD + lendingData.volumeInUseUSD,
