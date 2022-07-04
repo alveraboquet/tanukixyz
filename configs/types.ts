@@ -85,7 +85,11 @@ export interface LiquityProtocolConfig {
 export interface UniswapProtocolConfig {
   name: string;
   tokenomics?: TokenConfig;
-  subgraphs: Array<string>;
+  subgraphs: Array<{
+    version: 2 | 3;
+    chainConfig: ChainConfig;
+    exchange: string;
+  }>;
 }
 
 export interface AaveProtocolConfig {

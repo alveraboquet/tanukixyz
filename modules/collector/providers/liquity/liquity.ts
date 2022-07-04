@@ -1,12 +1,12 @@
 import BigNumber from 'bignumber.js';
 import Web3 from 'web3';
 
-import { DefiProtocolModuleCode } from '../../../../configs';
 import envConfig from '../../../../configs/env';
 import { LiquityProtocolConfig } from '../../../../configs/types';
 import { getHistoryTokenPriceFromCoingecko, normalizeAddress } from '../../../../lib/helper';
-import { ProtocolDateData } from '../../types';
-import CollectorProvider, { GetProtocolDateDataProps } from '../collector';
+import { ShareProviders } from '../../../../lib/types';
+import { ProtocolData } from '../../types';
+import CollectorProvider, { GetProtocolDataProps } from '../collector';
 
 class LiquityProvider extends CollectorProvider {
   public readonly name: string = 'provider.liquity';
@@ -15,14 +15,8 @@ class LiquityProvider extends CollectorProvider {
     super(configs);
   }
 
-  public async getDateData(props: GetProtocolDateDataProps): Promise<ProtocolDateData> {
-    const { date, providers } = props;
-
-    const dateData: ProtocolDateData = {
-      module: DefiProtocolModuleCode,
-      name: this.configs.name,
-      date: date,
-
+  private async getDataInRange(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {
+    const dateData: ProtocolData = {
       revenueUSD: 0,
       totalValueLockedUSD: 0,
       volumeInUseUSD: 0,
@@ -35,8 +29,8 @@ class LiquityProvider extends CollectorProvider {
       .find({
         contract: normalizeAddress(this.configs.borrowOperation.contractAddress),
         timestamp: {
-          $gte: date,
-          $lt: date + 24 * 60 * 60,
+          $gte: fromTime,
+          $lt: toTime,
         },
       })
       .sort({ timestamp: -1 }) // get the latest event by index 0
@@ -113,6 +107,16 @@ class LiquityProvider extends CollectorProvider {
     }
 
     return dateData;
+  }
+
+  public async getDateData(props: GetProtocolDataProps): Promise<ProtocolData> {
+    const { date, providers } = props;
+    return await this.getDataInRange(providers, date, date + 24 * 60 * 60);
+  }
+
+  public async getDailyData(props: GetProtocolDataProps): Promise<ProtocolData> {
+    const { date, providers } = props;
+    return await this.getDataInRange(providers, date - 24 * 60 * 60, date);
   }
 }
 

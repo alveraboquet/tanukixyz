@@ -1,3 +1,4 @@
+import { getChainConfig } from '../chains';
 import { DefaultTokenList } from '../constants/defaultTokenList';
 import { GenesisBlocks } from '../constants/genesisBlocks';
 import { getCompoundPoolConfig } from '../helpers';
@@ -66,5 +67,11 @@ export const TraderJoeLendingConfigs: CompoundProtocolConfig = {
 
 export const TraderJoeExchangeConfigs: UniswapProtocolConfig = {
   name: 'traderjoe',
-  subgraphs: ['https://api.thegraph.com/subgraphs/name/traderjoe-xyz/exchange'],
+  subgraphs: [
+    {
+      version: 2,
+      chainConfig: getChainConfig('avalanche'),
+      exchange: 'https://api.thegraph.com/subgraphs/name/traderjoe-xyz/exchange',
+    },
+  ],
 };

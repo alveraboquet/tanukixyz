@@ -25,24 +25,22 @@ class CollectorModule {
         process.exit(0);
       }
 
-      while (true) {
-        await provider.startService({
-          providers: argv.providers,
-          initialDate: argv.initialDate,
-          forceSync: argv.forceSync,
-        });
-
-        await sleep(5 * 60);
-      }
+      await provider.startService({
+        providers: argv.providers,
+        initialDate: argv.initialDate,
+        forceSync: argv.forceSync,
+      });
     } else {
       // run all
       while (true) {
         for (const [, provider] of Object.entries(Providers)) {
-          await provider.startService({
-            providers: argv.providers,
-            initialDate: argv.initialDate,
-            forceSync: argv.forceSync,
-          });
+          try {
+            await provider.startService({
+              providers: argv.providers,
+              initialDate: argv.initialDate,
+              forceSync: argv.forceSync,
+            });
+          } catch (e: any) {}
         }
 
         await sleep(5 * 60);

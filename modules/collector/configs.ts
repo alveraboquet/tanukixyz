@@ -12,18 +12,17 @@ import { PancakeswapConfigs } from '../../configs/protocols/pancakeswap';
 import { SpookyswapConfigs } from '../../configs/protocols/spookyswap';
 import { SushiswapConfigs } from '../../configs/protocols/sushiswap';
 import { TraderJoeExchangeConfigs, TraderJoeLendingConfigs } from '../../configs/protocols/traderjoe';
-import { UniswapV2Configs } from '../../configs/protocols/uniswap';
+import { UniswapConfigs } from '../../configs/protocols/uniswap';
 import { VenusConfigs } from '../../configs/protocols/venus';
 import { BalancerProvider } from './providers/balancer/balancer';
 import CollectorProvider from './providers/collector';
 import CompoundProvider from './providers/compound/compound';
 import EulerProvider from './providers/euler/euler';
 import LiquityProvider from './providers/liquity/liquity';
-import { PancakeswapProvider } from './providers/pancakeswap/pancakeswap';
+import { PancakeswapStreamFastProvider } from './providers/pancakeswap/pancakeswapStreamfast';
 import { SushiswapProvider } from './providers/sushiswap/sushiswap';
 import TraderjoeProvider from './providers/traderjoe/traderjoe';
 import { UniswapProvider } from './providers/uniswap/uniswap';
-import { UniswapV2Provider } from './providers/uniswap/uniswapv2';
 
 export const Providers: { [key: string]: CollectorProvider } = {
   compound: new CompoundProvider(CompoundConfigs),
@@ -40,10 +39,10 @@ export const Providers: { [key: string]: CollectorProvider } = {
   }),
   bastion: new CompoundProvider(BastionConfigs),
   aurigami: new CompoundProvider(AurigamiConfigs),
-  uniswap: new UniswapProvider(UniswapV2Configs),
+  uniswap: new UniswapProvider(UniswapConfigs),
   sushiswap: new SushiswapProvider(SushiswapConfigs),
-  spookyswap: new UniswapV2Provider(SpookyswapConfigs),
-  pancakeswap: new PancakeswapProvider(PancakeswapConfigs),
+  spookyswap: new UniswapProvider(SpookyswapConfigs),
+  pancakeswap: new PancakeswapStreamFastProvider(PancakeswapConfigs),
   balancer: new BalancerProvider(BalancerConfigs),
   beets: new BalancerProvider(BeetsConfigs),
 };

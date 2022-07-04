@@ -1,14 +1,14 @@
 import BigNumber from 'bignumber.js';
 import Web3 from 'web3';
 
-import { DefiProtocolModuleCode } from '../../../../configs';
 import CompoundLendAbi from '../../../../configs/abi/compound/cToken.json';
 import envConfig from '../../../../configs/env';
 import { CompoundProtocolConfig } from '../../../../configs/types';
 import { getHistoryTokenPriceFromCoingecko, normalizeAddress } from '../../../../lib/helper';
 import logger from '../../../../lib/logger';
-import { ProtocolDateData } from '../../types';
-import CollectorProvider, { GetProtocolDateDataProps } from '../collector';
+import { ShareProviders } from '../../../../lib/types';
+import { ProtocolData } from '../../types';
+import CollectorProvider, { GetProtocolDataProps } from '../collector';
 import { getPoolConfigByAddress } from './helpers';
 
 class CompoundProvider extends CollectorProvider {
@@ -18,14 +18,8 @@ class CompoundProvider extends CollectorProvider {
     super(configs);
   }
 
-  public async getDateData(props: GetProtocolDateDataProps): Promise<ProtocolDateData> {
-    const { date, providers } = props;
-
-    const dateData: ProtocolDateData = {
-      module: DefiProtocolModuleCode,
-      name: this.configs.name,
-      date: date,
-
+  private async getDataInRange(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {
+    const data: ProtocolData = {
       revenueUSD: 0,
       totalValueLockedUSD: 0,
       volumeInUseUSD: 0,
@@ -40,8 +34,8 @@ class CompoundProvider extends CollectorProvider {
         .find({
           contract: normalizeAddress(this.configs.pools[poolId].contractAddress),
           timestamp: {
-            $gte: date,
-            $lt: date + 24 * 60 * 60,
+            $gte: fromTime,
+            $lt: toTime,
           },
         })
         .sort({ timestamp: -1 }) // get the latest event by index 0
@@ -81,53 +75,53 @@ class CompoundProvider extends CollectorProvider {
       for (let i = 0; i < events.length; i++) {
         // count transaction
         if (!transactions[events[i].transactionId.split(':')[0]]) {
-          dateData.transactionCount += 1;
+          data.transactionCount += 1;
           transactions[events[i].transactionId.split(':')[0]] = true;
         }
 
         // count user
         if (!addresses[normalizeAddress(events[i].returnValues['minter'])]) {
-          dateData.userCount += 1;
+          data.userCount += 1;
           addresses[normalizeAddress(events[i].returnValues['minter'])] = true;
         }
         if (!addresses[normalizeAddress(events[i].returnValues['redeemer'])]) {
-          dateData.userCount += 1;
+          data.userCount += 1;
           addresses[normalizeAddress(events[i].returnValues['redeemer'])] = true;
         }
         if (!addresses[normalizeAddress(events[i].returnValues['borrower'])]) {
-          dateData.userCount += 1;
+          data.userCount += 1;
           addresses[normalizeAddress(events[i].returnValues['borrower'])] = true;
         }
         if (!addresses[normalizeAddress(events[i].returnValues['payer'])]) {
-          dateData.userCount += 1;
+          data.userCount += 1;
           addresses[normalizeAddress(events[i].returnValues['payer'])] = true;
         }
 
         // count volume
         switch (events[i].event) {
           case 'Mint': {
-            dateData.volumeInUseUSD += new BigNumber(events[i].returnValues.mintAmount)
+            data.volumeInUseUSD += new BigNumber(events[i].returnValues.mintAmount)
               .dividedBy(new BigNumber(10).pow(poolConfig.underlying.chains[poolConfig.chainConfig.name].decimals))
               .multipliedBy(historyPrice)
               .toNumber();
             break;
           }
           case 'Redeem': {
-            dateData.volumeInUseUSD += new BigNumber(events[i].returnValues.redeemAmount)
+            data.volumeInUseUSD += new BigNumber(events[i].returnValues.redeemAmount)
               .dividedBy(new BigNumber(10).pow(poolConfig.underlying.chains[poolConfig.chainConfig.name].decimals))
               .multipliedBy(historyPrice)
               .toNumber();
             break;
           }
           case 'Borrow': {
-            dateData.volumeInUseUSD += new BigNumber(events[i].returnValues.borrowAmount)
+            data.volumeInUseUSD += new BigNumber(events[i].returnValues.borrowAmount)
               .dividedBy(new BigNumber(10).pow(poolConfig.underlying.chains[poolConfig.chainConfig.name].decimals))
               .multipliedBy(historyPrice)
               .toNumber();
             break;
           }
           case 'RepayBorrow': {
-            dateData.volumeInUseUSD += new BigNumber(events[i].returnValues.repayAmount)
+            data.volumeInUseUSD += new BigNumber(events[i].returnValues.repayAmount)
               .dividedBy(new BigNumber(10).pow(poolConfig.underlying.chains[poolConfig.chainConfig.name].decimals))
               .multipliedBy(historyPrice)
               .toNumber();
@@ -146,7 +140,7 @@ class CompoundProvider extends CollectorProvider {
           .minus(new BigNumber(totalReserves.toString()))
           .dividedBy(new BigNumber(10).pow(poolConfig.underlying.chains[poolConfig.chainConfig.name].decimals))
           .toNumber();
-        dateData.totalValueLockedUSD += underlyingLiquidity * historyPrice;
+        data.totalValueLockedUSD += underlyingLiquidity * historyPrice;
       } catch (e: any) {
         logger.onDebug({
           source: this.name,
@@ -160,7 +154,17 @@ class CompoundProvider extends CollectorProvider {
       }
     }
 
-    return dateData;
+    return data;
+  }
+
+  public async getDateData(props: GetProtocolDataProps): Promise<ProtocolData> {
+    const { date, providers } = props;
+    return await this.getDataInRange(providers, date, date + 24 * 60 * 60);
+  }
+
+  public async getDailyData(props: GetProtocolDataProps): Promise<ProtocolData> {
+    const { date, providers } = props;
+    return await this.getDataInRange(providers, date - 24 * 60 * 60, date);
   }
 }
 

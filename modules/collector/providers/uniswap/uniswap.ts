@@ -1,116 +1,214 @@
-import { DefiProtocolModuleCode } from '../../../../configs';
-import { UniswapV1Configs, UniswapV3Configs } from '../../../../configs/protocols/uniswap';
 import { UniswapProtocolConfig } from '../../../../configs/types';
-import { ProtocolDateData } from '../../types';
-import { GetProtocolDateDataProps } from '../collector';
-import { UniswapV2Provider } from './uniswapv2';
+import logger from '../../../../lib/logger';
+import { ProtocolData } from '../../types';
+import CollectorProvider, { GetProtocolDataProps } from '../collector';
 
-export class UniswapProvider extends UniswapV2Provider {
-  public readonly name: string = 'provider.uniswapv';
+export class UniswapProvider extends CollectorProvider {
+  public readonly name: string = 'provider.uniswap';
 
   constructor(configs: UniswapProtocolConfig) {
     super(configs);
   }
 
-  public async getMetricV1(props: GetProtocolDateDataProps): Promise<ProtocolDateData> {
-    const { providers, date } = props;
-    const v1QueryResponse = await providers.subgraph.querySubgraph(
-      UniswapV1Configs.subgraphs[0],
-      `
-			{
-				uniswapDayDatas(first: 1, where: {date: ${date}}) {
-					dailyVolumeInUSD
-					totalLiquidityUSD
-					txCount
-				}
-			}
-		`
-    );
-
-    const v1Data = v1QueryResponse['uniswapDayDatas'].length > 0 ? v1QueryResponse['uniswapDayDatas'][0] : null;
+  // override this methods match with new project definitions
+  public getFilters(): any {
     return {
-      module: DefiProtocolModuleCode,
-      name: 'uniswap',
-      date: date,
-      userCount: 0,
-      volumeInUseUSD: v1Data ? Number(v1Data['dailyVolumeInUSD']) : 0,
-      revenueUSD: v1Data ? (Number(v1Data['dailyVolumeInUSD']) * 0.3) / 100 : 0,
-      totalValueLockedUSD: v1Data ? Number(v1Data['totalLiquidityUSD']) : 0,
-      transactionCount: v1Data ? Number(v1Data['txCount']) : 0,
+      dayData: {
+        dayDataVar: 'uniswapDayDatas',
+        totalVolume: 'dailyVolumeUSD',
+        totalLiquidity: 'totalLiquidityUSD',
+        totalTransaction: 'txCount',
+      },
+
+      factory: {
+        factoryVar: 'uniswapFactories',
+        totalVolume: 'totalVolumeUSD',
+        totalLiquidity: 'totalLiquidityUSD',
+        totalTransaction: 'txCount',
+      },
+
+      // support uniswap v3 queries
+      v3: {
+        dayData: {
+          dayDataVar: 'poolDayDatas',
+          totalFee: 'feesUSD',
+          totalVolume: 'volumeUSD',
+          totalLiquidity: 'tvlUSD',
+          totalTransaction: 'txCount',
+        },
+
+        factory: {
+          factoryVar: 'factories',
+          totalFee: 'totalFeesUSD',
+          totalVolume: 'totalVolumeUSD',
+          totalLiquidity: 'totalValueLockedUSD',
+          totalTransaction: 'txCount',
+        },
+      },
     };
   }
 
-  public async getMetricV3(props: GetProtocolDateDataProps): Promise<ProtocolDateData> {
+  public async getDailyData(props: GetProtocolDataProps): Promise<ProtocolData> {
     const { providers, date } = props;
 
-    const data: ProtocolDateData = {
-      module: DefiProtocolModuleCode,
-      name: 'uniswap',
-      date: date,
-      userCount: 0,
-      volumeInUseUSD: 0,
+    const endTimestamp = date;
+
+    // last 24 hours
+    const last24HoursTimestamp = date - 24 * 60 * 60;
+    // last 48 hours
+    const last48HoursTimestamp = date - 48 * 60 * 60;
+
+    const data: ProtocolData = {
       revenueUSD: 0,
       totalValueLockedUSD: 0,
+      volumeInUseUSD: 0,
+      userCount: 0,
       transactionCount: 0,
     };
 
-    for (let i = 0; i < UniswapV3Configs.subgraphs.length; i++) {
-      const v3QueryResponse = await providers.subgraph.querySubgraph(
-        UniswapV3Configs.subgraphs[i],
-        `
-			{
-				uniswapDayDatas(first: 1, where: {date: ${date}}) {
-					volumeUSD
-					tvlUSD
-					feesUSD
-					txCount
-				}
-			}
-		`
+    for (let i = 0; i < this.configs.subgraphs.length; i++) {
+      const filters: any =
+        this.configs.subgraphs[i].version === 2 ? this.getFilters().factory : this.getFilters().v3.factory;
+      const blockNumberLast24Hours = await providers.subgraph.queryBlockAtTimestamp(
+        this.configs.subgraphs[i].chainConfig.subgraph?.blockSubgraph as string,
+        last24HoursTimestamp
+      );
+      const blockNumberLast48Hours = await providers.subgraph.queryBlockAtTimestamp(
+        this.configs.subgraphs[i].chainConfig.subgraph?.blockSubgraph as string,
+        last48HoursTimestamp
+      );
+      let blockNumberEndTime = await providers.subgraph.queryBlockAtTimestamp(
+        this.configs.subgraphs[i].chainConfig.subgraph?.blockSubgraph as string,
+        endTimestamp
       );
 
-      const v3Data = v3QueryResponse['uniswapDayDatas'].length > 0 ? v3QueryResponse['uniswapDayDatas'][0] : null;
-      data.volumeInUseUSD += v3Data ? Number(v3Data['volumeUSD']) : 0;
-      data.revenueUSD += v3Data ? Number(v3Data['feesUSD']) : 0;
-      data.totalValueLockedUSD += v3Data ? Number(v3Data['tvlUSD']) : 0;
-      data.transactionCount += v3Data ? Number(v3Data['txCount']) : 0;
+      // in case subgraph not full sync yet
+      const blockNumberMeta = await providers.subgraph.queryMetaLatestBlock(this.configs.subgraphs[i].exchange);
+      blockNumberEndTime = blockNumberEndTime > blockNumberMeta ? blockNumberMeta : blockNumberEndTime;
+
+      const response = await providers.subgraph.querySubgraph(
+        this.configs.subgraphs[i].exchange,
+        `
+				{
+          data: ${filters.factoryVar}(block: {number: ${blockNumberEndTime}}) {
+            ${this.configs.subgraphs[i].version === 3 ? filters.totalFee : ''}
+            ${filters.totalVolume}
+            ${filters.totalLiquidity}
+            ${filters.totalTransaction}
+            }
+					data24: ${filters.factoryVar}(block: {number: ${blockNumberLast24Hours}}) {
+					  ${this.configs.subgraphs[i].version === 3 ? filters.totalFee : ''}
+						${filters.totalVolume}
+						${filters.totalLiquidity}
+						${filters.totalTransaction}
+					}
+					data48: ${filters.factoryVar}(block: {number: ${blockNumberLast48Hours}}) {
+					  ${this.configs.subgraphs[i].version === 3 ? filters.totalFee : ''}
+						${filters.totalVolume}
+						${filters.totalLiquidity}
+						${filters.totalTransaction}
+					}
+				}
+			`
+      );
+
+      const parsed = response && response['data'] ? response['data'][0] : null;
+      const parsed24 = response && response['data24'] ? response['data24'][0] : null;
+      const parsed48 = response && response['data48'] ? response['data48'][0] : null;
+
+      if (parsed && parsed24) {
+        const volumeUSD = Number(parsed[filters.totalVolume]) - Number(parsed24[filters.totalVolume]);
+        data.revenueUSD +=
+          this.configs.subgraphs[i].version === 2
+            ? (volumeUSD * 0.3) / 100
+            : Number(parsed[filters.totalFee]) - Number(parsed24[filters.totalFee]);
+        data.volumeInUseUSD += volumeUSD;
+        data.totalValueLockedUSD += Number(parsed[filters.totalLiquidity]);
+        data.transactionCount += Number(parsed[filters.totalTransaction]) - Number(parsed24[filters.totalTransaction]);
+      }
+
+      if (parsed && parsed24 && parsed48) {
+        const volumeUSD = Number(parsed[filters.totalVolume]) - Number(parsed24[filters.totalVolume]);
+        const volumeUSD24 = Number(parsed24[filters.totalVolume]) - Number(parsed48[filters.totalVolume]);
+        const revenueUSD =
+          this.configs.subgraphs[i].version === 2
+            ? (volumeUSD * 0.3) / 100
+            : Number(parsed[filters.totalFee]) - Number(parsed24[filters.totalFee]);
+        const revenueUSD24 =
+          this.configs.subgraphs[i].version === 2
+            ? (volumeUSD * 0.3) / 100
+            : Number(parsed24[filters.totalFee]) - Number(parsed48[filters.totalFee]);
+        const totalValueLockedUSD = Number(parsed[filters.totalLiquidity]);
+        const totalValueLockedUSD24 = Number(parsed24[filters.totalLiquidity]);
+        const transactionCount = Number(parsed[filters.totalTransaction]) - Number(parsed24[filters.totalTransaction]);
+        const transactionCount24 =
+          Number(parsed24[filters.totalTransaction]) - Number(parsed48[filters.totalTransaction]);
+
+        data.changes = {
+          revenueChangePercentage: ((revenueUSD - revenueUSD24) / revenueUSD24) * 100,
+          totalValueLockedChangePercentage:
+            ((totalValueLockedUSD - totalValueLockedUSD24) / totalValueLockedUSD24) * 100,
+          volumeInUseChangePercentage: ((volumeUSD - volumeUSD24) / volumeUSD24) * 100,
+          userCountChangePercentage: 0,
+          transactionCountChangePercentage: ((transactionCount - transactionCount24) / transactionCount24) * 100,
+        };
+      }
     }
 
     return data;
   }
 
-  // override this methods match with new project definitions
-  public getFilters(): any {
-    return {
-      dayDataVar: 'uniswapDayDatas',
-      totalVolume: 'dailyVolumeUSD',
-      totalLiquidity: 'totalLiquidityUSD',
-      totalTransaction: 'txCount',
-    };
-  }
-
-  public async getDateData(props: GetProtocolDateDataProps): Promise<ProtocolDateData> {
+  public async getDateData(props: GetProtocolDataProps): Promise<ProtocolData> {
     const { providers, date } = props;
 
-    const metricsV1 = await this.getMetricV1({ providers, date });
-    const metricsV2 = await super.getDateData({ providers, date });
-    const metricsV3 = await this.getMetricV3({ providers, date });
-
-    const revenueUSD = metricsV1.revenueUSD + metricsV2.revenueUSD + metricsV3.revenueUSD;
-    const totalValueLockedUSD =
-      metricsV1.totalValueLockedUSD + metricsV2.totalValueLockedUSD + metricsV3.totalValueLockedUSD;
-    const volumeInUseUSD = metricsV1.volumeInUseUSD + metricsV2.volumeInUseUSD + metricsV3.volumeInUseUSD;
-    const transactionCount = metricsV1.transactionCount + metricsV2.transactionCount + metricsV3.transactionCount;
-
-    return {
-      module: DefiProtocolModuleCode,
-      date: date,
-      name: this.configs.name,
+    const data: ProtocolData = {
+      revenueUSD: 0,
+      totalValueLockedUSD: 0,
+      volumeInUseUSD: 0,
       userCount: 0,
-      revenueUSD,
-      totalValueLockedUSD,
-      volumeInUseUSD,
-      transactionCount,
+      transactionCount: 0,
     };
+
+    for (let i = 0; i < this.configs.subgraphs.length; i++) {
+      const filters: any =
+        this.configs.subgraphs[i].version === 2 ? this.getFilters().dayData : this.getFilters().v3.dayData;
+      try {
+        const response = await providers.subgraph.querySubgraph(
+          this.configs.subgraphs[i].exchange,
+          `
+				{
+					${filters.dayDataVar}(first: 1, where: {date: ${date}}) {
+					  ${this.configs.subgraphs[i].version === 3 ? filters.totalFee : ''}
+						${filters.totalVolume}
+						${filters.totalLiquidity}
+						${filters.totalTransaction}
+					}
+				}
+			`
+        );
+
+        if (response[filters.dayDataVar] && response[filters.dayDataVar].length > 0) {
+          data.volumeInUseUSD += Number(response[filters.dayDataVar][0][filters.totalVolume]);
+          data.revenueUSD +=
+            this.configs.subgraphs[i].version === 2
+              ? (Number(response[filters.dayDataVar][0][filters.totalVolume]) * 0.3) / 100
+              : Number(response[filters.dayDataVar][0][filters.totalFee]);
+          data.totalValueLockedUSD += Number(response[filters.dayDataVar][0][filters.totalLiquidity]);
+          data.transactionCount += Number(response[filters.dayDataVar][0][filters.totalTransaction]);
+        }
+      } catch (e: any) {
+        logger.onError({
+          source: this.name,
+          message: 'failed top query protocol subgraph',
+          props: {
+            name: this.configs.name,
+            endpoint: this.configs.subgraphs[i].exchange,
+          },
+          error: e.message,
+        });
+      }
+    }
+
+    return data;
   }
 }

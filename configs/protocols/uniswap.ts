@@ -1,21 +1,25 @@
+import { getChainConfig } from '../chains';
 import { DefaultTokenList } from '../constants/defaultTokenList';
 import { UniswapProtocolConfig } from '../types';
 
-export const UniswapV2Configs: UniswapProtocolConfig = {
+export const UniswapConfigs: UniswapProtocolConfig = {
   name: 'uniswap',
-  subgraphs: ['https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2'],
   tokenomics: DefaultTokenList.UNI,
-};
-
-export const UniswapV1Configs: UniswapProtocolConfig = {
-  name: 'uniswap',
-  subgraphs: ['https://api.thegraph.com/subgraphs/name/ianlapham/uniswap'],
-};
-
-export const UniswapV3Configs: UniswapProtocolConfig = {
-  name: 'uniswap',
   subgraphs: [
-    'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3',
-    'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-polygon',
+    {
+      version: 2,
+      chainConfig: getChainConfig('ethereum'),
+      exchange: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
+    },
+    {
+      version: 3,
+      chainConfig: getChainConfig('ethereum'),
+      exchange: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3',
+    },
+    {
+      version: 3,
+      chainConfig: getChainConfig('polygon'),
+      exchange: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-polygon',
+    },
   ],
 };

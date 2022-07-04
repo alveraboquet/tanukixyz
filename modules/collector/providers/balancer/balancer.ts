@@ -1,7 +1,6 @@
-import { DefiProtocolModuleCode } from '../../../../configs';
 import { BalancerProtocolConfig } from '../../../../configs/types';
-import { ProtocolDateData } from '../../types';
-import CollectorProvider, { GetProtocolDateDataProps } from '../collector';
+import { ProtocolData } from '../../types';
+import CollectorProvider, { GetProtocolDataProps } from '../collector';
 
 export class BalancerProvider extends CollectorProvider {
   public readonly name: string = 'provider.balancer';
@@ -10,13 +9,10 @@ export class BalancerProvider extends CollectorProvider {
     super(configs);
   }
 
-  public async getDateData(props: GetProtocolDateDataProps): Promise<ProtocolDateData> {
+  public async getDateData(props: GetProtocolDataProps): Promise<ProtocolData> {
     const { providers, date } = props;
 
-    const dateData: ProtocolDateData = {
-      module: DefiProtocolModuleCode,
-      name: this.configs.name,
-      date: date,
+    const dateData: ProtocolData = {
       revenueUSD: 0,
       totalValueLockedUSD: 0,
       volumeInUseUSD: 0,
