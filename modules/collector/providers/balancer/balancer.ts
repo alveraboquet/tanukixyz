@@ -1,4 +1,5 @@
 import { BalancerProtocolConfig } from '../../../../configs/types';
+import { ShareProviders } from '../../../../lib/types';
 import { ProtocolData } from '../../types';
 import CollectorProvider, { GetProtocolDataProps } from '../collector';
 
@@ -9,9 +10,7 @@ export class BalancerProvider extends CollectorProvider {
     super(configs);
   }
 
-  public async getDateData(props: GetProtocolDataProps): Promise<ProtocolData> {
-    const { providers, date } = props;
-
+  private async getDatInRange(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {
     const dateData: ProtocolData = {
       revenueUSD: 0,
       totalValueLockedUSD: 0,
@@ -24,11 +23,11 @@ export class BalancerProvider extends CollectorProvider {
       const transactionCountFilter = `${this.configs.subgraphs[i].version === 1 ? 'txCount' : 'totalSwapCount'}`;
       const blockNumberStartDate = await providers.subgraph.queryBlockAtTimestamp(
         this.configs.subgraphs[i].chainConfig.subgraph?.blockSubgraph as string,
-        date
+        fromTime
       );
       let blockNumberEndDate = await providers.subgraph.queryBlockAtTimestamp(
         this.configs.subgraphs[i].chainConfig.subgraph?.blockSubgraph as string,
-        date + 24 * 60 * 60
+        toTime
       );
 
       // in case subgraph not full sync yet
@@ -72,5 +71,13 @@ export class BalancerProvider extends CollectorProvider {
     }
 
     return dateData;
+  }
+
+  public async getDailyData(props: GetProtocolDataProps): Promise<ProtocolData> {
+    return await this.getDatInRange(props.providers, props.date - 24 * 60 * 60, props.date);
+  }
+
+  public async getDateData(props: GetProtocolDataProps): Promise<ProtocolData> {
+    return await this.getDatInRange(props.providers, props.date, props.date + 24 * 60 * 60);
   }
 }
