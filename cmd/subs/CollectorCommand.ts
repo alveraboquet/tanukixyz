@@ -13,6 +13,7 @@ export class CollectorCommand extends BasicCommand {
     const providers = await super.getProviders();
     await collectorModule.run({
       providers,
+      mode: argv.mode,
       protocol: argv.protocol,
       initialDate: argv.initialDate ? argv.initialDate : 0,
       forceSync: argv.force ? argv.force : false,
@@ -25,6 +26,11 @@ export class CollectorCommand extends BasicCommand {
         type: 'string',
         default: '',
         describe: 'Run command with specify protocol name, ex: compound',
+      },
+      mode: {
+        type: 'string',
+        default: 'daily',
+        describe: 'Run collector with daily or date mode',
       },
       initialDate: {
         type: 'number',

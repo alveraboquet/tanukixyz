@@ -2,9 +2,11 @@ import { sleep } from '../../lib/helper';
 import logger from '../../lib/logger';
 import { ShareProviders } from '../../lib/types';
 import { Providers } from './configs';
+import { StartCollectorServiceMode } from './providers/collector';
 
 export interface RunCollectorModuleArgv {
   providers: ShareProviders;
+  mode: string;
   protocol: string;
   initialDate: number;
   forceSync: boolean;
@@ -26,6 +28,7 @@ class CollectorModule {
       }
 
       await provider.startService({
+        mode: argv.mode === 'date' ? StartCollectorServiceMode.DATE : StartCollectorServiceMode.DAILY,
         providers: argv.providers,
         initialDate: argv.initialDate,
         forceSync: argv.forceSync,
@@ -36,6 +39,7 @@ class CollectorModule {
         for (const [, provider] of Object.entries(Providers)) {
           try {
             await provider.startService({
+              mode: argv.mode === 'date' ? StartCollectorServiceMode.DATE : StartCollectorServiceMode.DAILY,
               providers: argv.providers,
               initialDate: argv.initialDate,
               forceSync: argv.forceSync,
