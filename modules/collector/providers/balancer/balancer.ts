@@ -1,3 +1,5 @@
+import BigNumber from 'bignumber.js';
+
 import { BalancerProtocolConfig } from '../../../../configs/types';
 import { ShareProviders } from '../../../../lib/types';
 import { ProtocolData } from '../../types';
@@ -66,7 +68,10 @@ export class BalancerProvider extends CollectorProvider {
         dateData.transactionCount +=
           Number(response['endDate'][0][transactionCountFilter]) -
           Number(response['startDate'][0][transactionCountFilter]);
-        dateData.totalValueLockedUSD += Number(response['endDate'][0]['totalLiquidity']);
+        dateData.totalValueLockedUSD +=
+          this.configs.subgraphs[i].version === 1
+            ? new BigNumber(response['endDate'][0]['totalLiquidity']).dividedBy(1e18).toNumber()
+            : Number(response['endDate'][0]['totalLiquidity']);
       }
     }
 
