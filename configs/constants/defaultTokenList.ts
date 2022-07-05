@@ -905,4 +905,44 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
       },
     },
   },
+  BSW: {
+    symbol: 'BSW',
+    coingeckoId: 'biswap',
+    chains: {
+      binance: {
+        decimals: 18,
+        address: '',
+      },
+    },
+  },
+  BABY: {
+    symbol: 'BABY',
+    coingeckoId: 'babyswap',
+    chains: {
+      binance: {
+        decimals: 18,
+        address: '',
+      },
+    },
+  },
+  MM: {
+    symbol: 'MM',
+    coingeckoId: 'mmfinance',
+    chains: {
+      cronos: {
+        decimals: 18,
+        address: '',
+      },
+    },
+  },
+  REF: {
+    symbol: 'REF',
+    coingeckoId: 'ref-finance',
+    chains: {
+      near: {
+        decimals: 24,
+        address: '',
+      },
+    },
+  },
 };

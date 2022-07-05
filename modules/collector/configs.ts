@@ -1,14 +1,18 @@
 import { AurigamiConfigs } from '../../configs/protocols/aurigami';
+import { BabyswapConfigs } from '../../configs/protocols/babyswap';
 import { BalancerConfigs } from '../../configs/protocols/balancer';
 import { BastionConfigs } from '../../configs/protocols/bastion';
 import { BeetsConfigs } from '../../configs/protocols/beets';
 import { BenqiConfigs } from '../../configs/protocols/benqi';
+import { BiswapConfigs } from '../../configs/protocols/biswap';
 import { CompoundConfigs } from '../../configs/protocols/compound';
 import { CreamConfigs } from '../../configs/protocols/cream';
 import { EulerConfigs } from '../../configs/protocols/euler';
 import { IronBankConfigs } from '../../configs/protocols/ironbank';
 import { LiquityConfigs } from '../../configs/protocols/liquity';
+import { MmfinanceConfigs } from '../../configs/protocols/mmfinance';
 import { PancakeswapConfigs } from '../../configs/protocols/pancakeswap';
+import { RefFinanceConfigs } from '../../configs/protocols/reffinance';
 import { SpookyswapConfigs } from '../../configs/protocols/spookyswap';
 import { SushiswapConfigs } from '../../configs/protocols/sushiswap';
 import { TraderJoeExchangeConfigs, TraderJoeLendingConfigs } from '../../configs/protocols/traderjoe';
@@ -19,7 +23,9 @@ import CollectorProvider from './providers/collector';
 import CompoundProvider from './providers/compound/compound';
 import EulerProvider from './providers/euler/euler';
 import LiquityProvider from './providers/liquity/liquity';
+import { PancakeswapProvider } from './providers/pancakeswap/pancakeswap';
 import { PancakeswapStreamFastProvider } from './providers/pancakeswap/pancakeswapStreamfast';
+import { RefFinanceProvider } from './providers/reffinance/reffinance';
 import { SushiswapProvider } from './providers/sushiswap/sushiswap';
 import TraderjoeProvider from './providers/traderjoe/traderjoe';
 import { UniswapProvider } from './providers/uniswap/uniswap';
@@ -45,4 +51,8 @@ export const Providers: { [key: string]: CollectorProvider } = {
   pancakeswap: new PancakeswapStreamFastProvider(PancakeswapConfigs),
   balancer: new BalancerProvider(BalancerConfigs),
   beets: new BalancerProvider(BeetsConfigs),
+  biswap: new PancakeswapProvider(BiswapConfigs),
+  babyswap: new PancakeswapProvider(BabyswapConfigs),
+  mmfinance: new PancakeswapProvider(MmfinanceConfigs),
+  reffinance: new RefFinanceProvider(RefFinanceConfigs),
 };
