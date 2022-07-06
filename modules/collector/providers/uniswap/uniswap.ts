@@ -1,4 +1,5 @@
 import { UniswapProtocolConfig } from '../../../../configs/types';
+import { normalizeAddress, sleep } from '../../../../lib/helper';
 import logger from '../../../../lib/logger';
 import { ProtocolData } from '../../types';
 import CollectorProvider, { GetProtocolDataProps } from '../collector';
@@ -67,6 +68,14 @@ export class UniswapProvider extends CollectorProvider {
     };
 
     for (let i = 0; i < this.configs.subgraphs.length; i++) {
+      logger.onDebug({
+        source: this.name,
+        message: 'querying volume, tvl, tcxCount from subgraph',
+        props: {
+          name: this.configs.name,
+          endpoint: this.configs.subgraphs[i].exchange,
+        },
+      });
       const filters: any =
         this.configs.subgraphs[i].version === 2 ? this.getFilters().factory : this.getFilters().v3.factory;
       const blockNumberLast24Hours = await providers.subgraph.queryBlockAtTimestamp(
@@ -95,7 +104,7 @@ export class UniswapProvider extends CollectorProvider {
             ${filters.totalVolume}
             ${filters.totalLiquidity}
             ${filters.totalTransaction}
-            }
+          }
 					data24: ${filters.factoryVar}(block: {number: ${blockNumberLast24Hours}}) {
 					  ${this.configs.subgraphs[i].version === 3 ? filters.totalFee : ''}
 						${filters.totalVolume}
@@ -153,6 +162,59 @@ export class UniswapProvider extends CollectorProvider {
           transactionCountChangePercentage: ((transactionCount - transactionCount24) / transactionCount24) * 100,
         };
       }
+
+      // count users
+      // try {
+      //   const addresses: any = {};
+      //   const eventResponses = await providers.subgraph.querySubgraph(
+      //     this.configs.subgraphs[i].exchange,
+      //     `
+      //       {
+      //
+      //         swap: swaps(where: {timestamp_gte: ${last24HoursTimestamp}, timestamp_lte: ${endTimestamp}}) {
+      //           transaction {
+      //             id
+      //           },
+      //           sender,
+      //         }
+      //         mint: mints(where: {timestamp_gte: ${last24HoursTimestamp}, timestamp_lte: ${endTimestamp}}) {
+      //           transaction {
+      //             id
+      //           },
+      //           sender,
+      //         }
+      //         burn: burns(where: {timestamp_gte: ${last24HoursTimestamp}, timestamp_lte: ${endTimestamp}}) {
+      //           transaction {
+      //             id
+      //           },
+      //           sender,
+      //         }
+      //       }
+      //     `
+      //   );
+      //   const swaps = eventResponses && eventResponses['swap'] ? eventResponses['swap'] : [];
+      //   const mints = eventResponses && eventResponses['mint'] ? eventResponses['mint'] : [];
+      //   const burns = eventResponses && eventResponses['burn'] ? eventResponses['burn'] : [];
+      //   const events = swaps.concat(mints).concat(burns);
+      //
+      //   console.info(events.length)
+      //
+      //   for (let i = 0; i < events.length; i++) {
+      //     if (!addresses[normalizeAddress(events[i].sender)]) {
+      //       addresses[normalizeAddress(events[i].sender)] = true;
+      //       data.userCount += 1;
+      //     }
+      //   }
+      // } catch (e: any) {
+      //   logger.onDebug({
+      //     source: this.name,
+      //     message: 'failed to count daily users',
+      //     props: {
+      //       name: this.configs.name,
+      //       error: e.message,
+      //     },
+      //   });
+      // }
     }
 
     return data;

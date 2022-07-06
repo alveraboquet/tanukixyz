@@ -7,6 +7,7 @@ import { BenqiConfigs } from '../../configs/protocols/benqi';
 import { BiswapConfigs } from '../../configs/protocols/biswap';
 import { CompoundConfigs } from '../../configs/protocols/compound';
 import { CreamConfigs } from '../../configs/protocols/cream';
+import { CurveConfigs } from '../../configs/protocols/curve';
 import { EulerConfigs } from '../../configs/protocols/euler';
 import { IronBankConfigs } from '../../configs/protocols/ironbank';
 import { LiquityConfigs } from '../../configs/protocols/liquity';
@@ -23,6 +24,7 @@ import { VvsfinanceConfigs } from '../../configs/protocols/vvsfinance';
 import { BalancerProvider } from './providers/balancer/balancer';
 import CollectorProvider from './providers/collector';
 import CompoundProvider from './providers/compound/compound';
+import { CurveProvider } from './providers/curve/curve';
 import EulerProvider from './providers/euler/euler';
 import LiquityProvider from './providers/liquity/liquity';
 import { PancakeswapProvider } from './providers/pancakeswap/pancakeswap';
@@ -35,6 +37,7 @@ import { VvsfinanceProvider } from './providers/vvsfinance/vvsfinance';
 
 export const Providers: { [key: string]: CollectorProvider } = {
   compound: new CompoundProvider(CompoundConfigs),
+  curve: new CurveProvider(CurveConfigs),
   liquity: new LiquityProvider(LiquityConfigs),
   euler: new EulerProvider(EulerConfigs),
   ironbank: new CompoundProvider(IronBankConfigs),
