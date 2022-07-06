@@ -9,7 +9,7 @@ export const SpookyswapConfigs: UniswapProtocolConfig = {
     {
       version: 2,
       chainConfig: getChainConfig('fantom'),
-      exchange: 'https://api.thegraph.com/subgraphs/name/eerieeight/spookyswap',
+      exchange: 'https://api.fura.org/subgraphs/name/spookyswap',
     },
   ],
 };
