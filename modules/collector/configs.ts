@@ -12,12 +12,14 @@ import { IronBankConfigs } from '../../configs/protocols/ironbank';
 import { LiquityConfigs } from '../../configs/protocols/liquity';
 import { MmfinanceConfigs } from '../../configs/protocols/mmfinance';
 import { PancakeswapConfigs } from '../../configs/protocols/pancakeswap';
+import { QuickswapConfigs } from '../../configs/protocols/quickswap';
 import { RefFinanceConfigs } from '../../configs/protocols/reffinance';
 import { SpookyswapConfigs } from '../../configs/protocols/spookyswap';
 import { SushiswapConfigs } from '../../configs/protocols/sushiswap';
 import { TraderJoeExchangeConfigs, TraderJoeLendingConfigs } from '../../configs/protocols/traderjoe';
 import { UniswapConfigs } from '../../configs/protocols/uniswap';
 import { VenusConfigs } from '../../configs/protocols/venus';
+import { VvsfinanceConfigs } from '../../configs/protocols/vvsfinance';
 import { BalancerProvider } from './providers/balancer/balancer';
 import CollectorProvider from './providers/collector';
 import CompoundProvider from './providers/compound/compound';
@@ -29,6 +31,7 @@ import { RefFinanceProvider } from './providers/reffinance/reffinance';
 import { SushiswapProvider } from './providers/sushiswap/sushiswap';
 import TraderjoeProvider from './providers/traderjoe/traderjoe';
 import { UniswapProvider } from './providers/uniswap/uniswap';
+import { VvsfinanceProvider } from './providers/vvsfinance/vvsfinance';
 
 export const Providers: { [key: string]: CollectorProvider } = {
   compound: new CompoundProvider(CompoundConfigs),
@@ -55,4 +58,6 @@ export const Providers: { [key: string]: CollectorProvider } = {
   babyswap: new PancakeswapProvider(BabyswapConfigs),
   mmfinance: new PancakeswapProvider(MmfinanceConfigs),
   reffinance: new RefFinanceProvider(RefFinanceConfigs),
+  quickswap: new UniswapProvider(QuickswapConfigs),
+  vvsfinance: new VvsfinanceProvider(VvsfinanceConfigs),
 };
