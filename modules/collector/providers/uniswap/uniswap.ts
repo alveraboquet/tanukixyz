@@ -220,8 +220,6 @@ export class UniswapProvider extends CollectorProvider {
 
           if (transactions.length > 0) {
             startTime = Number(transactions[transactions.length - 1]['timestamp']);
-          } else {
-            startTime += 5 * 60; // next 5 minutes
           }
 
           startTime += 1;

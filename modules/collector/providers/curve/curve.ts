@@ -13,7 +13,7 @@ export class CurveProvider extends CollectorProvider {
   }
 
   public async getDailyData(props: GetProtocolDataProps): Promise<ProtocolData> {
-    const { providers } = props;
+    const { providers, date } = props;
 
     const data: ProtocolData = {
       revenueUSD: 0,
@@ -64,6 +64,54 @@ export class CurveProvider extends CollectorProvider {
         const response = await axios.get(tvlApis[i]);
         if (response.data && response.data.data && response.data.data.tvl) {
           data.totalValueLockedUSD += Number(response.data.data.tvl);
+        }
+      }
+
+      // count transaction and user
+      const addresses: any = {};
+      const transactions: any = {};
+      let startTime = date - 24 * 60 * 60;
+      while (startTime <= date) {
+        try {
+          const query = `
+            {
+              swaps(first: 1000, where: {timestamp_gte: ${startTime}}) {
+                timestamp
+                user {
+                  id
+                }
+                transaction {
+                  id
+                }
+              }
+            }
+          `;
+          const response = await providers.subgraph.querySubgraph(this.configs.subgraph, query);
+          const events = response.swaps && response.swaps.length > 0 ? response.swaps : [];
+          for (let i = 0; i < events.length; i++) {
+            if (!transactions[events[i].transaction.id.split('-')[0]]) {
+              data.transactionCount += 1;
+              transactions[events[i].transaction.id.split('-')[0]] = true;
+            }
+            if (!addresses[events[i].user.id.split('-')[0]]) {
+              data.userCount += 1;
+              addresses[events[i].user.id.split('-')[0]] = true;
+            }
+          }
+
+          if (events.length > 0) {
+            startTime = Number(events[events.length - 1].timestamp);
+          }
+          startTime += 1;
+        } catch (e: any) {
+          logger.onDebug({
+            source: this.name,
+            message: 'failed to count daily users, txs',
+            props: {
+              name: this.configs.name,
+              error: e.message,
+            },
+          });
         }
       }
     } catch (e: any) {

@@ -33,6 +33,8 @@ class CollectorModule {
         initialDate: argv.initialDate,
         forceSync: argv.forceSync,
       });
+
+      process.exit(0);
     } else {
       // run all
       while (true) {
