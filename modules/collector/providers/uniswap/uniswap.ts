@@ -164,57 +164,78 @@ export class UniswapProvider extends CollectorProvider {
       }
 
       // count users
-      // try {
-      //   const addresses: any = {};
-      //   const eventResponses = await providers.subgraph.querySubgraph(
-      //     this.configs.subgraphs[i].exchange,
-      //     `
-      //       {
-      //
-      //         swap: swaps(where: {timestamp_gte: ${last24HoursTimestamp}, timestamp_lte: ${endTimestamp}}) {
-      //           transaction {
-      //             id
-      //           },
-      //           sender,
-      //         }
-      //         mint: mints(where: {timestamp_gte: ${last24HoursTimestamp}, timestamp_lte: ${endTimestamp}}) {
-      //           transaction {
-      //             id
-      //           },
-      //           sender,
-      //         }
-      //         burn: burns(where: {timestamp_gte: ${last24HoursTimestamp}, timestamp_lte: ${endTimestamp}}) {
-      //           transaction {
-      //             id
-      //           },
-      //           sender,
-      //         }
-      //       }
-      //     `
-      //   );
-      //   const swaps = eventResponses && eventResponses['swap'] ? eventResponses['swap'] : [];
-      //   const mints = eventResponses && eventResponses['mint'] ? eventResponses['mint'] : [];
-      //   const burns = eventResponses && eventResponses['burn'] ? eventResponses['burn'] : [];
-      //   const events = swaps.concat(mints).concat(burns);
-      //
-      //   console.info(events.length)
-      //
-      //   for (let i = 0; i < events.length; i++) {
-      //     if (!addresses[normalizeAddress(events[i].sender)]) {
-      //       addresses[normalizeAddress(events[i].sender)] = true;
-      //       data.userCount += 1;
-      //     }
-      //   }
-      // } catch (e: any) {
-      //   logger.onDebug({
-      //     source: this.name,
-      //     message: 'failed to count daily users',
-      //     props: {
-      //       name: this.configs.name,
-      //       error: e.message,
-      //     },
-      //   });
-      // }
+      try {
+        const addresses: any = {};
+
+        let startTime = last24HoursTimestamp;
+        while (startTime <= endTimestamp) {
+          const transactionsResponses = await providers.subgraph.querySubgraph(
+            this.configs.subgraphs[i].exchange,
+            `
+            {
+              transactions(first: 1000, where: {timestamp_gte: ${startTime}}) {
+                timestamp
+                swaps(first: 1000) {
+                  sender
+                  ${this.configs.subgraphs[i].version === 2 ? 'to' : 'recipient'}
+                }
+                mints(first: 1000) {
+                  sender
+                  ${this.configs.subgraphs[i].version === 2 ? 'to' : 'owner'},
+                }
+                burns(first: 1000) {
+                  ${this.configs.subgraphs[i].version === 2 ? 'sender' : 'owner'}
+                ${this.configs.subgraphs[i].version === 2 ? 'to' : ''}
+                }
+              }
+            }
+          `
+          );
+          const transactions =
+            transactionsResponses && transactionsResponses['transactions'] ? transactionsResponses['transactions'] : [];
+
+          for (let i = 0; i < transactions.length; i++) {
+            const events: Array<any> = transactions[i].swaps
+              .concat(transactions[i].mints)
+              .concat(transactions[i].burns);
+            for (let eIdx = 0; eIdx < events.length; eIdx++) {
+              if (events[eIdx].sender && !addresses[normalizeAddress(events[eIdx].sender)]) {
+                data.userCount += 1;
+                addresses[normalizeAddress(events[eIdx].sender)] = true;
+              }
+              if (events[eIdx].owner && !addresses[normalizeAddress(events[eIdx].owner)]) {
+                data.userCount += 1;
+                addresses[normalizeAddress(events[eIdx].owner)] = true;
+              }
+              if (events[eIdx].to && !addresses[normalizeAddress(events[eIdx].to)]) {
+                data.userCount += 1;
+                addresses[normalizeAddress(events[eIdx].to)] = true;
+              }
+              if (events[eIdx].recipient && !addresses[normalizeAddress(events[eIdx].recipient)]) {
+                data.userCount += 1;
+                addresses[normalizeAddress(events[eIdx].recipient)] = true;
+              }
+            }
+          }
+
+          if (transactions.length > 0) {
+            startTime = Number(transactions[transactions.length - 1]['timestamp']);
+          } else {
+            startTime += 5 * 60; // next 5 minutes
+          }
+
+          startTime += 1;
+        }
+      } catch (e: any) {
+        logger.onDebug({
+          source: this.name,
+          message: 'failed to count daily users',
+          props: {
+            name: this.configs.name,
+            error: e.message,
+          },
+        });
+      }
     }
 
     return data;

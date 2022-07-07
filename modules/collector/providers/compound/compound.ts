@@ -136,7 +136,8 @@ class CompoundProvider extends CollectorProvider {
               const borrowBefore = new BigNumber(totalBorrows.toString()).dividedBy(multiplier).toNumber();
               const borrowAfter = new BigNumber(events[i].returnValues.totalBorrows).dividedBy(multiplier).toNumber();
               const repayAmount = new BigNumber(events[i].returnValues.repayAmount).dividedBy(multiplier).toNumber();
-              data.revenueUSD += repayAmount + borrowAfter > borrowBefore ? repayAmount + borrowAfter - borrowBefore : 0;
+              data.revenueUSD +=
+                repayAmount + borrowAfter > borrowBefore ? repayAmount + borrowAfter - borrowBefore : 0;
             } catch (e: any) {
               logger.onDebug({
                 source: this.name,

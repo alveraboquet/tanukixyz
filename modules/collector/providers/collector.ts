@@ -80,6 +80,8 @@ class CollectorProvider implements ICollectorProvider {
           revenueUSD: dailyData.revenueUSD.toFixed(2),
           tvlUSD: dailyData.totalValueLockedUSD.toFixed(2),
           volumeUSD: dailyData.volumeInUseUSD.toFixed(2),
+          userCount: dailyData.userCount.toFixed(2),
+          txnCount: dailyData.transactionCount.toFixed(2),
         },
       });
     } else {

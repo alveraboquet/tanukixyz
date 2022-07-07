@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js';
 
 import { EulerProtocolConfig } from '../../../../configs/types';
 import logger from '../../../../lib/logger';
+import database from '../../../../lib/providers/database';
 import { ProtocolData } from '../../types';
 import CollectorProvider, { GetProtocolDataProps } from '../collector';
 
@@ -95,6 +96,110 @@ class EulerProvider extends CollectorProvider {
       // next hour
       fromTime += 60 * 60;
     }
+
+    // query interestAccumulator
+    // try {
+    //   // Collateral + Cross markets
+    //   const symbols: Array<any> = [
+    //     {
+    //       symbol: 'DAI',
+    //       decimals: 18,
+    //     },
+    //     {
+    //       symbol: 'WETH',
+    //       decimals: 18,
+    //     },
+    //     {
+    //       symbol: 'USDC',
+    //       decimals: 6,
+    //     },
+    //     {
+    //       symbol: 'wstETH',
+    //       decimals: 18,
+    //     },
+    //     {
+    //       symbol: 'WBTC',
+    //       decimals: 8,
+    //     },
+    //     {
+    //       symbol: 'UNI',
+    //       decimals: 18,
+    //     },
+    //     {
+    //       symbol: 'LINK',
+    //       decimals: 18,
+    //     },
+    //     {
+    //       symbol: 'ENS',
+    //       decimals: 18,
+    //     },
+    //     {
+    //       symbol: 'agEUR',
+    //       decimals: 18,
+    //     },
+    //     {
+    //       symbol: 'MATIC',
+    //       decimals: 18,
+    //     },
+    //     {
+    //       symbol: 'CVX',
+    //       decimals: 18,
+    //     },
+    //     {
+    //       symbol: 'GRT',
+    //       decimals: 18,
+    //     },
+    //     {
+    //       symbol: 'MKR',
+    //       decimals: 18,
+    //     },
+    //   ];
+    //
+    //   const blockNumberLast24Hours = await providers.subgraph.queryBlockAtTimestamp(
+    //     this.configs.chainConfig.subgraph?.blockSubgraph as string,
+    //     date - 24 * 60 * 60
+    //   );
+    //   let blockNumberEndTime = await providers.subgraph.queryBlockAtTimestamp(
+    //     this.configs.chainConfig.subgraph?.blockSubgraph as string,
+    //     date
+    //   );
+    //
+    //   // in case subgraph not full sync yet
+    //   const blockNumberMeta = await providers.subgraph.queryMetaLatestBlock(this.configs.graphEndpoint);
+    //   blockNumberEndTime = blockNumberEndTime > blockNumberMeta ? blockNumberMeta : blockNumberEndTime;
+    //
+    //   for (let i = 0; i < symbols.length; i++) {
+    //     const query = `
+    // 		{
+    // 			fromData: assets(first: 1, where: {symbol: "${symbols[i].symbols}"}, block: {number: ${blockNumberLast24Hours}}) {
+    // 				interestAccumulator,
+    // 			}
+    // 			toData: assets(first: 1, where: {symbol: "${symbols[i].symbols}"}, block: {number: ${blockNumberEndTime}}) {
+    // 				interestAccumulator,
+    // 			}
+    // 		}
+    // 	`;
+    //     const response = await providers.subgraph.querySubgraph(this.configs.graphEndpoint as string, query);
+    //     const parsedTop = response.toData && response.toData.length > 0 ? response.toData[0] : null;
+    //     const parsedBottom = response.fromData && response.fromData.length > 0 ? response.fromData[0] : null;
+    //     if (parsedTop && parsedBottom) {
+    //       dailyData.revenueUSD += new BigNumber(parsedTop.interestAccumulator.toString())
+    //         .minus(new BigNumber(parsedBottom.interestAccumulator.toString()))
+    //         .dividedBy(new BigNumber(10).pow(symbols[i].decimals))
+    //         .toNumber();
+    //     }
+    //   }
+    // } catch (e: any) {
+    //   logger.onDebug({
+    //     source: this.name,
+    //     message: 'failed to get asset data',
+    //     props: {
+    //       date: new Date(date * 1000).toISOString().split('T')[0],
+    //       endpoint: this.configs.graphEndpoint,
+    //       error: e.message,
+    //     },
+    //   });
+    // }
 
     return dailyData;
   }
