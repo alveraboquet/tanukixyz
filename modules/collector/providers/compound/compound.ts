@@ -125,6 +125,29 @@ class CompoundProvider extends CollectorProvider {
               .dividedBy(new BigNumber(10).pow(poolConfig.underlying.chains[poolConfig.chainConfig.name].decimals))
               .multipliedBy(historyPrice)
               .toNumber();
+
+            try {
+              // count revenue = totalBorrowAfterWithRepay - totalBorrowBeforeRepay
+              const contract = new web3.eth.Contract(CompoundLendAbi as any, poolConfig.contractAddress);
+              const totalBorrows = await contract.methods.totalBorrows().call(events[i].blockNumber - 1);
+              const multiplier = new BigNumber(10).pow(
+                poolConfig.underlying.chains[poolConfig.chainConfig.name].decimals
+              );
+              const borrowBefore = new BigNumber(totalBorrows.toString()).dividedBy(multiplier).toNumber();
+              const borrowAfter = new BigNumber(events[i].returnValues.totalBorrows).dividedBy(multiplier).toNumber();
+              const repayAmount = new BigNumber(events[i].returnValues.repayAmount).dividedBy(multiplier).toNumber();
+              data.revenueUSD += repayAmount + borrowAfter > borrowBefore ? repayAmount + borrowAfter - borrowBefore : 0;
+            } catch (e: any) {
+              logger.onDebug({
+                source: this.name,
+                message: 'cannot query history data',
+                props: {
+                  chain: poolConfig.chainConfig.name,
+                  contract: normalizeAddress(poolConfig.contractAddress),
+                  error: e.message,
+                },
+              });
+            }
           }
         }
       }
