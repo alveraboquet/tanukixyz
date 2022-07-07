@@ -30,7 +30,6 @@ import LiquityProvider from './providers/liquity/liquity';
 import { PancakeswapProvider } from './providers/pancakeswap/pancakeswap';
 import { PancakeswapStreamFastProvider } from './providers/pancakeswap/pancakeswapStreamfast';
 import { RefFinanceProvider } from './providers/reffinance/reffinance';
-import { SpookyswapProvider } from './providers/spookyswap/spookyswap';
 import { SushiswapProvider } from './providers/sushiswap/sushiswap';
 import TraderjoeProvider from './providers/traderjoe/traderjoe';
 import { UniswapProvider } from './providers/uniswap/uniswap';
@@ -54,7 +53,7 @@ export const Providers: { [key: string]: CollectorProvider } = {
   aurigami: new CompoundProvider(AurigamiConfigs),
   uniswap: new UniswapProvider(UniswapConfigs),
   sushiswap: new SushiswapProvider(SushiswapConfigs),
-  spookyswap: new SpookyswapProvider(SpookyswapConfigs),
+  spookyswap: new UniswapProvider(SpookyswapConfigs),
   pancakeswap: new PancakeswapStreamFastProvider(PancakeswapConfigs),
   balancer: new BalancerProvider(BalancerConfigs),
   beets: new BalancerProvider(BeetsConfigs),

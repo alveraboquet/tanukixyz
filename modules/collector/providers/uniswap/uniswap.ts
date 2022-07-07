@@ -78,22 +78,44 @@ export class UniswapProvider extends CollectorProvider {
       });
       const filters: any =
         this.configs.subgraphs[i].version === 2 ? this.getFilters().factory : this.getFilters().v3.factory;
-      const blockNumberLast24Hours = await providers.subgraph.queryBlockAtTimestamp(
-        this.configs.subgraphs[i].chainConfig.subgraph?.blockSubgraph as string,
-        last24HoursTimestamp
-      );
-      const blockNumberLast48Hours = await providers.subgraph.queryBlockAtTimestamp(
-        this.configs.subgraphs[i].chainConfig.subgraph?.blockSubgraph as string,
-        last48HoursTimestamp
-      );
-      let blockNumberEndTime = await providers.subgraph.queryBlockAtTimestamp(
-        this.configs.subgraphs[i].chainConfig.subgraph?.blockSubgraph as string,
-        endTimestamp
-      );
 
-      // in case subgraph not full sync yet
-      const blockNumberMeta = await providers.subgraph.queryMetaLatestBlock(this.configs.subgraphs[i].exchange);
-      blockNumberEndTime = blockNumberEndTime > blockNumberMeta ? blockNumberMeta : blockNumberEndTime;
+      let blockNumberLast24Hours: Number;
+      let blockNumberLast48Hours: Number;
+      let blockNumberEndTime: Number;
+
+      if (this.configs.subgraphs[i].exchange.includes('thegraph.com')) {
+        // thegraph
+        blockNumberLast24Hours = await providers.subgraph.queryBlockAtTimestamp(
+          this.configs.subgraphs[i].chainConfig.subgraph?.blockSubgraph as string,
+          last24HoursTimestamp
+        );
+        blockNumberLast48Hours = await providers.subgraph.queryBlockAtTimestamp(
+          this.configs.subgraphs[i].chainConfig.subgraph?.blockSubgraph as string,
+          last48HoursTimestamp
+        );
+        blockNumberEndTime = await providers.subgraph.queryBlockAtTimestamp(
+          this.configs.subgraphs[i].chainConfig.subgraph?.blockSubgraph as string,
+          endTimestamp
+        );
+
+        // in case the graph not full sync yet
+        const blockNumberMeta = await providers.subgraph.queryMetaLatestBlock(this.configs.subgraphs[i].exchange);
+        blockNumberEndTime = blockNumberEndTime > blockNumberMeta ? blockNumberMeta : blockNumberEndTime;
+      } else {
+        // fura
+        blockNumberLast24Hours = await providers.subgraph.queryBlockAtTimestamp(
+          this.configs.subgraphs[i].exchange,
+          last24HoursTimestamp
+        );
+        blockNumberLast48Hours = await providers.subgraph.queryBlockAtTimestamp(
+          this.configs.subgraphs[i].exchange,
+          last48HoursTimestamp
+        );
+        blockNumberEndTime = await providers.subgraph.queryBlockAtTimestamp(
+          this.configs.subgraphs[i].exchange,
+          endTimestamp
+        );
+      }
 
       const response = await providers.subgraph.querySubgraph(
         this.configs.subgraphs[i].exchange,

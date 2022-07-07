@@ -18,7 +18,7 @@ export const QuickswapConfigs: UniswapProtocolConfig = {
     {
       version: 2,
       chainConfig: getChainConfig('polygon'),
-      exchange: 'https://api.thegraph.com/subgraphs/name/sameepsi/quickswap06',
+      exchange: 'https://polygon.furadao.org/subgraphs/name/quickswap',
     },
   ],
 };
