@@ -8,6 +8,7 @@ import { BiswapConfigs } from '../../configs/protocols/biswap';
 import { CompoundConfigs } from '../../configs/protocols/compound';
 import { CreamConfigs } from '../../configs/protocols/cream';
 import { CurveConfigs } from '../../configs/protocols/curve';
+import { DodoexConfigs } from '../../configs/protocols/dodoex';
 import { EulerConfigs } from '../../configs/protocols/euler';
 import { IronBankConfigs } from '../../configs/protocols/ironbank';
 import { LiquityConfigs } from '../../configs/protocols/liquity';
@@ -25,6 +26,7 @@ import { BalancerProvider } from './providers/balancer/balancer';
 import CollectorProvider from './providers/collector';
 import CompoundProvider from './providers/compound/compound';
 import { CurveProvider } from './providers/curve/curve';
+import { DodoexProvider } from './providers/dodoex/dodoex';
 import EulerProvider from './providers/euler/euler';
 import LiquityProvider from './providers/liquity/liquity';
 import { PancakeswapProvider } from './providers/pancakeswap/pancakeswap';
@@ -43,6 +45,7 @@ export const Providers: { [key: string]: CollectorProvider } = {
   ironbank: new CompoundProvider(IronBankConfigs),
   cream: new CompoundProvider(CreamConfigs),
   benqi: new CompoundProvider(BenqiConfigs),
+  dodoex: new DodoexProvider(DodoexConfigs),
   venus: new CompoundProvider(VenusConfigs),
   traderjoe: new TraderjoeProvider({
     name: 'traderjoe',
