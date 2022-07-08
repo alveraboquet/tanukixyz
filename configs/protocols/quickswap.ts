@@ -6,7 +6,7 @@ export const QuickswapConfigs: UniswapProtocolConfig = {
   name: 'quickswap',
   tokenomics: {
     symbol: 'QUICK',
-    coingeckoId: 'quickswap',
+    coingeckoId: 'quick',
     chains: {
       polygon: {
         decimals: 18,

@@ -1,4 +1,4 @@
-import { CompoundProtocolConfig, UniswapProtocolConfig } from '../../../../configs/types';
+import {CompoundProtocolConfig, TokenConfig, UniswapProtocolConfig} from '../../../../configs/types';
 import { ProtocolData } from '../../types';
 import CollectorProvider, { GetProtocolDataProps } from '../collector';
 import CompoundProvider from '../compound/compound';
@@ -8,6 +8,7 @@ export interface TraderjoeProtocolConfig {
   name: string;
   exchange: UniswapProtocolConfig;
   lending: CompoundProtocolConfig;
+  tokenomics: TokenConfig;
 }
 
 class TraderjoeProvider extends CollectorProvider {

@@ -36,6 +36,7 @@ import { SushiswapProvider } from './providers/sushiswap/sushiswap';
 import TraderjoeProvider from './providers/traderjoe/traderjoe';
 import { UniswapProvider } from './providers/uniswap/uniswap';
 import { VvsfinanceProvider } from './providers/vvsfinance/vvsfinance';
+import {DefaultTokenList} from "../../configs/constants/defaultTokenList";
 
 export const Providers: { [key: string]: CollectorProvider } = {
   compound: new CompoundProvider(CompoundConfigs),
@@ -51,6 +52,7 @@ export const Providers: { [key: string]: CollectorProvider } = {
     name: 'traderjoe',
     exchange: TraderJoeExchangeConfigs,
     lending: TraderJoeLendingConfigs,
+    tokenomics: DefaultTokenList.JOE,
   }),
   bastion: new CompoundProvider(BastionConfigs),
   aurigami: new CompoundProvider(AurigamiConfigs),
