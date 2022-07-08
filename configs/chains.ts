@@ -44,7 +44,7 @@ export const Blockchains: Array<ChainConfig> = [
     name: 'polygon',
     nodeRpcs: {
       default: AnkrPublicNodes.polygon,
-      archive: AnkrPublicNodes.polygon,
+      archive: 'https://matic-mainnet.chainstacklabs.com',
     },
     subgraph: {
       blockSubgraph: BlockSubgraphs.polygon,

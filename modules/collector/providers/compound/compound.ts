@@ -156,9 +156,9 @@ class CompoundProvider extends CollectorProvider {
       try {
         // count liquidity
         const contract = new web3.eth.Contract(CompoundLendAbi as any, poolConfig.contractAddress);
-        const totalCash = await contract.methods.getCash().call(events[0].blockNumber);
-        const totalBorrows = await contract.methods.totalBorrows().call(events[0].blockNumber);
-        const totalReserves = await contract.methods.totalReserves().call(events[0].blockNumber);
+        const totalCash = await contract.methods.getCash().call();
+        const totalBorrows = await contract.methods.totalBorrows().call();
+        const totalReserves = await contract.methods.totalReserves().call();
         const underlyingLiquidity = new BigNumber(totalCash.toString())
           .plus(new BigNumber(totalBorrows.toString()))
           .minus(new BigNumber(totalReserves.toString()))

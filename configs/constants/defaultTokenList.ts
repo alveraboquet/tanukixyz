@@ -133,6 +133,10 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
         decimals: 18,
         address: '',
       },
+      binance: {
+        decimals: 18,
+        address: '',
+      },
     },
   },
   MKR: {
