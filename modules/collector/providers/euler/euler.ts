@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js';
 
 import { EulerProtocolConfig } from '../../../../configs/types';
+import { normalizeAddress } from '../../../../lib/helper';
 import logger from '../../../../lib/logger';
 import database from '../../../../lib/providers/database';
 import { ProtocolData } from '../../types';
@@ -97,109 +98,60 @@ class EulerProvider extends CollectorProvider {
       fromTime += 60 * 60;
     }
 
-    // query interestAccumulator
-    // try {
-    //   // Collateral + Cross markets
-    //   const symbols: Array<any> = [
-    //     {
-    //       symbol: 'DAI',
-    //       decimals: 18,
-    //     },
-    //     {
-    //       symbol: 'WETH',
-    //       decimals: 18,
-    //     },
-    //     {
-    //       symbol: 'USDC',
-    //       decimals: 6,
-    //     },
-    //     {
-    //       symbol: 'wstETH',
-    //       decimals: 18,
-    //     },
-    //     {
-    //       symbol: 'WBTC',
-    //       decimals: 8,
-    //     },
-    //     {
-    //       symbol: 'UNI',
-    //       decimals: 18,
-    //     },
-    //     {
-    //       symbol: 'LINK',
-    //       decimals: 18,
-    //     },
-    //     {
-    //       symbol: 'ENS',
-    //       decimals: 18,
-    //     },
-    //     {
-    //       symbol: 'agEUR',
-    //       decimals: 18,
-    //     },
-    //     {
-    //       symbol: 'MATIC',
-    //       decimals: 18,
-    //     },
-    //     {
-    //       symbol: 'CVX',
-    //       decimals: 18,
-    //     },
-    //     {
-    //       symbol: 'GRT',
-    //       decimals: 18,
-    //     },
-    //     {
-    //       symbol: 'MKR',
-    //       decimals: 18,
-    //     },
-    //   ];
-    //
-    //   const blockNumberLast24Hours = await providers.subgraph.queryBlockAtTimestamp(
-    //     this.configs.chainConfig.subgraph?.blockSubgraph as string,
-    //     date - 24 * 60 * 60
-    //   );
-    //   let blockNumberEndTime = await providers.subgraph.queryBlockAtTimestamp(
-    //     this.configs.chainConfig.subgraph?.blockSubgraph as string,
-    //     date
-    //   );
-    //
-    //   // in case subgraph not full sync yet
-    //   const blockNumberMeta = await providers.subgraph.queryMetaLatestBlock(this.configs.graphEndpoint);
-    //   blockNumberEndTime = blockNumberEndTime > blockNumberMeta ? blockNumberMeta : blockNumberEndTime;
-    //
-    //   for (let i = 0; i < symbols.length; i++) {
-    //     const query = `
-    // 		{
-    // 			fromData: assets(first: 1, where: {symbol: "${symbols[i].symbols}"}, block: {number: ${blockNumberLast24Hours}}) {
-    // 				interestAccumulator,
-    // 			}
-    // 			toData: assets(first: 1, where: {symbol: "${symbols[i].symbols}"}, block: {number: ${blockNumberEndTime}}) {
-    // 				interestAccumulator,
-    // 			}
-    // 		}
-    // 	`;
-    //     const response = await providers.subgraph.querySubgraph(this.configs.graphEndpoint as string, query);
-    //     const parsedTop = response.toData && response.toData.length > 0 ? response.toData[0] : null;
-    //     const parsedBottom = response.fromData && response.fromData.length > 0 ? response.fromData[0] : null;
-    //     if (parsedTop && parsedBottom) {
-    //       dailyData.revenueUSD += new BigNumber(parsedTop.interestAccumulator.toString())
-    //         .minus(new BigNumber(parsedBottom.interestAccumulator.toString()))
-    //         .dividedBy(new BigNumber(10).pow(symbols[i].decimals))
-    //         .toNumber();
-    //     }
-    //   }
-    // } catch (e: any) {
-    //   logger.onDebug({
-    //     source: this.name,
-    //     message: 'failed to get asset data',
-    //     props: {
-    //       date: new Date(date * 1000).toISOString().split('T')[0],
-    //       endpoint: this.configs.graphEndpoint,
-    //       error: e.message,
-    //     },
-    //   });
-    // }
+    // count user & transaction
+    try {
+      fromTime = date - 24 * 60 * 60;
+      const addresses: any = {};
+      const transactions: any = {};
+
+      while (fromTime < date) {
+        const balanceChangesResponses = await providers.subgraph.querySubgraph(
+          this.configs.graphEndpoint,
+          `
+            {
+              balanceChanges(first: 1000, where: {timestamp_gte: ${fromTime}}) {
+                timestamp
+                transactionHash
+                account {
+                  id
+                }
+              }
+            }
+          `
+        );
+
+        const balanceChanges: Array<any> =
+          balanceChangesResponses && balanceChangesResponses['balanceChanges']
+            ? balanceChangesResponses['balanceChanges']
+            : [];
+        for (let i = 0; i < balanceChanges.length; i++) {
+          if (balanceChanges[i].transactionHash && !transactions[balanceChanges[i].transactionHash]) {
+            dailyData.transactionCount += 1;
+            transactions[balanceChanges[i].transactionHash] = true;
+          }
+          if (balanceChanges[i].account.id && !addresses[normalizeAddress(balanceChanges[i].account.id)]) {
+            dailyData.userCount += 1;
+            addresses[normalizeAddress(balanceChanges[i].account.id)] = true;
+          }
+        }
+
+        if (balanceChanges.length > 0) {
+          fromTime = Number(balanceChanges[balanceChanges.length - 1]['timestamp']);
+        }
+
+        // no more records
+        break;
+      }
+    } catch (e: any) {
+      logger.onDebug({
+        source: this.name,
+        message: 'failed to count daily users',
+        props: {
+          name: this.configs.name,
+          error: e.message,
+        },
+      });
+    }
 
     return dailyData;
   }

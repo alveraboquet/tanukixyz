@@ -112,7 +112,8 @@ export class BalancerProvider extends CollectorProvider {
             startTime = Number(transactions[transactions.length - 1]['timestamp']);
           }
 
-          startTime += 1;
+          // no more records
+          break;
         }
       } catch (e: any) {
         logger.onDebug({
