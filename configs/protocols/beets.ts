@@ -10,8 +10,8 @@ export const BeetsConfigs: BalancerProtocolConfig = {
       fantom: {
         decimals: 18,
         address: '0xf24bcf4d1e507740041c9cfd2dddb29585adce1e',
-      }
-    }
+      },
+    },
   },
   subgraphs: [
     {

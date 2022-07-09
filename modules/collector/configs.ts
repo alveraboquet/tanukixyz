@@ -1,3 +1,4 @@
+import { DefaultTokenList } from '../../configs/constants/defaultTokenList';
 import { AurigamiConfigs } from '../../configs/protocols/aurigami';
 import { BabyswapConfigs } from '../../configs/protocols/babyswap';
 import { BalancerConfigs } from '../../configs/protocols/balancer';
@@ -36,7 +37,6 @@ import { SushiswapProvider } from './providers/sushiswap/sushiswap';
 import TraderjoeProvider from './providers/traderjoe/traderjoe';
 import { UniswapProvider } from './providers/uniswap/uniswap';
 import { VvsfinanceProvider } from './providers/vvsfinance/vvsfinance';
-import {DefaultTokenList} from "../../configs/constants/defaultTokenList";
 
 export const Providers: { [key: string]: CollectorProvider } = {
   compound: new CompoundProvider(CompoundConfigs),

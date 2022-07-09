@@ -1,4 +1,4 @@
-import {CompoundProtocolConfig, TokenConfig, UniswapProtocolConfig} from '../../../../configs/types';
+import { CompoundProtocolConfig, TokenConfig, UniswapProtocolConfig } from '../../../../configs/types';
 import { ProtocolData } from '../../types';
 import CollectorProvider, { GetProtocolDataProps } from '../collector';
 import CompoundProvider from '../compound/compound';
