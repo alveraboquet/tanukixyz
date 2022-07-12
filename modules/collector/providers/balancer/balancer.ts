@@ -85,7 +85,7 @@ export class BalancerProvider extends CollectorProvider {
             this.configs.subgraphs[i].exchange,
             `
             {
-              swaps(first: 1000, where: {timestamp_gte: ${startTime}}) {
+              swaps(first: 1000, where: {timestamp_gte: ${startTime}}, orderBy: timestamp, orderDirection: asc) {
                 timestamp
                 caller
                 userAddress {
@@ -109,7 +109,7 @@ export class BalancerProvider extends CollectorProvider {
           }
 
           if (transactions.length > 0) {
-            startTime = Number(transactions[transactions.length - 1]['timestamp']);
+            startTime = Number(transactions[transactions.length - 1]['timestamp']) + 1;
           } else {
             // no more records
             break;

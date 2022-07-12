@@ -83,7 +83,10 @@ export class UniswapProvider extends CollectorProvider {
       let blockNumberLast48Hours: Number;
       let blockNumberEndTime: Number;
 
-      if (this.configs.subgraphs[i].exchange.includes('thegraph.com')) {
+      if (
+        this.configs.subgraphs[i].exchange.includes('thegraph.com') ||
+        this.configs.subgraphs[i].exchange.includes('streamingfast.io')
+      ) {
         // thegraph
         blockNumberLast24Hours = await providers.subgraph.queryBlockAtTimestamp(
           this.configs.subgraphs[i].chainConfig.subgraph?.blockSubgraph as string,
@@ -195,7 +198,7 @@ export class UniswapProvider extends CollectorProvider {
             this.configs.subgraphs[i].exchange,
             `
             {
-              transactions(first: 1000, where: {timestamp_gte: ${startTime}}) {
+              transactions(first: 1000, where: {timestamp_gte: ${startTime}}, orderBy: timestamp, orderDirection: asc) {
                 timestamp
                 swaps(first: 1000) {
                   sender
@@ -207,7 +210,7 @@ export class UniswapProvider extends CollectorProvider {
                 }
                 burns(first: 1000) {
                   ${this.configs.subgraphs[i].version === 2 ? 'sender' : 'owner'}
-                ${this.configs.subgraphs[i].version === 2 ? 'to' : ''}
+                  ${this.configs.subgraphs[i].version === 2 ? 'to' : ''}
                 }
               }
             }
@@ -241,7 +244,7 @@ export class UniswapProvider extends CollectorProvider {
           }
 
           if (transactions.length > 0) {
-            startTime = Number(transactions[transactions.length - 1]['timestamp']);
+            startTime = Number(transactions[transactions.length - 1]['timestamp']) + 1;
           } else {
             // no more records
             break;

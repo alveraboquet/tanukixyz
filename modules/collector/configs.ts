@@ -33,7 +33,6 @@ import { DodoexProvider } from './providers/dodoex/dodoex';
 import EulerProvider from './providers/euler/euler';
 import LiquityProvider from './providers/liquity/liquity';
 import { PancakeswapProvider } from './providers/pancakeswap/pancakeswap';
-import { PancakeswapStreamFastProvider } from './providers/pancakeswap/pancakeswapStreamfast';
 import { RefFinanceProvider } from './providers/reffinance/reffinance';
 import { SushiswapProvider } from './providers/sushiswap/sushiswap';
 import TraderjoeProvider from './providers/traderjoe/traderjoe';
@@ -62,7 +61,7 @@ export const Providers: { [key: string]: CollectorProvider } = {
   uniswap: new UniswapProvider(UniswapConfigs),
   sushiswap: new SushiswapProvider(SushiswapConfigs),
   spookyswap: new UniswapProvider(SpookyswapConfigs),
-  pancakeswap: new PancakeswapStreamFastProvider(PancakeswapConfigs),
+  pancakeswap: new PancakeswapProvider(PancakeswapConfigs),
   balancer: new BalancerProvider(BalancerConfigs),
   beets: new BalancerProvider(BeetsConfigs),
   biswap: new PancakeswapProvider(BiswapConfigs),

@@ -96,7 +96,7 @@ export class CurveProvider extends CollectorProvider {
       try {
         const query = `
             {
-              swaps(first: 1000, where: {timestamp_gte: ${startTime}}) {
+              swaps(first: 1000, where: {timestamp_gte: ${startTime}}, orderBy: timestamp, orderDirection: asc) {
                 timestamp
                 user {
                   id
@@ -121,7 +121,7 @@ export class CurveProvider extends CollectorProvider {
         }
 
         if (events.length > 0) {
-          startTime = Number(events[events.length - 1].timestamp);
+          startTime = Number(events[events.length - 1].timestamp) + 1;
         } else {
           break;
         }

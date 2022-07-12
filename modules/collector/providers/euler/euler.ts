@@ -109,7 +109,7 @@ class EulerProvider extends CollectorProvider {
           this.configs.graphEndpoint,
           `
             {
-              balanceChanges(first: 1000, where: {timestamp_gte: ${fromTime}}) {
+              balanceChanges(first: 1000, where: {timestamp_gte: ${fromTime}}, orderBy: timestamp, orderDirection: asc) {
                 timestamp
                 transactionHash
                 account {
@@ -136,7 +136,7 @@ class EulerProvider extends CollectorProvider {
         }
 
         if (balanceChanges.length > 0) {
-          fromTime = Number(balanceChanges[balanceChanges.length - 1]['timestamp']);
+          fromTime = Number(balanceChanges[balanceChanges.length - 1]['timestamp']) + 1;
         } else {
           // no more records
           break;
