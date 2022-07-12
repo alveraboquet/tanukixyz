@@ -1031,4 +1031,14 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
       },
     },
   },
+  ENS: {
+    symbol: 'ENS',
+    coingeckoId: 'ethereum-name-service',
+    chains: {
+      ethereum: {
+        decimals: 18,
+        address: '',
+      },
+    },
+  },
 };

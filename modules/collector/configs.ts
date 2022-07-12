@@ -8,6 +8,7 @@ import { BeetsConfigs } from '../../configs/protocols/beets';
 import { BenqiConfigs } from '../../configs/protocols/benqi';
 import { BiswapConfigs } from '../../configs/protocols/biswap';
 import { CompoundConfigs } from '../../configs/protocols/compound';
+import { ConvexConfigs } from '../../configs/protocols/convex';
 import { CreamConfigs } from '../../configs/protocols/cream';
 import { CurveConfigs } from '../../configs/protocols/curve';
 import { DodoexConfigs } from '../../configs/protocols/dodoex';
@@ -28,6 +29,7 @@ import { AaveProvider } from './providers/aave/aave';
 import { BalancerProvider } from './providers/balancer/balancer';
 import CollectorProvider from './providers/collector';
 import CompoundProvider from './providers/compound/compound';
+import { ConvexProvider } from './providers/convex/convex';
 import { CurveProvider } from './providers/curve/curve';
 import { DodoexProvider } from './providers/dodoex/dodoex';
 import EulerProvider from './providers/euler/euler';
@@ -45,6 +47,7 @@ export const Providers: { [key: string]: CollectorProvider } = {
   curve: new CurveProvider(CurveConfigs),
   liquity: new LiquityProvider(LiquityConfigs),
   euler: new EulerProvider(EulerConfigs),
+  convex: new ConvexProvider(ConvexConfigs),
   ironbank: new CompoundProvider(IronBankConfigs),
   cream: new CompoundProvider(CreamConfigs),
   benqi: new CompoundProvider(BenqiConfigs),
