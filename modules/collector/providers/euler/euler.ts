@@ -137,10 +137,10 @@ class EulerProvider extends CollectorProvider {
 
         if (balanceChanges.length > 0) {
           fromTime = Number(balanceChanges[balanceChanges.length - 1]['timestamp']);
+        } else {
+          // no more records
+          break;
         }
-
-        // no more records
-        break;
       }
     } catch (e: any) {
       logger.onDebug({

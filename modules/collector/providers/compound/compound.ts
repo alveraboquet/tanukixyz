@@ -29,6 +29,10 @@ class CompoundProvider extends CollectorProvider {
 
     const eventCollection = await providers.database.getCollection(envConfig.database.collections.globalContractEvents);
 
+    const addresses: any = {};
+    const transactions: any = {};
+    const historyPrices: any = {};
+
     for (let poolId = 0; poolId < this.configs.pools.length; poolId++) {
       const events = await eventCollection
         .find({
@@ -40,10 +44,6 @@ class CompoundProvider extends CollectorProvider {
         })
         .sort({ timestamp: -1 }) // get the latest event by index 0
         .toArray();
-
-      const addresses: any = {};
-      const transactions: any = {};
-      const historyPrices: any = {};
       const poolConfig = getPoolConfigByAddress(this.configs.pools[poolId].contractAddress, this.configs.pools);
       if (!poolConfig) {
         logger.onDebug({

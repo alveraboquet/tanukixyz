@@ -29,6 +29,14 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
         decimals: 18,
         address: '',
       },
+      arbitrum: {
+        decimals: 18,
+        address: '',
+      },
+      harmony: {
+        decimals: 18,
+        address: '',
+      },
     },
   },
   AAVE: {
@@ -39,6 +47,10 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
         decimals: 18,
         address: '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9',
       },
+      avalanche: {
+        decimals: 18,
+        address: '',
+      },
       fantom: {
         decimals: 18,
         address: '',
@@ -48,6 +60,14 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
         address: '',
       },
       polygon: {
+        decimals: 18,
+        address: '',
+      },
+      arbitrum: {
+        decimals: 18,
+        address: '',
+      },
+      harmony: {
         decimals: 18,
         address: '',
       },
@@ -101,6 +121,14 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
         decimals: 18,
         address: '',
       },
+      arbitrum: {
+        decimals: 18,
+        address: '',
+      },
+      harmony: {
+        decimals: 18,
+        address: '',
+      },
     },
   },
   FEI: {
@@ -134,6 +162,14 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
         address: '',
       },
       binance: {
+        decimals: 18,
+        address: '',
+      },
+      arbitrum: {
+        decimals: 18,
+        address: '',
+      },
+      harmony: {
         decimals: 18,
         address: '',
       },
@@ -255,6 +291,14 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
         decimals: 6,
         address: '',
       },
+      arbitrum: {
+        decimals: 6,
+        address: '',
+      },
+      harmony: {
+        decimals: 6,
+        address: '',
+      },
     },
   },
   USDP: {
@@ -295,6 +339,14 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
         decimals: 6,
         address: '',
       },
+      arbitrum: {
+        decimals: 6,
+        address: '',
+      },
+      harmony: {
+        decimals: 6,
+        address: '',
+      },
     },
   },
   WBTC: {
@@ -318,11 +370,19 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
         address: '',
       },
       polygon: {
-        decimals: 18,
+        decimals: 8,
         address: '',
       },
       aurora: {
-        decimals: 18,
+        decimals: 8,
+        address: '',
+      },
+      arbitrum: {
+        decimals: 8,
+        address: '',
+      },
+      harmony: {
+        decimals: 8,
         address: '',
       },
     },
@@ -378,6 +438,10 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
         address: '',
       },
       polygon: {
+        decimals: 18,
+        address: '',
+      },
+      fantom: {
         decimals: 18,
         address: '',
       },
@@ -509,6 +573,10 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
     symbol: 'FRAX',
     coingeckoId: 'frax',
     chains: {
+      ethereum: {
+        decimals: 18,
+        address: '',
+      },
       fantom: {
         decimals: 18,
         address: '',
@@ -660,7 +728,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
     },
   },
   ADA: {
-    symbol: 'AAVE',
+    symbol: 'ADA',
     coingeckoId: 'cardano',
     chains: {
       binance: {
@@ -907,6 +975,10 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
         decimals: 18,
         address: '',
       },
+      polygon: {
+        decimals: 18,
+        address: '',
+      },
     },
   },
   BSW: {
@@ -945,6 +1017,16 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
     chains: {
       near: {
         decimals: 24,
+        address: '',
+      },
+    },
+  },
+  ONE: {
+    symbol: 'ONE',
+    coingeckoId: 'harmony',
+    chains: {
+      harmony: {
+        decimals: 18,
         address: '',
       },
     },

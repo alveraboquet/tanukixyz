@@ -1,4 +1,5 @@
 import { DefaultTokenList } from '../../configs/constants/defaultTokenList';
+import { AaveConfigs } from '../../configs/protocols/aave';
 import { AurigamiConfigs } from '../../configs/protocols/aurigami';
 import { BabyswapConfigs } from '../../configs/protocols/babyswap';
 import { BalancerConfigs } from '../../configs/protocols/balancer';
@@ -23,6 +24,7 @@ import { TraderJoeExchangeConfigs, TraderJoeLendingConfigs } from '../../configs
 import { UniswapConfigs } from '../../configs/protocols/uniswap';
 import { VenusConfigs } from '../../configs/protocols/venus';
 import { VvsfinanceConfigs } from '../../configs/protocols/vvsfinance';
+import { AaveProvider } from './providers/aave/aave';
 import { BalancerProvider } from './providers/balancer/balancer';
 import CollectorProvider from './providers/collector';
 import CompoundProvider from './providers/compound/compound';
@@ -40,6 +42,7 @@ import { VvsfinanceProvider } from './providers/vvsfinance/vvsfinance';
 
 export const Providers: { [key: string]: CollectorProvider } = {
   compound: new CompoundProvider(CompoundConfigs),
+  aave: new AaveProvider(AaveConfigs),
   curve: new CurveProvider(CurveConfigs),
   liquity: new LiquityProvider(LiquityConfigs),
   euler: new EulerProvider(EulerConfigs),
