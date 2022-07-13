@@ -19,6 +19,7 @@ import { MmfinanceConfigs } from '../../configs/protocols/mmfinance';
 import { PancakeswapConfigs } from '../../configs/protocols/pancakeswap';
 import { QuickswapConfigs } from '../../configs/protocols/quickswap';
 import { RefFinanceConfigs } from '../../configs/protocols/reffinance';
+import { RibbonConfigs } from '../../configs/protocols/ribbon';
 import { SpookyswapConfigs } from '../../configs/protocols/spookyswap';
 import { SushiswapConfigs } from '../../configs/protocols/sushiswap';
 import { TraderJoeExchangeConfigs, TraderJoeLendingConfigs } from '../../configs/protocols/traderjoe';
@@ -36,6 +37,7 @@ import EulerProvider from './providers/euler/euler';
 import LiquityProvider from './providers/liquity/liquity';
 import { PancakeswapProvider } from './providers/pancakeswap/pancakeswap';
 import { RefFinanceProvider } from './providers/reffinance/reffinance';
+import { RibbonProvider } from './providers/ribbon/ribbon';
 import { SushiswapProvider } from './providers/sushiswap/sushiswap';
 import TraderjoeProvider from './providers/traderjoe/traderjoe';
 import { UniswapProvider } from './providers/uniswap/uniswap';
@@ -48,6 +50,7 @@ export const Providers: { [key: string]: CollectorProvider } = {
   liquity: new LiquityProvider(LiquityConfigs),
   euler: new EulerProvider(EulerConfigs),
   convex: new ConvexProvider(ConvexConfigs),
+  ribbon: new RibbonProvider(RibbonConfigs),
   ironbank: new CompoundProvider(IronBankConfigs),
   cream: new CompoundProvider(CreamConfigs),
   benqi: new CompoundProvider(BenqiConfigs),

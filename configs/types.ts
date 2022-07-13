@@ -61,6 +61,11 @@ export interface CompoundLendingPoolConfig extends EventIndexConfig {
   underlying: TokenConfig;
 }
 
+export interface ProtocolConfig {
+  name: string;
+  tokenomics?: TokenConfig;
+}
+
 export interface CompoundProtocolConfig {
   name: string;
   tokenomics?: TokenConfig;
