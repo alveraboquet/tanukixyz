@@ -49,10 +49,7 @@ class CollectorProvider implements ICollectorProvider {
 
   public async getDateData(argv: GetProtocolDataProps): Promise<any> {
     const { providers, date } = argv;
-
-    const startDateTime = getStartDayTimestamp(date);
-
-    return await this.getDataInTimeFrame(providers, startDateTime, date);
+    return await this.getDataInTimeFrame(providers, date, date + 24 * 60 * 60);
   }
 
   public async startService(props: StartCollectorServiceProps): Promise<any> {
