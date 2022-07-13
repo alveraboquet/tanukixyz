@@ -14,7 +14,7 @@ export class BalancerProvider extends CollectorProvider {
     super(configs);
   }
 
-  private async getDatInRange(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {
+  public async getDataInTimeFrame(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {
     const dateData: ProtocolData = {
       revenueUSD: 0,
       totalValueLockedUSD: 0,
@@ -128,13 +128,5 @@ export class BalancerProvider extends CollectorProvider {
     }
 
     return dateData;
-  }
-
-  public async getDailyData(props: GetProtocolDataProps): Promise<ProtocolData> {
-    return await this.getDatInRange(props.providers, props.date - 24 * 60 * 60, props.date);
-  }
-
-  public async getDateData(props: GetProtocolDataProps): Promise<ProtocolData> {
-    return await this.getDatInRange(props.providers, props.date, props.date + 24 * 60 * 60);
   }
 }

@@ -1,6 +1,6 @@
 import { DefiProtocolModuleCode, InitialSyncDate } from '../../../configs';
 import envConfig from '../../../configs/env';
-import { getTimestamp, getTodayUTCTimestamp } from '../../../lib/helper';
+import { getStartDayTimestamp, getTimestamp, getTodayUTCTimestamp } from '../../../lib/helper';
 import logger from '../../../lib/logger';
 import { ShareProviders } from '../../../lib/types';
 import { ICollectorProvider, ProtocolData } from '../types';
@@ -31,12 +31,28 @@ class CollectorProvider implements ICollectorProvider {
     this.configs = configs;
   }
 
-  getDailyData(argv: GetProtocolDataProps): Promise<any> {
+  // override this function
+  getDataInTimeFrame(providers: ShareProviders, fromTime: number, toTime: number): Promise<any> {
     return Promise.resolve(undefined);
   }
 
-  getDateData(argv: GetProtocolDataProps): Promise<any> {
-    return Promise.resolve(undefined);
+  public async getDailyData(argv: GetProtocolDataProps): Promise<any> {
+    const { providers, date } = argv;
+
+    const endTimestamp = date;
+
+    // last 24 hours
+    const last24HoursTimestamp = date - 24 * 60 * 60;
+
+    return await this.getDataInTimeFrame(providers, last24HoursTimestamp, endTimestamp);
+  }
+
+  public async getDateData(argv: GetProtocolDataProps): Promise<any> {
+    const { providers, date } = argv;
+
+    const startDateTime = getStartDayTimestamp(date);
+
+    return await this.getDataInTimeFrame(providers, startDateTime, date);
   }
 
   public async startService(props: StartCollectorServiceProps): Promise<any> {

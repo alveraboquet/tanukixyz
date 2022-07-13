@@ -1,6 +1,7 @@
 import { UniswapProtocolConfig } from '../../../../configs/types';
-import { normalizeAddress, sleep } from '../../../../lib/helper';
+import { getStartDayTimestamp, normalizeAddress } from '../../../../lib/helper';
 import logger from '../../../../lib/logger';
+import { ShareProviders } from '../../../../lib/types';
 import { ProtocolData } from '../../types';
 import CollectorProvider, { GetProtocolDataProps } from '../collector';
 
@@ -49,16 +50,7 @@ export class UniswapProvider extends CollectorProvider {
     };
   }
 
-  public async getDailyData(props: GetProtocolDataProps): Promise<ProtocolData> {
-    const { providers, date } = props;
-
-    const endTimestamp = date;
-
-    // last 24 hours
-    const last24HoursTimestamp = date - 24 * 60 * 60;
-    // last 48 hours
-    const last48HoursTimestamp = date - 48 * 60 * 60;
-
+  public async getDataInTimeFrame(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {
     const data: ProtocolData = {
       revenueUSD: 0,
       totalValueLockedUSD: 0,
@@ -79,64 +71,46 @@ export class UniswapProvider extends CollectorProvider {
       const filters: any =
         this.configs.subgraphs[i].version === 2 ? this.getFilters().factory : this.getFilters().v3.factory;
 
-      let blockNumberLast24Hours: Number;
-      let blockNumberLast48Hours: Number;
-      let blockNumberEndTime: Number;
+      let blockNumberFromTime: Number;
+      let blockNumberToTime: Number;
 
       if (
         this.configs.subgraphs[i].exchange.includes('thegraph.com') ||
         this.configs.subgraphs[i].exchange.includes('streamingfast.io')
       ) {
         // thegraph
-        blockNumberLast24Hours = await providers.subgraph.queryBlockAtTimestamp(
+        blockNumberFromTime = await providers.subgraph.queryBlockAtTimestamp(
           this.configs.subgraphs[i].chainConfig.subgraph?.blockSubgraph as string,
-          last24HoursTimestamp
+          fromTime
         );
-        blockNumberLast48Hours = await providers.subgraph.queryBlockAtTimestamp(
+        blockNumberToTime = await providers.subgraph.queryBlockAtTimestamp(
           this.configs.subgraphs[i].chainConfig.subgraph?.blockSubgraph as string,
-          last48HoursTimestamp
-        );
-        blockNumberEndTime = await providers.subgraph.queryBlockAtTimestamp(
-          this.configs.subgraphs[i].chainConfig.subgraph?.blockSubgraph as string,
-          endTimestamp
+          toTime
         );
 
         // in case the graph not full sync yet
         const blockNumberMeta = await providers.subgraph.queryMetaLatestBlock(this.configs.subgraphs[i].exchange);
-        blockNumberEndTime = blockNumberEndTime > blockNumberMeta ? blockNumberMeta : blockNumberEndTime;
+        blockNumberToTime = blockNumberToTime > blockNumberMeta ? blockNumberMeta : blockNumberToTime;
       } else {
         // fura
-        blockNumberLast24Hours = await providers.subgraph.queryBlockAtTimestamp(
+        blockNumberFromTime = await providers.subgraph.queryBlockAtTimestamp(
           this.configs.subgraphs[i].exchange,
-          last24HoursTimestamp
+          fromTime
         );
-        blockNumberLast48Hours = await providers.subgraph.queryBlockAtTimestamp(
-          this.configs.subgraphs[i].exchange,
-          last48HoursTimestamp
-        );
-        blockNumberEndTime = await providers.subgraph.queryBlockAtTimestamp(
-          this.configs.subgraphs[i].exchange,
-          endTimestamp
-        );
+        blockNumberToTime = await providers.subgraph.queryBlockAtTimestamp(this.configs.subgraphs[i].exchange, toTime);
       }
 
       const response = await providers.subgraph.querySubgraph(
         this.configs.subgraphs[i].exchange,
         `
 				{
-          data: ${filters.factoryVar}(block: {number: ${blockNumberEndTime}}) {
+          data: ${filters.factoryVar}(block: {number: ${blockNumberToTime}}) {
             ${this.configs.subgraphs[i].version === 3 ? filters.totalFee : ''}
             ${filters.totalVolume}
             ${filters.totalLiquidity}
             ${filters.totalTransaction}
           }
-					data24: ${filters.factoryVar}(block: {number: ${blockNumberLast24Hours}}) {
-					  ${this.configs.subgraphs[i].version === 3 ? filters.totalFee : ''}
-						${filters.totalVolume}
-						${filters.totalLiquidity}
-						${filters.totalTransaction}
-					}
-					data48: ${filters.factoryVar}(block: {number: ${blockNumberLast48Hours}}) {
+					data24: ${filters.factoryVar}(block: {number: ${blockNumberFromTime}}) {
 					  ${this.configs.subgraphs[i].version === 3 ? filters.totalFee : ''}
 						${filters.totalVolume}
 						${filters.totalLiquidity}
@@ -148,7 +122,6 @@ export class UniswapProvider extends CollectorProvider {
 
       const parsed = response && response['data'] ? response['data'][0] : null;
       const parsed24 = response && response['data24'] ? response['data24'][0] : null;
-      const parsed48 = response && response['data48'] ? response['data48'][0] : null;
 
       if (parsed && parsed24) {
         const volumeUSD = Number(parsed[filters.totalVolume]) - Number(parsed24[filters.totalVolume]);
@@ -161,39 +134,21 @@ export class UniswapProvider extends CollectorProvider {
         data.transactionCount += Number(parsed[filters.totalTransaction]) - Number(parsed24[filters.totalTransaction]);
       }
 
-      if (parsed && parsed24 && parsed48) {
-        const volumeUSD = Number(parsed[filters.totalVolume]) - Number(parsed24[filters.totalVolume]);
-        const volumeUSD24 = Number(parsed24[filters.totalVolume]) - Number(parsed48[filters.totalVolume]);
-        const revenueUSD =
-          this.configs.subgraphs[i].version === 2
-            ? (volumeUSD * 0.3) / 100
-            : Number(parsed[filters.totalFee]) - Number(parsed24[filters.totalFee]);
-        const revenueUSD24 =
-          this.configs.subgraphs[i].version === 2
-            ? (volumeUSD * 0.3) / 100
-            : Number(parsed24[filters.totalFee]) - Number(parsed48[filters.totalFee]);
-        const totalValueLockedUSD = Number(parsed[filters.totalLiquidity]);
-        const totalValueLockedUSD24 = Number(parsed24[filters.totalLiquidity]);
-        const transactionCount = Number(parsed[filters.totalTransaction]) - Number(parsed24[filters.totalTransaction]);
-        const transactionCount24 =
-          Number(parsed24[filters.totalTransaction]) - Number(parsed48[filters.totalTransaction]);
-
-        data.changes = {
-          revenueChangePercentage: ((revenueUSD - revenueUSD24) / revenueUSD24) * 100,
-          totalValueLockedChangePercentage:
-            ((totalValueLockedUSD - totalValueLockedUSD24) / totalValueLockedUSD24) * 100,
-          volumeInUseChangePercentage: ((volumeUSD - volumeUSD24) / volumeUSD24) * 100,
-          userCountChangePercentage: 0,
-          transactionCountChangePercentage: ((transactionCount - transactionCount24) / transactionCount24) * 100,
-        };
-      }
-
       // count users
       try {
+        logger.onDebug({
+          source: this.name,
+          message: 'querying transactions and events',
+          props: {
+            name: this.configs.name,
+            endpoint: this.configs.subgraphs[i].exchange,
+          },
+        });
+
         const addresses: any = {};
 
-        let startTime = last24HoursTimestamp;
-        while (startTime <= endTimestamp) {
+        let startTime = fromTime;
+        while (startTime <= toTime) {
           const transactionsResponses = await providers.subgraph.querySubgraph(
             this.configs.subgraphs[i].exchange,
             `
@@ -258,60 +213,6 @@ export class UniswapProvider extends CollectorProvider {
             name: this.configs.name,
             error: e.message,
           },
-        });
-      }
-    }
-
-    return data;
-  }
-
-  public async getDateData(props: GetProtocolDataProps): Promise<ProtocolData> {
-    const { providers, date } = props;
-
-    const data: ProtocolData = {
-      revenueUSD: 0,
-      totalValueLockedUSD: 0,
-      volumeInUseUSD: 0,
-      userCount: 0,
-      transactionCount: 0,
-    };
-
-    for (let i = 0; i < this.configs.subgraphs.length; i++) {
-      const filters: any =
-        this.configs.subgraphs[i].version === 2 ? this.getFilters().dayData : this.getFilters().v3.dayData;
-      try {
-        const response = await providers.subgraph.querySubgraph(
-          this.configs.subgraphs[i].exchange,
-          `
-				{
-					${filters.dayDataVar}(first: 1, where: {date: ${date}}) {
-					  ${this.configs.subgraphs[i].version === 3 ? filters.totalFee : ''}
-						${filters.totalVolume}
-						${filters.totalLiquidity}
-						${filters.totalTransaction}
-					}
-				}
-			`
-        );
-
-        if (response[filters.dayDataVar] && response[filters.dayDataVar].length > 0) {
-          data.volumeInUseUSD += Number(response[filters.dayDataVar][0][filters.totalVolume]);
-          data.revenueUSD +=
-            this.configs.subgraphs[i].version === 2
-              ? (Number(response[filters.dayDataVar][0][filters.totalVolume]) * 0.3) / 100
-              : Number(response[filters.dayDataVar][0][filters.totalFee]);
-          data.totalValueLockedUSD += Number(response[filters.dayDataVar][0][filters.totalLiquidity]);
-          data.transactionCount += Number(response[filters.dayDataVar][0][filters.totalTransaction]);
-        }
-      } catch (e: any) {
-        logger.onError({
-          source: this.name,
-          message: 'failed top query protocol subgraph',
-          props: {
-            name: this.configs.name,
-            endpoint: this.configs.subgraphs[i].exchange,
-          },
-          error: e.message,
         });
       }
     }

@@ -3,9 +3,9 @@ import BigNumber from 'bignumber.js';
 import { EulerProtocolConfig } from '../../../../configs/types';
 import { normalizeAddress } from '../../../../lib/helper';
 import logger from '../../../../lib/logger';
-import database from '../../../../lib/providers/database';
+import { ShareProviders } from '../../../../lib/types';
 import { ProtocolData } from '../../types';
-import CollectorProvider, { GetProtocolDataProps } from '../collector';
+import CollectorProvider from '../collector';
 
 class EulerProvider extends CollectorProvider {
   public readonly name: string = 'provider.euler';
@@ -14,11 +14,8 @@ class EulerProvider extends CollectorProvider {
     super(configs);
   }
 
-  public async getDailyData(props: GetProtocolDataProps): Promise<ProtocolData> {
-    const { date, providers } = props;
-    let fromTime = date - 24 * 60 * 60;
-
-    const dailyData: ProtocolData = {
+  public async getDataInTimeFrame(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {
+    const data: ProtocolData = {
       revenueUSD: 0,
       totalValueLockedUSD: 0,
       volumeInUseUSD: 0,
@@ -30,27 +27,28 @@ class EulerProvider extends CollectorProvider {
     const metaBlock = await providers.subgraph.queryMetaLatestBlock(this.configs.graphEndpoint);
     const blockAtDate = await providers.subgraph.queryBlockAtTimestamp(
       this.configs.chainConfig.subgraph.blockSubgraph as string,
-      date
+      toTime
     );
     const blockNumber = blockAtDate < metaBlock ? blockAtDate : metaBlock;
 
-    while (fromTime < date) {
+    let startTime = fromTime;
+    while (startTime < toTime) {
       try {
         const query = `
 				{
-					deposit: hourlyDeposits(where: {timestamp_gte: ${fromTime}}) {
+					deposit: hourlyDeposits(where: {timestamp_gte: ${startTime}}) {
 						count,
 						totalUsdAmount,
 					}
-					withdraw: hourlyWithdraws(where: {timestamp_gte: ${fromTime}}) {
+					withdraw: hourlyWithdraws(where: {timestamp_gte: ${startTime}}) {
 						count,
 						totalUsdAmount,
 					}
-					borrow: hourlyBorrows(where: {timestamp_gte: ${date}}) {
+					borrow: hourlyBorrows(where: {timestamp_gte: ${startTime}}) {
 						count,
 						totalUsdAmount,
 					}
-					repay: hourlyRepays(where: {timestamp_gte: ${date}}) {
+					repay: hourlyRepays(where: {timestamp_gte: ${startTime}}) {
 						count,
 						totalUsdAmount,
 					}
@@ -62,32 +60,30 @@ class EulerProvider extends CollectorProvider {
         const response = await providers.subgraph.querySubgraph(this.configs.graphEndpoint as string, query);
 
         if (response['deposit'].length > 0) {
-          dailyData.volumeInUseUSD += new BigNumber(response['deposit'][0].totalUsdAmount).dividedBy(1e18).toNumber();
-          dailyData.transactionCount += Number(response['deposit'][0].count);
+          data.volumeInUseUSD += new BigNumber(response['deposit'][0].totalUsdAmount).dividedBy(1e18).toNumber();
+          data.transactionCount += Number(response['deposit'][0].count);
         }
         if (response['withdraw'].length > 0) {
-          dailyData.volumeInUseUSD += new BigNumber(response['withdraw'][0].totalUsdAmount).dividedBy(1e18).toNumber();
-          dailyData.transactionCount += Number(response['withdraw'][0].count);
+          data.volumeInUseUSD += new BigNumber(response['withdraw'][0].totalUsdAmount).dividedBy(1e18).toNumber();
+          data.transactionCount += Number(response['withdraw'][0].count);
         }
         if (response['borrow'].length > 0) {
-          dailyData.volumeInUseUSD += new BigNumber(response['borrow'][0].totalUsdAmount).dividedBy(1e18).toNumber();
-          dailyData.transactionCount += Number(response['borrow'][0].count);
+          data.volumeInUseUSD += new BigNumber(response['borrow'][0].totalUsdAmount).dividedBy(1e18).toNumber();
+          data.transactionCount += Number(response['borrow'][0].count);
         }
         if (response['repay'].length > 0) {
-          dailyData.volumeInUseUSD += new BigNumber(response['repay'][0].totalUsdAmount).dividedBy(1e18).toNumber();
-          dailyData.transactionCount += Number(response['repay'][0].count);
+          data.volumeInUseUSD += new BigNumber(response['repay'][0].totalUsdAmount).dividedBy(1e18).toNumber();
+          data.transactionCount += Number(response['repay'][0].count);
         }
 
         // count liquidity
-        dailyData.totalValueLockedUSD = new BigNumber(response['overview'][0].totalBalancesUsd)
-          .dividedBy(1e18)
-          .toNumber();
+        data.totalValueLockedUSD = new BigNumber(response['overview'][0].totalBalancesUsd).dividedBy(1e18).toNumber();
       } catch (e: any) {
         logger.onError({
           source: this.name,
           message: 'failed to get hourly data',
           props: {
-            date: new Date(date * 1000).toISOString().split('T')[0],
+            date: new Date(toTime * 1000).toISOString().split('T')[0],
             endpoint: this.configs.graphEndpoint,
           },
           error: e.message,
@@ -95,21 +91,21 @@ class EulerProvider extends CollectorProvider {
       }
 
       // next hour
-      fromTime += 60 * 60;
+      startTime += 60 * 60;
     }
 
     // count user & transaction
     try {
-      fromTime = date - 24 * 60 * 60;
+      startTime = fromTime;
       const addresses: any = {};
       const transactions: any = {};
 
-      while (fromTime < date) {
+      while (startTime < toTime) {
         const balanceChangesResponses = await providers.subgraph.querySubgraph(
           this.configs.graphEndpoint,
           `
             {
-              balanceChanges(first: 1000, where: {timestamp_gte: ${fromTime}}, orderBy: timestamp, orderDirection: asc) {
+              balanceChanges(first: 1000, where: {timestamp_gte: ${startTime}}, orderBy: timestamp, orderDirection: asc) {
                 timestamp
                 transactionHash
                 account {
@@ -126,17 +122,17 @@ class EulerProvider extends CollectorProvider {
             : [];
         for (let i = 0; i < balanceChanges.length; i++) {
           if (balanceChanges[i].transactionHash && !transactions[balanceChanges[i].transactionHash]) {
-            dailyData.transactionCount += 1;
+            data.transactionCount += 1;
             transactions[balanceChanges[i].transactionHash] = true;
           }
           if (balanceChanges[i].account.id && !addresses[normalizeAddress(balanceChanges[i].account.id)]) {
-            dailyData.userCount += 1;
+            data.userCount += 1;
             addresses[normalizeAddress(balanceChanges[i].account.id)] = true;
           }
         }
 
         if (balanceChanges.length > 0) {
-          fromTime = Number(balanceChanges[balanceChanges.length - 1]['timestamp']) + 1;
+          startTime = Number(balanceChanges[balanceChanges.length - 1]['timestamp']) + 1;
         } else {
           // no more records
           break;
@@ -153,86 +149,7 @@ class EulerProvider extends CollectorProvider {
       });
     }
 
-    return dailyData;
-  }
-
-  public async getDateData(props: GetProtocolDataProps): Promise<ProtocolData> {
-    const { date, providers } = props;
-
-    const dateData: ProtocolData = {
-      revenueUSD: 0,
-      totalValueLockedUSD: 0,
-      volumeInUseUSD: 0,
-      userCount: 0,
-      transactionCount: 0,
-    };
-
-    // query date data
-    const metaBlock = await providers.subgraph.queryMetaLatestBlock(this.configs.graphEndpoint);
-    const blockAtDate = await providers.subgraph.queryBlockAtTimestamp(
-      this.configs.chainConfig.subgraph.blockSubgraph as string,
-      date
-    );
-    const blockNumber = blockAtDate < metaBlock ? blockAtDate : metaBlock;
-
-    try {
-      const query = `
-				{
-					deposit: dailyDeposits(where: {timestamp: ${date}}) {
-						count,
-						totalUsdAmount,
-					}
-					withdraw: dailyWithdraws(where: {timestamp: ${date}}) {
-						count,
-						totalUsdAmount,
-					}
-					borrow: dailyBorrows(where: {timestamp: ${date}}) {
-						count,
-						totalUsdAmount,
-					}
-					repay: dailyRepays(where: {timestamp: ${date}}) {
-						count,
-						totalUsdAmount,
-					}
-					overview: eulerOverviews(first: 1, block: {number: ${blockNumber}}) {
-            totalBalancesUsd
-          }
-				}
-			`;
-      const response = await providers.subgraph.querySubgraph(this.configs.graphEndpoint as string, query);
-
-      if (response['deposit'].length > 0) {
-        dateData.volumeInUseUSD += new BigNumber(response['deposit'][0].totalUsdAmount).dividedBy(1e18).toNumber();
-        dateData.transactionCount += Number(response['deposit'][0].count);
-      }
-      if (response['withdraw'].length > 0) {
-        dateData.volumeInUseUSD += new BigNumber(response['withdraw'][0].totalUsdAmount).dividedBy(1e18).toNumber();
-        dateData.transactionCount += Number(response['withdraw'][0].count);
-      }
-      if (response['borrow'].length > 0) {
-        dateData.volumeInUseUSD += new BigNumber(response['borrow'][0].totalUsdAmount).dividedBy(1e18).toNumber();
-        dateData.transactionCount += Number(response['borrow'][0].count);
-      }
-      if (response['repay'].length > 0) {
-        dateData.volumeInUseUSD += new BigNumber(response['repay'][0].totalUsdAmount).dividedBy(1e18).toNumber();
-        dateData.transactionCount += Number(response['repay'][0].count);
-      }
-
-      // count liquidity
-      dateData.totalValueLockedUSD = new BigNumber(response['overview'][0].totalBalancesUsd).dividedBy(1e18).toNumber();
-    } catch (e: any) {
-      logger.onError({
-        source: this.name,
-        message: 'failed to get date data',
-        props: {
-          date: new Date(date * 1000).toISOString().split('T')[0],
-          endpoint: this.configs.graphEndpoint,
-        },
-        error: e.message,
-      });
-    }
-
-    return dateData;
+    return data;
   }
 }
 

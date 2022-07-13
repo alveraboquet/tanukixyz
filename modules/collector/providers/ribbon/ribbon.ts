@@ -14,7 +14,7 @@ export class RibbonProvider extends CollectorProvider {
     super(configs);
   }
 
-  private async getDataInRange(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {
+  public async getDataInTimeFrame(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {
     const data: ProtocolData = {
       revenueUSD: 0,
       totalValueLockedUSD: 0,
@@ -78,13 +78,5 @@ export class RibbonProvider extends CollectorProvider {
     }
 
     return data;
-  }
-
-  public async getDailyData(props: GetProtocolDataProps): Promise<ProtocolData> {
-    return await this.getDataInRange(props.providers, props.date - 24 * 60 * 60, props.date);
-  }
-
-  public async getDateData(props: GetProtocolDataProps): Promise<ProtocolData> {
-    return await this.getDataInRange(props.providers, props.date, props.date + 24 * 60 * 60);
   }
 }

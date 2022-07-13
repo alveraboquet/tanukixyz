@@ -1,4 +1,4 @@
-import { Provider } from '../../lib/types';
+import { Provider, ShareProviders } from '../../lib/types';
 
 export interface ProtocolTokenomics {
   priceUSD: number;
@@ -25,6 +25,8 @@ export interface ProtocolData {
 }
 
 export interface ICollectorProvider extends Provider {
+  getDataInTimeFrame: (providers: ShareProviders, fromTime: number, toTime: number) => Promise<any>;
+
   // get latest 24 hours metrics
   getDailyData: (argv: any) => Promise<any>;
 

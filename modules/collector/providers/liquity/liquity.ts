@@ -15,7 +15,7 @@ class LiquityProvider extends CollectorProvider {
     super(configs);
   }
 
-  private async getDataInRange(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {
+  public async getDataInTimeFrame(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {
     const dateData: ProtocolData = {
       revenueUSD: 0,
       totalValueLockedUSD: 0,
@@ -107,16 +107,6 @@ class LiquityProvider extends CollectorProvider {
     }
 
     return dateData;
-  }
-
-  public async getDateData(props: GetProtocolDataProps): Promise<ProtocolData> {
-    const { date, providers } = props;
-    return await this.getDataInRange(providers, date, date + 24 * 60 * 60);
-  }
-
-  public async getDailyData(props: GetProtocolDataProps): Promise<ProtocolData> {
-    const { date, providers } = props;
-    return await this.getDataInRange(providers, date - 24 * 60 * 60, date);
   }
 }
 
