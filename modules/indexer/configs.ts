@@ -1,4 +1,5 @@
 import { AaveConfigs } from '../../configs/protocols/aave';
+import { AbracadabraConfigs } from '../../configs/protocols/abracadabra';
 import { AurigamiConfigs } from '../../configs/protocols/aurigami';
 import { BastionConfigs } from '../../configs/protocols/bastion';
 import { BenqiConfigs } from '../../configs/protocols/benqi';
@@ -23,6 +24,7 @@ const IndexConfigs: { [key: string]: Array<EventIndexConfig> } = {
   bastion: BastionConfigs.pools,
   aurigami: AurigamiConfigs.pools,
   lido: LidoConfigs.stakingContract,
+  abracadabra: AbracadabraConfigs.markets,
 };
 
 export default IndexConfigs;
