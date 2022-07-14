@@ -76,7 +76,8 @@ export class UniswapProvider extends CollectorProvider {
 
       if (
         this.configs.subgraphs[i].exchange.includes('thegraph.com') ||
-        this.configs.subgraphs[i].exchange.includes('streamingfast.io')
+        this.configs.subgraphs[i].exchange.includes('streamingfast.io') ||
+        this.configs.subgraphs[i].exchange.includes('graph.mm.finance')
       ) {
         // thegraph
         blockNumberFromTime = await providers.subgraph.queryBlockAtTimestamp(

@@ -14,12 +14,17 @@ export const UniswapConfigs: UniswapProtocolConfig = {
     {
       version: 3,
       chainConfig: getChainConfig('ethereum'),
-      exchange: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3',
+      exchange: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-subgraph',
     },
     {
       version: 3,
       chainConfig: getChainConfig('polygon'),
       exchange: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-polygon',
+    },
+    {
+      version: 3,
+      chainConfig: getChainConfig('arbitrum'),
+      exchange: 'https://api.thegraph.com/subgraphs/name/ianlapham/arbitrum-dev',
     },
   ],
 };
