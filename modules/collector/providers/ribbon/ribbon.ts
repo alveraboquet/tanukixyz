@@ -4,7 +4,7 @@ import { RibbonProtocolConfig } from '../../../../configs/protocols/ribbon';
 import { getHistoryTokenPriceFromCoingecko, normalizeAddress } from '../../../../lib/helper';
 import { ShareProviders } from '../../../../lib/types';
 import { ProtocolData } from '../../types';
-import CollectorProvider  from '../collector';
+import CollectorProvider from '../collector';
 import { queryVaultTransactions, queryVaults } from './helpers';
 
 export class RibbonProvider extends CollectorProvider {

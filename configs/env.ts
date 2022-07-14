@@ -16,6 +16,7 @@ const envConfig: EnvConfig = {
       globalDataDate: 'tanukixyz.data.date',
       globalContractEvents: 'tanukixyz.contract.events',
       globalBlockscanBlocks: 'tanukixyz.chain.blocks',
+      globalRegistryAddresses: 'tanukixyz.registry.addresses',
       globalRegistryTransactions: 'tanukixyz.registry.transactions',
     },
   },

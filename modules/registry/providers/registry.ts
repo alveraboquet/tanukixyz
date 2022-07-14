@@ -32,6 +32,9 @@ class RegistryProvider implements IRegistryProvider {
     const { initialTime, forceSync, providers } = props;
 
     const stateCollection = await providers.database.getCollection(envConfig.database.collections.globalState);
+    const transactionRegistryCollection = await providers.database.getCollection(
+      envConfig.database.collections.globalRegistryTransactions
+    );
 
     // for every protocol, we default collect data from the beginning
     // but if initialTime and forceSync were set, we will collect data from there
@@ -47,7 +50,7 @@ class RegistryProvider implements IRegistryProvider {
         .limit(1)
         .toArray();
       if (states.length > 0) {
-        startTime = states[0].timestmap;
+        startTime = states[0].timestamp;
       }
     }
 
@@ -60,23 +63,65 @@ class RegistryProvider implements IRegistryProvider {
       },
     });
 
-    // we collect registry data with one day step
-    const oneDayStep = 24 * 60 * 60;
+    // timeframe to query
+    const queryTimeframe = 60 * 60;
 
     const currentTime = getTimestamp();
     while (startTime <= currentTime) {
       const transactions: Array<RegistryTransactionData> = await this.getTransactionInTimeFrame(
         providers,
         startTime,
-        startTime + oneDayStep
+        startTime + queryTimeframe
       );
 
-      // process transactions
-      console.info({
-        transactions,
+      const operations: Array<any> = [];
+      for (let txIdx = 0; txIdx < transactions.length; txIdx++) {
+        operations.push({
+          updateOne: {
+            filter: {
+              protocol: transactions[txIdx].protocol,
+              chain: transactions[txIdx].chain,
+              transactionHash: transactions[txIdx].transactionHash,
+            },
+            update: {
+              $set: {
+                ...transactions[txIdx],
+              },
+            },
+            upsert: true,
+          },
+        });
+      }
+
+      if (operations.length > 0) {
+        await transactionRegistryCollection.bulkWrite(operations);
+      }
+
+      await stateCollection.updateOne(
+        {
+          name: `registry-${(this.configs as RegistryProtocolConfig).name}`,
+        },
+        {
+          $set: {
+            name: `registry-${(this.configs as RegistryProtocolConfig).name}`,
+            timestamp: startTime + queryTimeframe > currentTime ? currentTime : startTime + queryTimeframe,
+          },
+        },
+        {
+          upsert: true,
+        }
+      );
+
+      logger.onInfo({
+        source: this.name,
+        message: `collected ${operations.length} registry transactions`,
+        props: {
+          name: this.configs.name,
+          timestamp: startTime + queryTimeframe,
+        },
       });
 
-      startTime += oneDayStep;
+      startTime += queryTimeframe;
     }
   }
 }

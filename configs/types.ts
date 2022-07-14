@@ -8,6 +8,7 @@ export interface EnvConfig {
       globalDataDate: string;
       globalContractEvents: string;
       globalBlockscanBlocks: string;
+      globalRegistryAddresses: string;
       globalRegistryTransactions: string;
     };
   };

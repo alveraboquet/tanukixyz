@@ -123,18 +123,6 @@ export class UniswapRegistryProvider extends RegistryProvider {
         const response = await providers.subgraph.querySubgraph(configs.subgraphs[subIdx].exchange, query);
         const parsed: Array<any> = response && response['transactions'] ? response['transactions'] : [];
 
-        if (parsed.length > 0) {
-          logger.onDebug({
-            source: this.name,
-            message: 'processing transactions',
-            props: {
-              name: this.configs.name,
-              txCount: parsed.length,
-              timestamp: parsed[parsed.length - 1].timestamp,
-            },
-          });
-        }
-
         for (let pIdx = 0; pIdx < parsed.length; pIdx++) {
           const transformedTransaction: RegistryTransactionData = await this._transformUniswapData(
             {
@@ -151,9 +139,9 @@ export class UniswapRegistryProvider extends RegistryProvider {
           transactions.push(transformedTransaction);
         }
 
-        logger.onInfo({
+        logger.onDebug({
           source: this.name,
-          message: 'collected transactions registry data',
+          message: 'processed registry transactions',
           props: {
             name: this.configs.name,
             txCount: parsed.length,
@@ -161,10 +149,8 @@ export class UniswapRegistryProvider extends RegistryProvider {
           },
         });
 
-        console.info(transactions, transactions[0].breakdown);
-
         if (parsed.length > 0) {
-          startTime = Number(transactions[transactions.length - 1].timestamp) + 1;
+          startTime = Number(parsed[parsed.length - 1].timestamp) + 1;
         } else {
           break;
         }
