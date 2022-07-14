@@ -13,7 +13,8 @@
     /* Advanced Options */
     "skipLibCheck": true /* Skip type checking of declaration files. */,
     "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "noUnusedLocals": true
   },
   "include": ["lib/**/*.ts", "cmd/**/*.ts", "configs/**/*.ts", "modules/**/*.ts", "scripts/**/*.ts", "restapi/**/*.ts"],
   "exclude": ["node_modules"]

@@ -1,6 +1,6 @@
 import { DefiProtocolModuleCode, InitialSyncDate } from '../../../configs';
 import envConfig from '../../../configs/env';
-import { getStartDayTimestamp, getTimestamp, getTodayUTCTimestamp } from '../../../lib/helper';
+import { getTimestamp, getTodayUTCTimestamp } from '../../../lib/helper';
 import logger from '../../../lib/logger';
 import { ShareProviders } from '../../../lib/types';
 import { ICollectorProvider, ProtocolData } from '../types';

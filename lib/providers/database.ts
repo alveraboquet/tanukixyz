@@ -84,6 +84,7 @@ class DatabaseProvider implements Provider {
     const dataDateCollection = await this.getCollection(envConfig.database.collections.globalDataDate);
     const eventCollection = await this.getCollection(envConfig.database.collections.globalContractEvents);
     const blocksCollection = await this.getCollection(envConfig.database.collections.globalBlockscanBlocks);
+    const registryCollection = await this.getCollection(envConfig.database.collections.globalRegistryTransactions);
 
     stateCollection.createIndex({ name: 1 }, { background: true });
     dataDailyCollection.createIndex({ module: 1 }, { background: true });
@@ -91,6 +92,7 @@ class DatabaseProvider implements Provider {
     eventCollection.createIndex({ contract: 1, event: 1, transactionId: 1 }, { background: true });
     eventCollection.createIndex({ contract: 1, timestamp: 1 }, { background: true });
     blocksCollection.createIndex({ chain: 1, blockTime: 1, blockNumber: 1 }, { background: true });
+    registryCollection.createIndex({ chain: 1, protocol: 1, timestamp: 1, transactionHash: 1 }, { background: true });
   }
 }
 

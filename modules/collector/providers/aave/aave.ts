@@ -8,7 +8,7 @@ import { getHistoryTokenPriceFromCoingecko, normalizeAddress } from '../../../..
 import logger from '../../../../lib/logger';
 import { ShareProviders } from '../../../../lib/types';
 import { ProtocolData } from '../../types';
-import CollectorProvider, { GetProtocolDataProps } from '../collector';
+import CollectorProvider  from '../collector';
 import { getReserveConfig } from './helpers';
 
 export class AaveProvider extends CollectorProvider {

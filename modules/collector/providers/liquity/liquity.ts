@@ -6,7 +6,7 @@ import { LiquityProtocolConfig } from '../../../../configs/types';
 import { getHistoryTokenPriceFromCoingecko, normalizeAddress } from '../../../../lib/helper';
 import { ShareProviders } from '../../../../lib/types';
 import { ProtocolData } from '../../types';
-import CollectorProvider, { GetProtocolDataProps } from '../collector';
+import CollectorProvider  from '../collector';
 
 class LiquityProvider extends CollectorProvider {
   public readonly name: string = 'provider.liquity';

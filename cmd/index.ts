@@ -3,12 +3,14 @@ import yargs from 'yargs/yargs';
 import { BlockscanCommand } from './subs/BlockscanCommand';
 import { CollectorCommand } from './subs/CollectorCommand';
 import { IndexerCommand } from './subs/IndexerCommand';
+import { RegistryCommand } from './subs/RegistryCommand';
 import { RestCommand } from './subs/RestCommand';
 
 (async function () {
   const restCmd = new RestCommand();
   const indexerCmd = new IndexerCommand();
   const collectorCmd = new CollectorCommand();
+  const registryCmd = new RegistryCommand();
   const blockscanCmd = new BlockscanCommand();
 
   yargs(process.argv.slice(2))
@@ -16,6 +18,7 @@ import { RestCommand } from './subs/RestCommand';
     .command(restCmd.name, restCmd.describe, restCmd.setOptions, restCmd.execute)
     .command(indexerCmd.name, indexerCmd.describe, indexerCmd.setOptions, indexerCmd.execute)
     .command(collectorCmd.name, collectorCmd.describe, collectorCmd.setOptions, collectorCmd.execute)
+    .command(registryCmd.name, registryCmd.describe, registryCmd.setOptions, registryCmd.execute)
     .command(blockscanCmd.name, blockscanCmd.describe, blockscanCmd.setOptions, blockscanCmd.execute)
     .help().argv;
 })();

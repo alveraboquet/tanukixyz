@@ -1,5 +1,4 @@
 import { getChainConfig } from '../chains';
-import { DefaultTokenList } from '../constants/defaultTokenList';
 import { UniswapProtocolConfig } from '../types';
 
 export const QuickswapConfigs: UniswapProtocolConfig = {

@@ -8,6 +8,7 @@ export interface EnvConfig {
       globalDataDate: string;
       globalContractEvents: string;
       globalBlockscanBlocks: string;
+      globalRegistryTransactions: string;
     };
   };
   apiKeys: {
@@ -111,4 +112,8 @@ export interface BalancerProtocolConfig {
     chainConfig: ChainConfig;
     exchange: string;
   }>;
+}
+
+export interface RegistryProtocolConfig {
+  name: string;
 }

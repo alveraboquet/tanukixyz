@@ -31,3 +31,14 @@ export interface BlockscanBlockInfo {
   collectedFees?: number;
   burntFees?: number;
 }
+
+export interface RegistryTransactionData {
+  transactionHash: string;
+  blockNumber: number;
+  timestamp: number;
+  protocol: string;
+  chain: string;
+
+  // protocol data
+  breakdown?: any;
+}
