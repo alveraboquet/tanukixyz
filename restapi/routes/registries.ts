@@ -5,6 +5,8 @@ import logger from '../../lib/logger';
 import { ShareProviders } from '../../lib/types';
 import { writeResponseData, writeResponseError } from '../helpers';
 
+const MaxRecordLimit = 100;
+
 export function getRouter(providers: ShareProviders): Router {
   const router = Router({ mergeParams: true });
 
@@ -12,7 +14,11 @@ export function getRouter(providers: ShareProviders): Router {
     const protocolQuery: string | null = request.query.protocol ? String(request.query.protocol) : null;
     const chainQuery: string | null = request.query.chain ? String(request.query.chain) : null;
 
-    const limit: number = request.query.limit ? Number(request.query.limit) : 100;
+    const limit: number = request.query.limit
+      ? Number(request.query.limit) > MaxRecordLimit
+        ? MaxRecordLimit
+        : Number(request.query.limit)
+      : MaxRecordLimit;
     const skip: number = request.query.skip ? Number(request.query.skip) : 0;
     const sort: string = request.query.sort ? String(request.query.sort) : 'latest';
 
