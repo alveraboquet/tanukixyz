@@ -7,4 +7,5 @@ export const BlockSubgraphs: { [key: string]: string } = {
   cronos: 'https://graph.mm.finance/subgraphs/name/madmeerkat-finance/blocks',
   arbitrum: 'https://api.thegraph.com/subgraphs/name/ianlapham/arbitrum-one-blocks',
   optimism: 'https://api.thegraph.com/subgraphs/name/ianlapham/uni-testing-subgraph',
+  celo: 'https://api.thegraph.com/subgraphs/name/jesse-sawa/celo-blocks',
 };

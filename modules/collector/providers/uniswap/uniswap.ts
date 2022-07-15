@@ -12,6 +12,10 @@ export class UniswapProvider extends CollectorProvider {
     super(configs);
   }
 
+  public getQueryRecordLimit(): number {
+    return 1000;
+  }
+
   // override this methods match with new project definitions
   public getFilters(): any {
     return {
@@ -149,12 +153,13 @@ export class UniswapProvider extends CollectorProvider {
         const addresses: any = {};
 
         let startTime = fromTime;
+        const limit = this.getQueryRecordLimit();
         while (startTime <= toTime) {
           const transactionsResponses = await providers.subgraph.querySubgraph(
             this.configs.subgraphs[i].exchange,
             `
             {
-              transactions(first: 1000, where: {timestamp_gte: ${startTime}}, orderBy: timestamp, orderDirection: asc) {
+              transactions(first: ${limit}, where: {timestamp_gte: ${startTime}}, orderBy: timestamp, orderDirection: asc) {
                 timestamp
                 swaps(first: 1000) {
                   sender

@@ -26,5 +26,15 @@ export const UniswapConfigs: UniswapProtocolConfig = {
       chainConfig: getChainConfig('arbitrum'),
       exchange: 'https://api.thegraph.com/subgraphs/name/ianlapham/arbitrum-dev',
     },
+    {
+      version: 3,
+      chainConfig: getChainConfig('optimism'),
+      exchange: 'https://api.thegraph.com/subgraphs/name/ianlapham/optimism-post-regenesis',
+    },
+    {
+      version: 3,
+      chainConfig: getChainConfig('celo'),
+      exchange: 'https://api.thegraph.com/subgraphs/name/jesse-sawa/uniswap-celo',
+    },
   ],
 };

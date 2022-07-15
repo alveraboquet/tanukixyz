@@ -12,4 +12,5 @@ export const AnkrPublicNodes: { [key: string]: string } = {
   iotex: 'https://rpc.ankr.com/iotex',
   moonbeam: 'https://rpc.ankr.com/moonbeam',
   syscoin: 'https://rpc.ankr.com/syscoin',
+  optimism: 'https://rpc.ankr.com/optimism',
 };

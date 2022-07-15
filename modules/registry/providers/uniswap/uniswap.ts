@@ -21,6 +21,12 @@ export class UniswapRegistryProvider extends RegistryProvider {
     super(configs);
   }
 
+  public getQueryConfigs(): any {
+    return {
+      queryRecordLimit: 1000,
+    }
+  }
+
   private async _transformUniswapData(
     transactionData: RegistryTransactionData,
     swaps: Array<any>,
@@ -83,7 +89,7 @@ export class UniswapRegistryProvider extends RegistryProvider {
     fromTime: number,
     toTime: number
   ): Promise<Array<RegistryTransactionData>> {
-    const queryCount = 1000;
+    const queryCount = this.getQueryConfigs().queryRecordLimit;
     const configs: UniswapProtocolConfig = this.configs as UniswapProtocolConfig;
 
     const transactions: Array<RegistryTransactionData> = [];
@@ -144,6 +150,7 @@ export class UniswapRegistryProvider extends RegistryProvider {
           message: 'processed registry transactions',
           props: {
             name: this.configs.name,
+            chain: this.configs.subgraphs[subIdx].chainConfig.name,
             txCount: parsed.length,
             timestamp: startTime,
           },

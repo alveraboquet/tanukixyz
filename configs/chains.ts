@@ -117,8 +117,11 @@ export const Blockchains: Array<ChainConfig> = [
     family: 'evm',
     name: 'celo',
     nodeRpcs: {
-      default: 'https://forno.celo.org',
+      default: AnkrPublicNodes.celo,
       archive: 'https://forno.celo.org',
+    },
+    subgraph: {
+      blockSubgraph: BlockSubgraphs.celo,
     },
   },
   {
@@ -132,6 +135,18 @@ export const Blockchains: Array<ChainConfig> = [
     subgraph: {
       blockSubgraph: BlockSubgraphs.arbitrum,
     },
+  },
+  {
+    network: 'mainnet',
+    family: 'evm',
+    name: 'optimism',
+    nodeRpcs: {
+      default: AnkrPublicNodes.optimism,
+      archive: AnkrPublicNodes.optimism,
+    },
+    subgraph: {
+      blockSubgraph: BlockSubgraphs.optimism
+    }
   },
   {
     network: 'mainnet',

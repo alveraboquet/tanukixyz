@@ -8,6 +8,11 @@ export class PancakeswapProvider extends UniswapProvider {
     super(configs);
   }
 
+  // due to streamingfast performance
+  public getQueryRecordLimit(): number {
+    return 50;
+  }
+
   // override this methods match with new project definitions
   public getFilters(): any {
     return {
