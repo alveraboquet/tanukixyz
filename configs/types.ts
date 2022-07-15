@@ -118,3 +118,5 @@ export interface BalancerProtocolConfig {
 export interface RegistryProtocolConfig {
   name: string;
 }
+
+export type RegistryTransactionVersion = 'univ2' | 'univ3' | 'compound';

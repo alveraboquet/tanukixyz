@@ -25,13 +25,15 @@ class RegistryModule {
         process.exit(0);
       }
 
-      await provider.startService({
-        providers: argv.providers,
-        initialTime: argv.initialTime,
-        forceSync: argv.forceSync,
-      });
+      while (true) {
+        await provider.startService({
+          providers: argv.providers,
+          initialTime: argv.initialTime,
+          forceSync: argv.forceSync,
+        });
 
-      process.exit(0);
+        await sleep(10 * 60);
+      }
     } else {
       // run all
       while (true) {
@@ -45,7 +47,7 @@ class RegistryModule {
           } catch (e: any) {}
         }
 
-        await sleep(5 * 60);
+        await sleep(10 * 60);
       }
     }
   }

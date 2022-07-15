@@ -145,8 +145,8 @@ export const Blockchains: Array<ChainConfig> = [
       archive: AnkrPublicNodes.optimism,
     },
     subgraph: {
-      blockSubgraph: BlockSubgraphs.optimism
-    }
+      blockSubgraph: BlockSubgraphs.optimism,
+    },
   },
   {
     network: 'mainnet',

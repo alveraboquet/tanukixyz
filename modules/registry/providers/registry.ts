@@ -45,7 +45,7 @@ class RegistryProvider implements IRegistryProvider {
       // we check last time in database and start from there
       const states = await stateCollection
         .find({
-          name: `registry-${(this.configs as RegistryProtocolConfig).name}`,
+          name: `registry-transactions-${(this.configs as RegistryProtocolConfig).name}`,
         })
         .limit(1)
         .toArray();
@@ -99,11 +99,11 @@ class RegistryProvider implements IRegistryProvider {
 
       await stateCollection.updateOne(
         {
-          name: `registry-${(this.configs as RegistryProtocolConfig).name}`,
+          name: `registry-transactions-${(this.configs as RegistryProtocolConfig).name}`,
         },
         {
           $set: {
-            name: `registry-${(this.configs as RegistryProtocolConfig).name}`,
+            name: `registry-transactions-${(this.configs as RegistryProtocolConfig).name}`,
             timestamp: startTime + queryTimeframe > currentTime ? currentTime : startTime + queryTimeframe,
           },
         },

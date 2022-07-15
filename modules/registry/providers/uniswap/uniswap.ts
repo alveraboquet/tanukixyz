@@ -1,4 +1,4 @@
-import { UniswapProtocolConfig } from '../../../../configs/types';
+import { RegistryTransactionVersion, UniswapProtocolConfig } from '../../../../configs/types';
 import { normalizeAddress } from '../../../../lib/helper';
 import logger from '../../../../lib/logger';
 import { RegistryTransactionData, ShareProviders } from '../../../../lib/types';
@@ -13,10 +13,13 @@ export interface UniswapActionData {
 }
 
 export interface UniswapBreakdownData {
+  version: RegistryTransactionVersion;
   actions: Array<UniswapActionData>;
 }
 
 export class UniswapRegistryProvider extends RegistryProvider {
+  public readonly name: string = 'provider.uniswap';
+
   constructor(configs: UniswapProtocolConfig) {
     super(configs);
   }
@@ -24,16 +27,21 @@ export class UniswapRegistryProvider extends RegistryProvider {
   public getQueryConfigs(): any {
     return {
       queryRecordLimit: 1000,
-    }
+      filters: {
+        transactionBlock: 'blockNumber',
+      },
+    };
   }
 
   private async _transformUniswapData(
     transactionData: RegistryTransactionData,
+    version: RegistryTransactionVersion,
     swaps: Array<any>,
     mints: Array<any>,
     burns: Array<any>
   ): Promise<RegistryTransactionData> {
     const breakdown: UniswapBreakdownData = {
+      version: version,
       actions: [],
     };
 
@@ -102,7 +110,7 @@ export class UniswapRegistryProvider extends RegistryProvider {
 					{
 						transactions(first: ${queryCount}, where: {timestamp_gte: ${startTime}, timestamp_lte: ${toTime}}, orderBy: timestamp, orderDirection: asc) {
 						  id
-						  blockNumber
+						  ${this.getQueryConfigs().filters.transactionBlock}
 							timestamp
 							swaps(first: ${queryCount}) {
 								sender
@@ -130,14 +138,16 @@ export class UniswapRegistryProvider extends RegistryProvider {
         const parsed: Array<any> = response && response['transactions'] ? response['transactions'] : [];
 
         for (let pIdx = 0; pIdx < parsed.length; pIdx++) {
+          const version = configs.subgraphs[subIdx].version === 2 ? 'univ2' : 'univ3';
           const transformedTransaction: RegistryTransactionData = await this._transformUniswapData(
             {
               protocol: configs.name,
               chain: configs.subgraphs[subIdx].chainConfig.name,
-              blockNumber: Number(parsed[pIdx].blockNumber),
+              blockNumber: Number(parsed[pIdx][this.getQueryConfigs().filters.transactionBlock]),
               timestamp: Number(parsed[pIdx].timestamp),
               transactionHash: parsed[pIdx].id,
             },
+            version,
             parsed[pIdx].swaps,
             parsed[pIdx].mints,
             parsed[pIdx].burns
