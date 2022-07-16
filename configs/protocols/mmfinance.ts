@@ -4,7 +4,7 @@ import { UniswapProtocolConfig } from '../types';
 
 export const MmfinanceConfigs: UniswapProtocolConfig = {
   name: 'mmfinance',
-  tokenomics: DefaultTokenList.BABY,
+  tokenomics: DefaultTokenList.MMF,
   subgraphs: [
     {
       version: 2,

@@ -38,7 +38,7 @@ class RegistryProvider implements IRegistryProvider {
 
     // for every protocol, we default collect data from the beginning
     // but if initialTime and forceSync were set, we will collect data from there
-    let startTime = 1609459200; // Fri Jan 01 2021 00:00:00 GMT+0000
+    let startTime = 1640995200; // Sat Jan 01 2022 00:00:00 GMT+0000
     if (initialTime && forceSync) {
       startTime = initialTime;
     } else {
