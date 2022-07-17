@@ -68,6 +68,7 @@ class RegistryProvider implements IRegistryProvider {
 
     const currentTime = getTimestamp();
     while (startTime <= currentTime) {
+      const startExeTime = new Date().getTime();
       const transactions: Array<RegistryTransactionData> = await this.getTransactionInTimeFrame(
         providers,
         startTime,
@@ -112,12 +113,15 @@ class RegistryProvider implements IRegistryProvider {
         }
       );
 
+      const endExeTime = new Date().getTime();
+      const elapsed = (endExeTime - startExeTime) / 1000;
       logger.onInfo({
         source: this.name,
         message: `collected ${operations.length} registry transactions`,
         props: {
           name: this.configs.name,
           timestamp: startTime + queryTimeframe,
+          elapsed: `${elapsed.toFixed(2)}s`,
         },
       });
 
