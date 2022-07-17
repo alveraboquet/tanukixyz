@@ -1001,8 +1001,8 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
       },
     },
   },
-  MM: {
-    symbol: 'MM',
+  MMF: {
+    symbol: 'MMF',
     coingeckoId: 'mmfinance',
     chains: {
       cronos: {
