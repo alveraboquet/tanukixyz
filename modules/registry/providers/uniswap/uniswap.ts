@@ -26,7 +26,7 @@ export class UniswapRegistryProvider extends RegistryProvider {
 
   public getQueryConfigs(): any {
     return {
-      queryRecordLimit: 1000,
+      queryRecordLimit: 100,
       filters: {
         transactionBlock: 'blockNumber',
       },

@@ -1,3 +1,5 @@
+import cTokenAbi from '../abi/compound/cToken.json';
+import { getChainConfig } from '../chains';
 import { DefaultTokenList } from '../constants/defaultTokenList';
 import { GenesisBlocks } from '../constants/genesisBlocks';
 import { getCompoundPoolConfig } from '../helpers';
@@ -116,6 +118,124 @@ export const IronBankConfigs: CompoundProtocolConfig = {
       GenesisBlocks['ethereum'],
       DefaultTokenList.MIM
     ), // MIM
+    getCompoundPoolConfig('ethereum', '0x00e5c0774A5F065c285068170b20393925C84BF3', GenesisBlocks['ethereum'], {
+      symbol: 'ibEUR',
+      coingeckoId: 'iron-bank-euro',
+      chains: {
+        ethereum: {
+          decimals: 18,
+          address: '',
+        },
+      },
+    }), // ibEUR
+    {
+      chainConfig: getChainConfig('ethereum'),
+      contractAbi: cTokenAbi,
+      contractAddress: '0x3c9f5385c288cE438Ed55620938A4B967c080101',
+      contractBirthday: GenesisBlocks['ethereum'],
+      events: ['Mint', 'Redeem', 'Borrow', 'RepayBorrow'],
+      underlying: {
+        symbol: 'ibKRW',
+        coingeckoId: '',
+        chains: {
+          ethereum: {
+            decimals: 18,
+            address: '',
+          },
+        },
+      },
+      underlyingOracle: '0xe4e9f6cfe8ac8c75a3dbef809dbe4fc40e6fdc4b',
+    }, // ibKRW
+    {
+      chainConfig: getChainConfig('ethereum'),
+      contractAbi: cTokenAbi,
+      contractAddress: '0x215F34af6557A6598DbdA9aa11cc556F5AE264B1',
+      contractBirthday: GenesisBlocks['ethereum'],
+      events: ['Mint', 'Redeem', 'Borrow', 'RepayBorrow'],
+      underlying: {
+        symbol: 'ibJPY',
+        coingeckoId: '',
+        chains: {
+          ethereum: {
+            decimals: 18,
+            address: '',
+          },
+        },
+      },
+      underlyingOracle: '0xe4e9f6cfe8ac8c75a3dbef809dbe4fc40e6fdc4b',
+    }, // ibJPY
+    {
+      chainConfig: getChainConfig('ethereum'),
+      contractAbi: cTokenAbi,
+      contractAddress: '0x86BBD9ac8B9B44C95FFc6BAAe58E25033B7548AA',
+      contractBirthday: GenesisBlocks['ethereum'],
+      events: ['Mint', 'Redeem', 'Borrow', 'RepayBorrow'],
+      underlying: {
+        symbol: 'ibAUD',
+        coingeckoId: '',
+        chains: {
+          ethereum: {
+            decimals: 18,
+            address: '',
+          },
+        },
+      },
+      underlyingOracle: '0xe4e9f6cfe8ac8c75a3dbef809dbe4fc40e6fdc4b',
+    }, // ibAUD
+    {
+      chainConfig: getChainConfig('ethereum'),
+      contractAbi: cTokenAbi,
+      contractAddress: '0xecaB2C76f1A8359A06fAB5fA0CEea51280A97eCF',
+      contractBirthday: GenesisBlocks['ethereum'],
+      events: ['Mint', 'Redeem', 'Borrow', 'RepayBorrow'],
+      underlying: {
+        symbol: 'ibGBP',
+        coingeckoId: '',
+        chains: {
+          ethereum: {
+            decimals: 18,
+            address: '',
+          },
+        },
+      },
+      underlyingOracle: '0xe4e9f6cfe8ac8c75a3dbef809dbe4fc40e6fdc4b',
+    }, // ibGBP
+    {
+      chainConfig: getChainConfig('ethereum'),
+      contractAbi: cTokenAbi,
+      contractAddress: '0x1b3E95E8ECF7A7caB6c4De1b344F94865aBD12d5',
+      contractBirthday: GenesisBlocks['ethereum'],
+      events: ['Mint', 'Redeem', 'Borrow', 'RepayBorrow'],
+      underlying: {
+        symbol: 'ibCHF',
+        coingeckoId: '',
+        chains: {
+          ethereum: {
+            decimals: 18,
+            address: '',
+          },
+        },
+      },
+      underlyingOracle: '0xe4e9f6cfe8ac8c75a3dbef809dbe4fc40e6fdc4b',
+    }, // ibCHF
+    {
+      chainConfig: getChainConfig('ethereum'),
+      contractAbi: cTokenAbi,
+      contractAddress: '0x672473908587b10e65DAB177Dbaeadcbb30BF40B',
+      contractBirthday: GenesisBlocks['ethereum'],
+      events: ['Mint', 'Redeem', 'Borrow', 'RepayBorrow'],
+      underlying: {
+        symbol: 'ibZAR',
+        coingeckoId: '',
+        chains: {
+          ethereum: {
+            decimals: 18,
+            address: '',
+          },
+        },
+      },
+      underlyingOracle: '0xe4e9f6cfe8ac8c75a3dbef809dbe4fc40e6fdc4b',
+    }, // ibCHF
 
     // avalanche
     getCompoundPoolConfig(

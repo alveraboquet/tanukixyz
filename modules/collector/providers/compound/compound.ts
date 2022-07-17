@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js';
 import Web3 from 'web3';
 
+import CompoundPriceOracle from '../../../../configs/abi/compound/PriceOracle.json';
 import CompoundLendAbi from '../../../../configs/abi/compound/cToken.json';
 import envConfig from '../../../../configs/env';
 import { CompoundProtocolConfig } from '../../../../configs/types';
@@ -55,7 +56,6 @@ class CompoundProvider extends CollectorProvider {
         });
         continue;
       }
-      if (events.length <= 0) continue;
 
       const web3 = new Web3(
         poolConfig.chainConfig.nodeRpcs.archive
@@ -65,11 +65,18 @@ class CompoundProvider extends CollectorProvider {
 
       // get history price
       let historyPrice: number;
-      if (historyPrices[poolConfig.underlying.coingeckoId]) {
-        historyPrice = historyPrices[poolConfig.underlying.coingeckoId];
+      if (!poolConfig.underlyingOracle) {
+        if (historyPrices[poolConfig.underlying.coingeckoId]) {
+          historyPrice = historyPrices[poolConfig.underlying.coingeckoId];
+        } else {
+          historyPrice = await getHistoryTokenPriceFromCoingecko(poolConfig.underlying.coingeckoId, toTime);
+          historyPrices[poolConfig.underlying.coingeckoId] = historyPrice;
+        }
       } else {
-        historyPrice = await getHistoryTokenPriceFromCoingecko(poolConfig.underlying.coingeckoId, events[0].timestamp);
-        historyPrices[poolConfig.underlying.coingeckoId] = historyPrice;
+        // get price from on-chain oracle
+        const oracleContract = new web3.eth.Contract(CompoundPriceOracle as any, poolConfig.underlyingOracle);
+        const underlyingPrice = await oracleContract.methods.getUnderlyingPrice(poolConfig.contractAddress).call();
+        historyPrice = new BigNumber(underlyingPrice.toString()).dividedBy(1e18).toNumber();
       }
 
       for (let i = 0; i < events.length; i++) {

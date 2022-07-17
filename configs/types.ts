@@ -61,6 +61,7 @@ export interface EventIndexConfig {
 // cToken config - compound.finance liked protocols
 export interface CompoundLendingPoolConfig extends EventIndexConfig {
   underlying: TokenConfig;
+  underlyingOracle?: string;
 }
 
 export interface ProtocolConfig {

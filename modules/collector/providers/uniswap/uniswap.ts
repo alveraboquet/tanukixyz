@@ -13,7 +13,7 @@ export class UniswapProvider extends CollectorProvider {
   }
 
   public getQueryRecordLimit(): number {
-    return 1000;
+    return 100;
   }
 
   // override this methods match with new project definitions

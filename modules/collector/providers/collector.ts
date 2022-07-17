@@ -56,6 +56,7 @@ class CollectorProvider implements ICollectorProvider {
     const { mode, initialDate, forceSync, providers } = props;
 
     if (mode === StartCollectorServiceMode.DAILY) {
+      const startExeTime = new Date().getTime();
       const dailyCollection = await providers.database.getCollection(envConfig.database.collections.globalDataDaily);
       // update daily data
       const currentTimestamp = getTimestamp();
@@ -85,6 +86,8 @@ class CollectorProvider implements ICollectorProvider {
           upsert: true,
         }
       );
+      const endExeTime = new Date().getTime();
+      const elapsed = (endExeTime - startExeTime) / 1000;
       logger.onInfo({
         source: this.name,
         message: 'collected protocol daily data',
@@ -95,6 +98,7 @@ class CollectorProvider implements ICollectorProvider {
           volumeUSD: dailyData.volumeInUseUSD.toFixed(2),
           userCount: dailyData.userCount.toFixed(2),
           txnCount: dailyData.transactionCount.toFixed(2),
+          elapsed: `${elapsed.toFixed(2)}s`,
         },
       });
     } else {
