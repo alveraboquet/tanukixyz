@@ -8,4 +8,5 @@ export const BlockSubgraphs: { [key: string]: string } = {
   arbitrum: 'https://api.thegraph.com/subgraphs/name/ianlapham/arbitrum-one-blocks',
   optimism: 'https://api.thegraph.com/subgraphs/name/ianlapham/uni-testing-subgraph',
   celo: 'https://api.thegraph.com/subgraphs/name/jesse-sawa/celo-blocks',
+  ronin: 'https://thegraph.roninchain.com/subgraphs/name/axieinfinity/ronin-blocks',
 };

@@ -115,6 +115,18 @@ export const Blockchains: Array<ChainConfig> = [
   {
     network: 'mainnet',
     family: 'evm',
+    name: 'ronin',
+    nodeRpcs: {
+      default: '',
+      archive: '',
+    },
+    subgraph: {
+      blockSubgraph: BlockSubgraphs.ronin,
+    },
+  },
+  {
+    network: 'mainnet',
+    family: 'evm',
     name: 'celo',
     nodeRpcs: {
       default: AnkrPublicNodes.celo,

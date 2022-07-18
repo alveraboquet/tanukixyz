@@ -21,6 +21,7 @@ import { PancakeswapConfigs } from '../../configs/protocols/pancakeswap';
 import { QuickswapConfigs } from '../../configs/protocols/quickswap';
 import { RefFinanceConfigs } from '../../configs/protocols/reffinance';
 import { RibbonConfigs } from '../../configs/protocols/ribbon';
+import { RoninKatanaConfigs } from '../../configs/protocols/ronin';
 import { SpookyswapConfigs } from '../../configs/protocols/spookyswap';
 import { SushiswapConfigs } from '../../configs/protocols/sushiswap';
 import { TraderJoeExchangeConfigs, TraderJoeLendingConfigs } from '../../configs/protocols/traderjoe';
@@ -36,6 +37,7 @@ import { ConvexProvider } from './providers/convex/convex';
 import { CurveProvider } from './providers/curve/curve';
 import { DodoexProvider } from './providers/dodoex/dodoex';
 import EulerProvider from './providers/euler/euler';
+import { RoninKatanaProvider } from './providers/katana/katana';
 import LiquityProvider from './providers/liquity/liquity';
 import { PancakeswapProvider } from './providers/pancakeswap/pancakeswap';
 import { RefFinanceProvider } from './providers/reffinance/reffinance';
@@ -79,4 +81,5 @@ export const Providers: { [key: string]: CollectorProvider } = {
   reffinance: new RefFinanceProvider(RefFinanceConfigs),
   quickswap: new UniswapProvider(QuickswapConfigs),
   vvsfinance: new VvsfinanceProvider(VvsfinanceConfigs),
+  katana: new RoninKatanaProvider(RoninKatanaConfigs),
 };
