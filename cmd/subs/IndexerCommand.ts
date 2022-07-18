@@ -15,7 +15,7 @@ export class IndexerCommand extends BasicCommand {
       providers,
       protocol: argv.protocol,
       initialBlock: argv.initialBlock ? Number(argv.initialBlock) : 0,
-      forceSync: argv.forceSync ? argv.forceSync : false,
+      forceSync: argv.force ? argv.force : false,
     });
   }
 

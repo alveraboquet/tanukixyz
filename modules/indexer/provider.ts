@@ -108,21 +108,23 @@ export class EventIndexerProvider implements Provider {
         await eventCollection.bulkWrite(operations);
       }
 
-      // save state to db
-      await stateCollection.updateOne(
-        {
-          name: `indexer-events-${this.config.chainConfig.name}-${normalizeAddress(this.config.contractAddress)}`,
-        },
-        {
-          $set: {
+      // save state to db, ignore if force sync
+      if (!forceSync) {
+        await stateCollection.updateOne(
+          {
             name: `indexer-events-${this.config.chainConfig.name}-${normalizeAddress(this.config.contractAddress)}`,
-            blockNumber: toBlock,
           },
-        },
-        {
-          upsert: true,
-        }
-      );
+          {
+            $set: {
+              name: `indexer-events-${this.config.chainConfig.name}-${normalizeAddress(this.config.contractAddress)}`,
+              blockNumber: toBlock,
+            },
+          },
+          {
+            upsert: true,
+          }
+        );
+      }
 
       // pass events to hook for addition steps
       if (this.hook) {
