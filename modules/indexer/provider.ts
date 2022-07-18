@@ -157,6 +157,7 @@ export class EventIndexerProvider implements Provider {
                 blockNumber: events[i].blockNumber,
               },
             });
+            continue;
           }
           blockTimestamps[events[i].blockNumber] = block.timestamp;
           timestamp = block.timestamp;
