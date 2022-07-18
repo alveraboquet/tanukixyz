@@ -10,7 +10,6 @@ import { EventIndexerProvider } from './provider';
 export interface RunIndexerArgv {
   providers: ShareProviders;
   protocol: string;
-  initialBlock: number;
   forceSync: boolean;
 }
 
@@ -50,7 +49,7 @@ class IndexerModule {
   }
 
   private static async startWithConfig(argv: RunIndexerArgv, config: EventIndexConfig): Promise<void> {
-    const { providers, protocol, initialBlock, forceSync } = argv;
+    const { providers, protocol, forceSync } = argv;
 
     logger.onInfo({
       source: 'module.indexer',
@@ -64,7 +63,7 @@ class IndexerModule {
 
     const hook: IndexerHook | null = getHook(protocol, providers, config);
     const provider: EventIndexerProvider = new EventIndexerProvider(providers, config, hook);
-    await provider.start({ initialBlock, forceSync });
+    await provider.start({ forceSync });
   }
 }
 

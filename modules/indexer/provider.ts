@@ -9,7 +9,6 @@ import { Provider, ShareProviders } from '../../lib/types';
 import IndexerHook from './hooks/hook';
 
 export interface StartEventIndexerProps {
-  initialBlock: number;
   forceSync: boolean;
 }
 
@@ -46,14 +45,14 @@ export class EventIndexerProvider implements Provider {
   }
 
   public async start(props: StartEventIndexerProps): Promise<void> {
-    const { initialBlock, forceSync } = props;
+    const { forceSync } = props;
 
     const eventCollection = await this.providers.database.getCollection(
       envConfig.database.collections.globalContractEvents
     );
     const stateCollection = await this.providers.database.getCollection(envConfig.database.collections.globalState);
 
-    let startBlock = initialBlock !== 0 ? initialBlock : this.config.contractBirthday;
+    let startBlock = this.config.contractBirthday;
     if (!forceSync) {
       const stateFromDb = await stateCollection
         .find({
