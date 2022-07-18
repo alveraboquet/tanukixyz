@@ -3,11 +3,15 @@ import { normalizeAddress, sleep } from '../../lib/helper';
 import logger from '../../lib/logger';
 import { ShareProviders } from '../../lib/types';
 import IndexConfigs from './configs';
+import { getHook } from './hooks';
+import IndexerHook from './hooks/hook';
 import { EventIndexerProvider } from './provider';
 
 export interface RunIndexerArgv {
   providers: ShareProviders;
   protocol: string;
+  initialBlock: number;
+  forceSync: boolean;
 }
 
 class IndexerModule {
@@ -27,7 +31,7 @@ class IndexerModule {
 
       while (true) {
         for (let i = 0; i < configs.length; i++) {
-          await IndexerModule.startWithConfig(argv.providers, configs[i]);
+          await IndexerModule.startWithConfig(argv, configs[i]);
         }
 
         await sleep(60);
@@ -36,7 +40,7 @@ class IndexerModule {
       while (true) {
         for (const [, configs] of Object.entries(IndexConfigs)) {
           for (let i = 0; i < configs.length; i++) {
-            await IndexerModule.startWithConfig(argv.providers, configs[i]);
+            await IndexerModule.startWithConfig(argv, configs[i]);
           }
         }
 
@@ -45,7 +49,9 @@ class IndexerModule {
     }
   }
 
-  private static async startWithConfig(providers: ShareProviders, config: EventIndexConfig): Promise<void> {
+  private static async startWithConfig(argv: RunIndexerArgv, config: EventIndexConfig): Promise<void> {
+    const { providers, protocol, initialBlock, forceSync } = argv;
+
     logger.onInfo({
       source: 'module.indexer',
       message: 'start events indexer service',
@@ -55,8 +61,10 @@ class IndexerModule {
         events: config.events.toString(),
       },
     });
-    const provider: EventIndexerProvider = new EventIndexerProvider(providers, config);
-    await provider.start({});
+
+    const hook: IndexerHook | null = getHook(protocol, providers, config);
+    const provider: EventIndexerProvider = new EventIndexerProvider(providers, config, hook);
+    await provider.start({ initialBlock, forceSync });
   }
 }
 

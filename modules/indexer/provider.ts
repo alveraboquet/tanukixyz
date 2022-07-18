@@ -6,8 +6,13 @@ import { normalizeAddress } from '../../lib/helper';
 import logger from '../../lib/logger';
 import { ContractEventRawData } from '../../lib/types';
 import { Provider, ShareProviders } from '../../lib/types';
+import IndexerHook from './hooks/hook';
 
-export interface StartEventIndexerProps {}
+export interface StartEventIndexerProps {
+  initialBlock: number;
+  forceSync: boolean;
+}
+
 export interface GetEventsProps {
   fromBlock: number;
   toBlock: number;
@@ -18,9 +23,13 @@ export class EventIndexerProvider implements Provider {
   public readonly providers: ShareProviders;
   public readonly config: EventIndexConfig;
 
-  constructor(providers: ShareProviders, config: EventIndexConfig) {
+  // special hook, additional steps to process the event data
+  public readonly hook: IndexerHook | null;
+
+  constructor(providers: ShareProviders, config: EventIndexConfig, hook: IndexerHook | null) {
     this.providers = providers;
     this.config = config;
+    this.hook = hook;
   }
 
   public async getEvents(props: GetEventsProps): Promise<Array<ContractEventRawData>> {
@@ -37,30 +46,34 @@ export class EventIndexerProvider implements Provider {
   }
 
   public async start(props: StartEventIndexerProps): Promise<void> {
+    const { initialBlock, forceSync } = props;
+
     const eventCollection = await this.providers.database.getCollection(
       envConfig.database.collections.globalContractEvents
     );
     const stateCollection = await this.providers.database.getCollection(envConfig.database.collections.globalState);
 
-    let startBlock = this.config.contractBirthday;
-    const stateFromDb = await stateCollection
-      .find({
-        name: `indexer-events-${this.config.chainConfig.name}-${normalizeAddress(this.config.contractAddress)}`,
-      })
-      .limit(1)
-      .toArray();
-    if (stateFromDb.length > 0) {
-      startBlock = startBlock > stateFromDb[0].blockNumber ? startBlock : stateFromDb[0].blockNumber;
-    } else {
-      const latestEventsFromDb = await eventCollection
+    let startBlock = initialBlock !== 0 ? initialBlock : this.config.contractBirthday;
+    if (!forceSync) {
+      const stateFromDb = await stateCollection
         .find({
-          contract: normalizeAddress(this.config.contractAddress),
+          name: `indexer-events-${this.config.chainConfig.name}-${normalizeAddress(this.config.contractAddress)}`,
         })
-        .sort({ timestamp: -1 })
         .limit(1)
         .toArray();
-      if (latestEventsFromDb.length > 0) {
-        startBlock = startBlock > latestEventsFromDb[0].blockNumber ? startBlock : latestEventsFromDb[0].blockNumber;
+      if (stateFromDb.length > 0) {
+        startBlock = startBlock > stateFromDb[0].blockNumber ? startBlock : stateFromDb[0].blockNumber;
+      } else {
+        const latestEventsFromDb = await eventCollection
+          .find({
+            contract: normalizeAddress(this.config.contractAddress),
+          })
+          .sort({ timestamp: -1 })
+          .limit(1)
+          .toArray();
+        if (latestEventsFromDb.length > 0) {
+          startBlock = startBlock > latestEventsFromDb[0].blockNumber ? startBlock : latestEventsFromDb[0].blockNumber;
+        }
       }
     }
 
@@ -110,6 +123,11 @@ export class EventIndexerProvider implements Provider {
           upsert: true,
         }
       );
+
+      // pass events to hook for addition steps
+      if (this.hook) {
+        await this.hook.processEvents(allEvents);
+      }
 
       const endExeTime = Math.floor(new Date().getTime() / 1000);
       const elapsed = endExeTime - startExeTime;
