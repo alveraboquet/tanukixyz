@@ -130,7 +130,7 @@ export const Blockchains: Array<ChainConfig> = [
     name: 'arbitrum',
     nodeRpcs: {
       default: 'https://arb1.arbitrum.io/rpc',
-      archive: 'https://arb1.arbitrum.io/rpc',
+      archive: AnkrPublicNodes.arbitrum,
     },
     subgraph: {
       blockSubgraph: BlockSubgraphs.arbitrum,

@@ -549,6 +549,10 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
         decimals: 18,
         address: '',
       },
+      ethereum: {
+        decimals: 18,
+        address: '',
+      },
     },
   },
   ALPHA: {
