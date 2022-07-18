@@ -27,12 +27,15 @@ class CollectorModule {
         process.exit(0);
       }
 
-      await provider.startService({
-        mode: argv.mode === 'date' ? StartCollectorServiceMode.DATE : StartCollectorServiceMode.DAILY,
-        providers: argv.providers,
-        initialDate: argv.initialDate,
-        forceSync: argv.forceSync,
-      });
+      do {
+        await provider.startService({
+          mode: argv.mode === 'date' ? StartCollectorServiceMode.DATE : StartCollectorServiceMode.DAILY,
+          providers: argv.providers,
+          initialDate: argv.initialDate,
+          forceSync: argv.forceSync,
+        });
+        if (argv.mode === 'date') await sleep(5 * 60);
+      } while (argv.mode === 'date');
 
       process.exit(0);
     } else {

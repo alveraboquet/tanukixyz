@@ -1,3 +1,4 @@
+import { InitialSyncDate } from '../../../configs';
 import envConfig from '../../../configs/env';
 import { RegistryProtocolConfig } from '../../../configs/types';
 import { getTimestamp } from '../../../lib/helper';
@@ -38,10 +39,8 @@ class RegistryProvider implements IRegistryProvider {
 
     // for every protocol, we default collect data from the beginning
     // but if initialTime and forceSync were set, we will collect data from there
-    let startTime = 1640995200; // Sat Jan 01 2022 00:00:00 GMT+0000
-    if (initialTime && forceSync) {
-      startTime = initialTime;
-    } else {
+    let startTime = initialTime === 0 ? InitialSyncDate : initialTime;
+    if (!forceSync) {
       // we check last time in database and start from there
       const states = await stateCollection
         .find({
