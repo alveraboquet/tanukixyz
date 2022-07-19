@@ -10,13 +10,14 @@ import logger from '../../../../lib/logger';
 import { ShareProviders } from '../../../../lib/types';
 import { ProtocolData } from '../../types';
 import CollectorProvider from '../collector';
+import { CollectorHook } from '../hook';
 import { getPoolConfigByAddress } from './helpers';
 
-class CompoundProvider extends CollectorProvider {
+export class CompoundProvider extends CollectorProvider {
   public readonly name: string = 'provider.compound';
 
-  constructor(configs: CompoundProtocolConfig) {
-    super(configs);
+  constructor(configs: CompoundProtocolConfig, hook: CollectorHook | null) {
+    super(configs, hook);
   }
 
   public async getDataInTimeFrame(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {
@@ -188,5 +189,3 @@ class CompoundProvider extends CollectorProvider {
     return data;
   }
 }
-
-export default CompoundProvider;

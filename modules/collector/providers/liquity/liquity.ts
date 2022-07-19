@@ -7,12 +7,13 @@ import { getHistoryTokenPriceFromCoingecko, normalizeAddress } from '../../../..
 import { ShareProviders } from '../../../../lib/types';
 import { ProtocolData } from '../../types';
 import CollectorProvider from '../collector';
+import { CollectorHook } from '../hook';
 
 class LiquityProvider extends CollectorProvider {
   public readonly name: string = 'provider.liquity';
 
-  constructor(configs: LiquityProtocolConfig) {
-    super(configs);
+  constructor(configs: LiquityProtocolConfig, hook: CollectorHook | null) {
+    super(configs, hook);
   }
 
   public async getDataInTimeFrame(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {

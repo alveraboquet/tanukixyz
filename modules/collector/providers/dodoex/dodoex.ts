@@ -4,12 +4,13 @@ import { DodoexProtocolConfig } from '../../../../configs/protocols/dodoex';
 import logger from '../../../../lib/logger';
 import { ProtocolData } from '../../types';
 import CollectorProvider, { GetProtocolDataProps } from '../collector';
+import { CollectorHook } from '../hook';
 
 export class DodoexProvider extends CollectorProvider {
   public readonly name: string = 'provider.dodoex';
 
-  constructor(configs: DodoexProtocolConfig) {
-    super(configs);
+  constructor(configs: DodoexProtocolConfig, hook: CollectorHook | null) {
+    super(configs, hook);
   }
 
   public async getDailyData(props: GetProtocolDataProps): Promise<ProtocolData> {

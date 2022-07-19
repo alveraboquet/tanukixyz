@@ -1,5 +1,3 @@
-import { Provider, ShareProviders } from '../../lib/types';
-
 export interface ProtocolTokenomics {
   priceUSD: number;
   marketCapUSD: number;
@@ -22,17 +20,8 @@ export interface ProtocolData {
 
   tokenomics?: ProtocolTokenomics;
   changes?: ProtocolDataChange;
-}
 
-export interface ICollectorProvider extends Provider {
-  getDataInTimeFrame: (providers: ShareProviders, fromTime: number, toTime: number) => Promise<any>;
-
-  // get latest 24 hours metrics
-  getDailyData: (argv: any) => Promise<any>;
-
-  // get metrics in a given date
-  getDateData: (argv: any) => Promise<any>;
-
-  // start collector service
-  startService: (argv: any) => Promise<any>;
+  // bad debts metrics on lending platform
+  badDebtUSD?: number;
+  insolventUserCount?: number;
 }

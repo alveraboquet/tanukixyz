@@ -5,13 +5,14 @@ import { getHistoryTokenPriceFromCoingecko, normalizeAddress } from '../../../..
 import { ShareProviders } from '../../../../lib/types';
 import { ProtocolData } from '../../types';
 import CollectorProvider from '../collector';
+import { CollectorHook } from '../hook';
 import { queryVaultTransactions, queryVaults } from './helpers';
 
 export class RibbonProvider extends CollectorProvider {
   public readonly name: string = 'provider.ribbon';
 
-  constructor(configs: RibbonProtocolConfig) {
-    super(configs);
+  constructor(configs: RibbonProtocolConfig, hook: CollectorHook | null) {
+    super(configs, hook);
   }
 
   public async getDataInTimeFrame(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {

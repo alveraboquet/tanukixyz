@@ -9,13 +9,14 @@ import logger from '../../../../lib/logger';
 import { ShareProviders } from '../../../../lib/types';
 import { ProtocolData } from '../../types';
 import CollectorProvider from '../collector';
+import { CollectorHook } from '../hook';
 import { getReserveConfig } from './helpers';
 
 export class AaveProvider extends CollectorProvider {
   public readonly name: string = 'provider.aave';
 
-  constructor(configs: AaveProtocolConfig) {
-    super(configs);
+  constructor(configs: AaveProtocolConfig, hook: CollectorHook | null) {
+    super(configs, hook);
   }
 
   public async getDataInTimeFrame(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {

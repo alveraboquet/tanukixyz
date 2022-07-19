@@ -6,12 +6,13 @@ import logger from '../../../../lib/logger';
 import { ShareProviders } from '../../../../lib/types';
 import { ProtocolData } from '../../types';
 import CollectorProvider from '../collector';
+import { CollectorHook } from '../hook';
 
 class EulerProvider extends CollectorProvider {
   public readonly name: string = 'provider.euler';
 
-  constructor(configs: EulerProtocolConfig) {
-    super(configs);
+  constructor(configs: EulerProtocolConfig, hook: CollectorHook | null) {
+    super(configs, hook);
   }
 
   public async getDataInTimeFrame(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {

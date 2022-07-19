@@ -73,6 +73,10 @@ export interface CompoundProtocolConfig {
   name: string;
   tokenomics?: TokenConfig;
   pools: Array<CompoundLendingPoolConfig>;
+  subgraphs?: Array<{
+    chainConfig: ChainConfig;
+    lending: string;
+  }>;
 }
 
 export interface EulerProtocolConfig {

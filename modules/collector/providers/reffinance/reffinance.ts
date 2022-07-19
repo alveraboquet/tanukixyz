@@ -4,12 +4,13 @@ import { RefFinanceConfig } from '../../../../configs/protocols/reffinance';
 import logger from '../../../../lib/logger';
 import { ProtocolData } from '../../types';
 import CollectorProvider, { GetProtocolDataProps } from '../collector';
+import { CollectorHook } from '../hook';
 
 export class RefFinanceProvider extends CollectorProvider {
   public readonly name: string = 'provider.reffinance';
 
-  constructor(configs: RefFinanceConfig) {
-    super(configs);
+  constructor(configs: RefFinanceConfig, hook: CollectorHook | null) {
+    super(configs, hook);
   }
 
   public async getDailyData(props: GetProtocolDataProps): Promise<ProtocolData> {

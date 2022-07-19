@@ -6,13 +6,14 @@ import logger from '../../../../lib/logger';
 import { ShareProviders } from '../../../../lib/types';
 import { ProtocolData } from '../../types';
 import CollectorProvider from '../collector';
+import { CollectorHook } from '../hook';
 import { queryCvxLockingTransactions, queryCvxStakingTransactions, queryLpStakingTransactions } from './helpers';
 
 export class ConvexProvider extends CollectorProvider {
   public readonly name: string = 'provider.convex';
 
-  constructor(configs: ConvexProtocolConfig) {
-    super(configs);
+  constructor(configs: ConvexProtocolConfig, hook: CollectorHook | null) {
+    super(configs, hook);
   }
 
   public async getDataInTimeFrame(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {

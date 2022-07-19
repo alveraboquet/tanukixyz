@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+import { DefaultTokenList } from '../configs/constants/defaultTokenList';
 import logger from './logger';
 
 export function normalizeAddress(address: string | undefined): string {
@@ -45,4 +46,34 @@ export async function getHistoryTokenPriceFromCoingecko(coingeckoId: string, tim
     },
   });
   return 0;
+}
+
+export async function getNativeTokenPrice(chain: string, timestamp: number): Promise<number> {
+  let coingeckoId: any;
+  switch (chain) {
+    case 'ethereum': {
+      coingeckoId = DefaultTokenList.ETH.coingeckoId;
+      break;
+    }
+    case 'avalanche': {
+      coingeckoId = DefaultTokenList.AVAX.coingeckoId;
+      break;
+    }
+    case 'binance': {
+      coingeckoId = DefaultTokenList.BNB.coingeckoId;
+      break;
+    }
+    case 'polygon': {
+      coingeckoId = DefaultTokenList.MATIC.coingeckoId;
+      break;
+    }
+    case 'fantom': {
+      coingeckoId = DefaultTokenList.FTM.coingeckoId;
+      break;
+    }
+    default:
+      return 0;
+  }
+
+  return await getHistoryTokenPriceFromCoingecko(coingeckoId, timestamp);
 }

@@ -2,8 +2,9 @@ import { DefiProtocolModuleCode, InitialSyncDate } from '../../../configs';
 import envConfig from '../../../configs/env';
 import { getTimestamp, getTodayUTCTimestamp } from '../../../lib/helper';
 import logger from '../../../lib/logger';
-import { ShareProviders } from '../../../lib/types';
-import { ICollectorProvider, ProtocolData } from '../types';
+import { Provider, ShareProviders } from '../../../lib/types';
+import { ProtocolData } from '../types';
+import { CollectorHook } from './hook';
 import TokenomicsProvider from './tokenomics';
 
 export interface GetProtocolDataProps {
@@ -23,12 +24,14 @@ export interface StartCollectorServiceProps {
   providers: ShareProviders;
 }
 
-class CollectorProvider implements ICollectorProvider {
+class CollectorProvider implements Provider {
   public readonly name: string = 'provider.collector';
   public readonly configs: any;
+  public hook: CollectorHook | null;
 
-  constructor(configs: any) {
+  constructor(configs: any, hook: CollectorHook | null) {
     this.configs = configs;
+    this.hook = hook;
   }
 
   // override this function
@@ -46,7 +49,7 @@ class CollectorProvider implements ICollectorProvider {
     const last24HoursData = await this.getDataInTimeFrame(providers, last24HoursTimestamp, date);
     const last48HoursData = await this.getDataInTimeFrame(providers, last48HoursTimestamp, last24HoursTimestamp);
 
-    return {
+    const data: ProtocolData = {
       revenueUSD: last24HoursData.revenueUSD,
       volumeInUseUSD: last24HoursData.volumeInUseUSD,
       totalValueLockedUSD: last24HoursData.totalValueLockedUSD,
@@ -69,6 +72,15 @@ class CollectorProvider implements ICollectorProvider {
           100,
       },
     };
+
+    // call hooks
+    if (this.hook) {
+      const hookData: any = await this.hook.getHookData({ providers, date });
+      data.badDebtUSD = hookData.badDebtUSD;
+      data.insolventUserCount = hookData.insolventUserCount;
+    }
+
+    return data;
   }
 
   public async getDateData(argv: GetProtocolDataProps): Promise<any> {

@@ -1,11 +1,12 @@
 import { UniswapProtocolConfig } from '../../../../configs/types';
+import { CollectorHook } from '../hook';
 import { UniswapProvider } from '../uniswap/uniswap';
 
 export class RoninKatanaProvider extends UniswapProvider {
   public readonly name: string = 'provider.katana';
 
-  constructor(configs: UniswapProtocolConfig) {
-    super(configs);
+  constructor(configs: UniswapProtocolConfig, hook: CollectorHook | null) {
+    super(configs, hook);
   }
 
   // override this methods match with new project definitions

@@ -1,3 +1,4 @@
+import { getChainConfig } from '../chains';
 import { DefaultTokenList } from '../constants/defaultTokenList';
 import { GenesisBlocks } from '../constants/genesisBlocks';
 import { getCompoundPoolConfig } from '../helpers';
@@ -6,6 +7,12 @@ import { CompoundProtocolConfig } from '../types';
 export const CompoundConfigs: CompoundProtocolConfig = {
   name: 'compound',
   tokenomics: DefaultTokenList.COMP,
+  subgraphs: [
+    {
+      chainConfig: getChainConfig('ethereum'),
+      lending: 'https://api.thegraph.com/subgraphs/name/graphprotocol/compound-v2',
+    },
+  ],
   pools: [
     getCompoundPoolConfig(
       'ethereum',

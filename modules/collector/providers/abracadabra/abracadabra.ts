@@ -8,13 +8,14 @@ import logger from '../../../../lib/logger';
 import { ShareProviders } from '../../../../lib/types';
 import { ProtocolData } from '../../types';
 import CollectorProvider from '../collector';
+import { CollectorHook } from '../hook';
 import { getHistoryPrice, getMarketConfigByAddress } from './helpers';
 
 class AbracadabraProvider extends CollectorProvider {
   public readonly name: string = 'provider.abracadabra';
 
-  constructor(configs: AbracadabraProtocolConfig) {
-    super(configs);
+  constructor(configs: AbracadabraProtocolConfig, hook: CollectorHook | null) {
+    super(configs, hook);
   }
 
   public async getDataInTimeFrame(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {

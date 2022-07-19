@@ -6,12 +6,13 @@ import { getHistoryTokenPriceFromCoingecko, getTimestamp, normalizeAddress } fro
 import { ShareProviders } from '../../../../lib/types';
 import { ProtocolData } from '../../types';
 import CollectorProvider, { GetProtocolDataProps } from '../collector';
+import { CollectorHook } from '../hook';
 
 export class EnsProvider extends CollectorProvider {
   public readonly name: string = 'provider.ens';
 
-  constructor(configs: EnsProtocolConfig) {
-    super(configs);
+  constructor(configs: EnsProtocolConfig, hook: CollectorHook | null) {
+    super(configs, hook);
   }
 
   private async getDataInRange(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {

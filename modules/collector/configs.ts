@@ -28,11 +28,12 @@ import { TraderJoeExchangeConfigs, TraderJoeLendingConfigs } from '../../configs
 import { UniswapConfigs } from '../../configs/protocols/uniswap';
 import { VenusConfigs } from '../../configs/protocols/venus';
 import { VvsfinanceConfigs } from '../../configs/protocols/vvsfinance';
+import { CompoundCollectorHook } from './hooks/compound';
 import { AaveProvider } from './providers/aave/aave';
 import AbracadabraProvider from './providers/abracadabra/abracadabra';
 import { BalancerProvider } from './providers/balancer/balancer';
 import CollectorProvider from './providers/collector';
-import CompoundProvider from './providers/compound/compound';
+import { CompoundProvider } from './providers/compound/compound';
 import { ConvexProvider } from './providers/convex/convex';
 import { CurveProvider } from './providers/curve/curve';
 import { DodoexProvider } from './providers/dodoex/dodoex';
@@ -48,38 +49,41 @@ import { UniswapProvider } from './providers/uniswap/uniswap';
 import { VvsfinanceProvider } from './providers/vvsfinance/vvsfinance';
 
 export const Providers: { [key: string]: CollectorProvider } = {
-  compound: new CompoundProvider(CompoundConfigs),
-  aave: new AaveProvider(AaveConfigs),
-  abracadabra: new AbracadabraProvider(AbracadabraConfigs),
-  curve: new CurveProvider(CurveConfigs),
-  liquity: new LiquityProvider(LiquityConfigs),
-  euler: new EulerProvider(EulerConfigs),
-  convex: new ConvexProvider(ConvexConfigs),
-  ribbon: new RibbonProvider(RibbonConfigs),
-  ironbank: new CompoundProvider(IronBankConfigs),
-  cream: new CompoundProvider(CreamConfigs),
-  benqi: new CompoundProvider(BenqiConfigs),
-  dodoex: new DodoexProvider(DodoexConfigs),
-  venus: new CompoundProvider(VenusConfigs),
-  traderjoe: new TraderjoeProvider({
-    name: 'traderjoe',
-    exchange: TraderJoeExchangeConfigs,
-    lending: TraderJoeLendingConfigs,
-    tokenomics: DefaultTokenList.JOE,
-  }),
-  bastion: new CompoundProvider(BastionConfigs),
-  aurigami: new CompoundProvider(AurigamiConfigs),
-  uniswap: new UniswapProvider(UniswapConfigs),
-  sushiswap: new SushiswapProvider(SushiswapConfigs),
-  spookyswap: new UniswapProvider(SpookyswapConfigs),
-  pancakeswap: new PancakeswapProvider(PancakeswapConfigs),
-  balancer: new BalancerProvider(BalancerConfigs),
-  beets: new BalancerProvider(BeetsConfigs),
-  biswap: new PancakeswapProvider(BiswapConfigs),
-  babyswap: new PancakeswapProvider(BabyswapConfigs),
-  mmfinance: new PancakeswapProvider(MmfinanceConfigs),
-  reffinance: new RefFinanceProvider(RefFinanceConfigs),
-  quickswap: new UniswapProvider(QuickswapConfigs),
-  vvsfinance: new VvsfinanceProvider(VvsfinanceConfigs),
-  katana: new RoninKatanaProvider(RoninKatanaConfigs),
+  compound: new CompoundProvider(CompoundConfigs, new CompoundCollectorHook(CompoundConfigs)),
+  aave: new AaveProvider(AaveConfigs, null),
+  abracadabra: new AbracadabraProvider(AbracadabraConfigs, null),
+  curve: new CurveProvider(CurveConfigs, null),
+  liquity: new LiquityProvider(LiquityConfigs, null),
+  euler: new EulerProvider(EulerConfigs, null),
+  convex: new ConvexProvider(ConvexConfigs, null),
+  ribbon: new RibbonProvider(RibbonConfigs, null),
+  ironbank: new CompoundProvider(IronBankConfigs, null),
+  cream: new CompoundProvider(CreamConfigs, null),
+  benqi: new CompoundProvider(BenqiConfigs, null),
+  dodoex: new DodoexProvider(DodoexConfigs, null),
+  venus: new CompoundProvider(VenusConfigs, null),
+  traderjoe: new TraderjoeProvider(
+    {
+      name: 'traderjoe',
+      exchange: TraderJoeExchangeConfigs,
+      lending: TraderJoeLendingConfigs,
+      tokenomics: DefaultTokenList.JOE,
+    },
+    null
+  ),
+  bastion: new CompoundProvider(BastionConfigs, null),
+  aurigami: new CompoundProvider(AurigamiConfigs, null),
+  uniswap: new UniswapProvider(UniswapConfigs, null),
+  sushiswap: new SushiswapProvider(SushiswapConfigs, null),
+  spookyswap: new UniswapProvider(SpookyswapConfigs, null),
+  pancakeswap: new PancakeswapProvider(PancakeswapConfigs, null),
+  balancer: new BalancerProvider(BalancerConfigs, null),
+  beets: new BalancerProvider(BeetsConfigs, null),
+  biswap: new PancakeswapProvider(BiswapConfigs, null),
+  babyswap: new PancakeswapProvider(BabyswapConfigs, null),
+  mmfinance: new PancakeswapProvider(MmfinanceConfigs, null),
+  reffinance: new RefFinanceProvider(RefFinanceConfigs, null),
+  quickswap: new UniswapProvider(QuickswapConfigs, null),
+  vvsfinance: new VvsfinanceProvider(VvsfinanceConfigs, null),
+  katana: new RoninKatanaProvider(RoninKatanaConfigs, null),
 };
