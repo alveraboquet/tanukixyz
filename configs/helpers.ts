@@ -16,7 +16,7 @@ export function getCompoundPoolConfig(
     contractAbi: cTokenAbi,
     contractAddress: address,
     contractBirthday: genesisBlock,
-    events: ['Mint', 'Redeem', 'Borrow', 'RepayBorrow'],
+    events: ['Mint', 'Redeem', 'Borrow', 'RepayBorrow', 'LiquidateBorrow'],
     underlying: token,
   };
 }
