@@ -75,8 +75,8 @@ export class UniswapProvider extends CollectorProvider {
       const filters: any =
         this.configs.subgraphs[i].version === 2 ? this.getFilters().factory : this.getFilters().v3.factory;
 
-      let blockNumberFromTime: Number;
-      let blockNumberToTime: Number;
+      let blockNumberFromTime: number;
+      let blockNumberToTime: number;
 
       if (
         this.configs.subgraphs[i].exchange.includes('thegraph.com') ||
