@@ -62,6 +62,7 @@ export function getRouter(providers: ShareProviders): Router {
 
   router.get('/date/:module', async (request, response) => {
     const module = request.params.module || 'unknown';
+    const protocol = request.query.protocol ? String(request.query.protocol) : null;
 
     let toDate = getTodayUTCTimestamp();
     let fromDate = toDate - 7 * 24 * 60 * 60; // last 7 days
@@ -77,16 +78,29 @@ export function getRouter(providers: ShareProviders): Router {
     const dateMetricCollection = await providers.database.getCollection(envConfig.database.collections.globalDataDate);
 
     try {
-      const documents: Array<any> = await dateMetricCollection
-        .find({
-          module: module,
-          date: {
-            $gte: fromDate,
-            $lte: toDate,
-          },
-        })
-        .sort({ date: -1 })
-        .toArray();
+      const documents: Array<any> =
+        protocol !== null
+          ? await dateMetricCollection
+              .find({
+                module: module,
+                name: protocol,
+                date: {
+                  $gte: fromDate,
+                  $lte: toDate,
+                },
+              })
+              .sort({ date: -1 })
+              .toArray()
+          : await dateMetricCollection
+              .find({
+                module: module,
+                date: {
+                  $gte: fromDate,
+                  $lte: toDate,
+                },
+              })
+              .sort({ date: -1 })
+              .toArray();
       writeResponseData(response, {
         status: 200,
         data: documents,
