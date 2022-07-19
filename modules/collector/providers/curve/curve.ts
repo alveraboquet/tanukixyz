@@ -3,7 +3,7 @@ import axios from 'axios';
 import { CurveProtocolConfig } from '../../../../configs/protocols/curve';
 import logger from '../../../../lib/logger';
 import { ProtocolData } from '../../types';
-import CollectorProvider, { GetProtocolDataProps } from '../collector';
+import { CollectorProvider, GetProtocolDataProps } from '../collector';
 import { CollectorHook } from '../hook';
 
 export class CurveProvider extends CollectorProvider {

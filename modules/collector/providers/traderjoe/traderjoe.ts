@@ -1,6 +1,6 @@
 import { CompoundProtocolConfig, TokenConfig, UniswapProtocolConfig } from '../../../../configs/types';
 import { ProtocolData } from '../../types';
-import CollectorProvider, { GetProtocolDataProps } from '../collector';
+import { CollectorProvider, GetProtocolDataProps } from '../collector';
 import { CompoundProvider } from '../compound/compound';
 import { CollectorHook } from '../hook';
 import { SushiswapProvider } from '../sushiswap/sushiswap';
@@ -12,7 +12,7 @@ export interface TraderjoeProtocolConfig {
   tokenomics: TokenConfig;
 }
 
-class TraderjoeProvider extends CollectorProvider {
+export class TraderjoeProvider extends CollectorProvider {
   public readonly name: string = 'provider.traderjoe';
 
   private exchangeProvider: SushiswapProvider;
@@ -53,5 +53,3 @@ class TraderjoeProvider extends CollectorProvider {
     };
   }
 }
-
-export default TraderjoeProvider;

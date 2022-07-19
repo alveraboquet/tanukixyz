@@ -24,7 +24,7 @@ export interface StartCollectorServiceProps {
   providers: ShareProviders;
 }
 
-class CollectorProvider implements Provider {
+export class CollectorProvider implements Provider {
   public readonly name: string = 'provider.collector';
   public readonly configs: any;
   public hook: CollectorHook | null;
@@ -212,5 +212,3 @@ class CollectorProvider implements Provider {
     }
   }
 }
-
-export default CollectorProvider;

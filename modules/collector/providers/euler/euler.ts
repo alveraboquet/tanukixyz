@@ -5,10 +5,10 @@ import { normalizeAddress } from '../../../../lib/helper';
 import logger from '../../../../lib/logger';
 import { ShareProviders } from '../../../../lib/types';
 import { ProtocolData } from '../../types';
-import CollectorProvider from '../collector';
+import { CollectorProvider } from '../collector';
 import { CollectorHook } from '../hook';
 
-class EulerProvider extends CollectorProvider {
+export class EulerProvider extends CollectorProvider {
   public readonly name: string = 'provider.euler';
 
   constructor(configs: EulerProtocolConfig, hook: CollectorHook | null) {
@@ -153,5 +153,3 @@ class EulerProvider extends CollectorProvider {
     return data;
   }
 }
-
-export default EulerProvider;

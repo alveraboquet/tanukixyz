@@ -6,10 +6,10 @@ import { LiquityProtocolConfig } from '../../../../configs/types';
 import { getHistoryTokenPriceFromCoingecko, normalizeAddress } from '../../../../lib/helper';
 import { ShareProviders } from '../../../../lib/types';
 import { ProtocolData } from '../../types';
-import CollectorProvider from '../collector';
+import { CollectorProvider } from '../collector';
 import { CollectorHook } from '../hook';
 
-class LiquityProvider extends CollectorProvider {
+export class LiquityProvider extends CollectorProvider {
   public readonly name: string = 'provider.liquity';
 
   constructor(configs: LiquityProtocolConfig, hook: CollectorHook | null) {
@@ -110,5 +110,3 @@ class LiquityProvider extends CollectorProvider {
     return dateData;
   }
 }
-
-export default LiquityProvider;

@@ -5,7 +5,7 @@ import { EnsProtocolConfig } from '../../../../configs/protocols/ens';
 import { getHistoryTokenPriceFromCoingecko, getTimestamp, normalizeAddress } from '../../../../lib/helper';
 import { ShareProviders } from '../../../../lib/types';
 import { ProtocolData } from '../../types';
-import CollectorProvider, { GetProtocolDataProps } from '../collector';
+import { CollectorProvider, GetProtocolDataProps } from '../collector';
 import { CollectorHook } from '../hook';
 
 export class EnsProvider extends CollectorProvider {

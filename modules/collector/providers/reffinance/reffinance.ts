@@ -3,7 +3,7 @@ import axios from 'axios';
 import { RefFinanceConfig } from '../../../../configs/protocols/reffinance';
 import logger from '../../../../lib/logger';
 import { ProtocolData } from '../../types';
-import CollectorProvider, { GetProtocolDataProps } from '../collector';
+import { CollectorProvider, GetProtocolDataProps } from '../collector';
 import { CollectorHook } from '../hook';
 
 export class RefFinanceProvider extends CollectorProvider {
