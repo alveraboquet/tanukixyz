@@ -10,9 +10,9 @@ const MaxRecordLimit = 100;
 export function getRouter(providers: ShareProviders): Router {
   const router = Router({ mergeParams: true });
 
-  router.get('/address/:address', async (request, response) => {
-    const address: string = String(request.params.address).toLowerCase();
-    const chainQuery: string | null = request.query.chain ? String(request.query.chain) : null;
+  router.get('/address', async (request, response) => {
+    const address: string | null = request.query.address ? String(request.query.address).toLowerCase() : null;
+    const protocol: string | null = request.query.protocol ? String(request.query.protocol) : null;
 
     const limit: number = request.query.limit
       ? Number(request.query.limit) > MaxRecordLimit
@@ -26,14 +26,13 @@ export function getRouter(providers: ShareProviders): Router {
     );
 
     try {
-      const query = chainQuery
-        ? {
-            address: address,
-            chain: chainQuery,
-          }
-        : {
-            address: address,
-          };
+      let query;
+
+      if (address) {
+        query = protocol ? { address, protocol } : { address };
+      } else {
+        query = protocol ? { protocol } : {};
+      }
 
       const documents: Array<any> = await addressRegistryCollection
         .find(query)

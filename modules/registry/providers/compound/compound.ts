@@ -162,7 +162,7 @@ export class CompoundRegistryProvider extends RegistryProvider {
                   },
                 },
                 upsert: true,
-              }
+              },
             });
           }
 
