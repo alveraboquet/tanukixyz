@@ -43,17 +43,12 @@ export interface RegistryTransactionData {
   breakdown?: any;
 }
 
-export interface RegistryAddressProtocolData {
-  protocol: string;
-  data: any;
-}
-
 export interface RegistryAddressData {
+  // index
   chain: string;
   address: string;
+  protocol: string;
+  timestamp: number;
 
-  // address data on specify protocol
-  protocols: {
-    [key: string]: RegistryAddressProtocolData;
-  };
+  breakdown?: any;
 }

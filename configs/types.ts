@@ -9,6 +9,7 @@ export interface EnvConfig {
       globalContractEvents: string;
       globalBlockscanBlocks: string;
       globalRegistryAddresses: string;
+      globalRegistryAddressSnapshot: string;
       globalRegistryTransactions: string;
     };
   };

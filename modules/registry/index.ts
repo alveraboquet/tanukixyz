@@ -6,6 +6,7 @@ import { Registries } from './configs';
 export interface RunRegistryModuleArgv {
   providers: ShareProviders;
   protocol: string;
+  forceSync: boolean;
 }
 
 class RegistryModule {
@@ -26,6 +27,7 @@ class RegistryModule {
       while (true) {
         await provider.startService({
           providers: argv.providers,
+          forceSync: argv.forceSync,
         });
 
         await sleep(10 * 60);
@@ -37,6 +39,7 @@ class RegistryModule {
           try {
             await provider.startService({
               providers: argv.providers,
+              forceSync: argv.forceSync,
             });
           } catch (e: any) {}
         }

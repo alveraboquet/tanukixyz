@@ -17,6 +17,7 @@ const envConfig: EnvConfig = {
       globalContractEvents: 'tanukixyz.contract.events',
       globalBlockscanBlocks: 'tanukixyz.chain.blocks',
       globalRegistryAddresses: 'tanukixyz.registry.addresses',
+      globalRegistryAddressSnapshot: 'tanukixyz.registry.address.snapshots',
       globalRegistryTransactions: 'tanukixyz.registry.transactions',
     },
   },

@@ -1,8 +1,8 @@
 import { CompoundProtocolConfig } from '../../../../configs/types';
 import { normalizeAddress } from '../../../../lib/helper';
 import logger from '../../../../lib/logger';
-import { RegistryAddressData, ShareProviders } from '../../../../lib/types';
-import RegistryProvider from '../registry';
+import { RegistryAddressData } from '../../../../lib/types';
+import RegistryProvider, { GetAddressSnapshotProps } from '../registry';
 
 export interface CompoundAddressMarketData {
   marketAddress: string;
@@ -21,7 +21,9 @@ export class CompoundRegistryProvider extends RegistryProvider {
     super(configs);
   }
 
-  public async getAllAddressInfo(providers: ShareProviders): Promise<Array<RegistryAddressData>> {
+  public async getAddressSnapshot(props: GetAddressSnapshotProps): Promise<Array<RegistryAddressData>> {
+    const { providers, timestamp } = props;
+
     const data: Array<RegistryAddressData> = [];
 
     const foundAddresses: {
@@ -31,9 +33,18 @@ export class CompoundRegistryProvider extends RegistryProvider {
         markets: Array<CompoundAddressMarketData>;
       };
     } = {};
+
     const configs: CompoundProtocolConfig = this.configs as CompoundProtocolConfig;
     if (configs.subgraphs) {
       for (let subIdx = 0; subIdx < configs.subgraphs.length; subIdx++) {
+        let blockAtTimestamp = await providers.subgraph.queryBlockAtTimestamp(
+          configs.subgraphs[subIdx].chainConfig.subgraph?.blockSubgraph as string,
+          timestamp
+        );
+        // in case the graph not full sync yet
+        const blockNumberMeta = await providers.subgraph.queryMetaLatestBlock(configs.subgraphs[subIdx].lending);
+        blockAtTimestamp = blockAtTimestamp > blockNumberMeta ? blockNumberMeta : blockAtTimestamp;
+
         let startAccountId = '0';
 
         const foundAddressMarket: any = {};
@@ -41,7 +52,7 @@ export class CompoundRegistryProvider extends RegistryProvider {
         while (true) {
           const query = `
             {
-              accounts: accountCTokens(first: 1000, where: {account_gt: "${startAccountId}"}) {
+              accounts: accountCTokens(first: 1000, where: {account_gt: "${startAccountId}"}, block: {number: ${blockAtTimestamp}}) {
                 account {
                   id
                 }
@@ -82,13 +93,13 @@ export class CompoundRegistryProvider extends RegistryProvider {
               foundAddresses[addressKey] = {
                 chain: configs.subgraphs[subIdx].chainConfig.name,
                 address: normalizeAddress(accounts[aIdx].account.id),
-                markets: [marketData],
+                markets: [],
               };
-            } else {
-              if (!foundAddressMarket[marketKey]) {
-                foundAddresses[addressKey].markets.push(marketData);
-                foundAddressMarket[marketKey] = true;
-              }
+            }
+
+            if (!foundAddressMarket[marketKey]) {
+              foundAddresses[addressKey].markets.push(marketData);
+              foundAddressMarket[marketKey] = true;
             }
           }
 
@@ -103,6 +114,8 @@ export class CompoundRegistryProvider extends RegistryProvider {
             message: `collected ${Object.keys(foundAddresses).length} accounts data`,
             props: {
               name: configs.name,
+              chain: configs.subgraphs[subIdx].chainConfig.name,
+              timestamp: timestamp,
               subgraph: configs.subgraphs[subIdx].lending,
             },
           });
@@ -114,14 +127,11 @@ export class CompoundRegistryProvider extends RegistryProvider {
       data.push({
         chain: accountData.chain,
         address: accountData.address,
+        protocol: configs.name,
+        timestamp: timestamp,
 
-        protocols: {
-          [this.configs.name]: {
-            protocol: configs.name,
-            data: {
-              markets: accountData.markets,
-            },
-          },
+        breakdown: {
+          markets: accountData.markets,
         },
       });
     }

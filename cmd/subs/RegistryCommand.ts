@@ -14,6 +14,7 @@ export class RegistryCommand extends BasicCommand {
     await registryModule.run({
       providers,
       protocol: argv.protocol,
+      forceSync: argv.force ? argv.force : false,
     });
   }
 
@@ -23,6 +24,11 @@ export class RegistryCommand extends BasicCommand {
         type: 'string',
         default: '',
         describe: 'Run command with specify protocol name, ex: uniswap',
+      },
+      force: {
+        type: 'boolean',
+        default: false,
+        describe: 'Force sync data from initial date',
       },
     });
   }
