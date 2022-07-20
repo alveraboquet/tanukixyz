@@ -3,7 +3,7 @@ import envConfig from '../../../configs/env';
 import { RegistryProtocolConfig } from '../../../configs/types';
 import { getTimestamp } from '../../../lib/helper';
 import logger from '../../../lib/logger';
-import { Provider, RegistryAddressData, ShareProviders } from '../../../lib/types';
+import { Provider, ShareProviders } from '../../../lib/types';
 
 export interface StartRegistryServiceProps {
   providers: ShareProviders;
@@ -13,6 +13,7 @@ export interface StartRegistryServiceProps {
 export interface GetAddressSnapshotProps {
   providers: ShareProviders;
   timestamp: number;
+  snapshot: boolean;
 }
 
 class RegistryProvider implements Provider {
@@ -24,18 +25,10 @@ class RegistryProvider implements Provider {
     this.configs = configs;
   }
 
-  public async getAddressInfo(providers: ShareProviders): Promise<Array<RegistryAddressData>> {
-    return await this.getAddressSnapshot({ providers, timestamp: getTimestamp() });
-  }
-
-  public async getAddressSnapshot(props: GetAddressSnapshotProps): Promise<Array<RegistryAddressData>> {
-    return [];
-  }
+  public async syncSnapshotAddressData(props: GetAddressSnapshotProps): Promise<void> {}
 
   private async _syncCurrentInfo(props: StartRegistryServiceProps): Promise<void> {
     const { providers } = props;
-
-    const startExeTime = new Date().getTime();
 
     logger.onInfo({
       source: this.name,
@@ -45,54 +38,13 @@ class RegistryProvider implements Provider {
       },
     });
 
-    const addressRegistryCollection = await providers.database.getCollection(
-      envConfig.database.collections.globalRegistryAddresses
-    );
-
-    const addresses: Array<RegistryAddressData> = await this.getAddressInfo(providers);
-
-    const operations: Array<any> = [];
-    for (let i = 0; i < addresses.length; i++) {
-      operations.push({
-        updateOne: {
-          filter: {
-            chain: addresses[i].chain,
-            address: addresses[i].address,
-            protocol: addresses[i].protocol,
-          },
-          update: {
-            $set: {
-              ...addresses[i],
-            },
-          },
-          upsert: true,
-        },
-      });
-    }
-
-    if (operations.length > 0) {
-      await addressRegistryCollection.bulkWrite(operations);
-    }
-
-    const endExeTime = new Date().getTime();
-    const elapsed = (endExeTime - startExeTime) / 1000;
-    logger.onInfo({
-      source: this.name,
-      message: `collected ${operations.length} addresses latest data`,
-      props: {
-        name: this.configs.name,
-        elapsed: `${elapsed.toFixed(2)}s`,
-      },
-    });
+    await this.syncSnapshotAddressData({ providers, timestamp: getTimestamp(), snapshot: false });
   }
 
   private async _syncSnapshotInfo(props: StartRegistryServiceProps): Promise<void> {
     const { providers, forceSync } = props;
 
     const stateCollection = await providers.database.getCollection(envConfig.database.collections.globalState);
-    const addressSnapshotCollection = await providers.database.getCollection(
-      envConfig.database.collections.globalRegistryAddressSnapshot
-    );
 
     let startDate = InitialSyncDate;
     if (!forceSync) {
@@ -119,33 +71,7 @@ class RegistryProvider implements Provider {
 
     const currentTimestamp = getTimestamp();
     while (startDate <= currentTimestamp) {
-      const startExeTime = Math.floor(new Date().getTime() / 1000);
-
-      const addresses: Array<RegistryAddressData> = await this.getAddressSnapshot({ providers, timestamp: startDate });
-
-      const operations: Array<any> = [];
-      for (let i = 0; i < addresses.length; i++) {
-        operations.push({
-          updateOne: {
-            filter: {
-              chain: addresses[i].chain,
-              address: addresses[i].address,
-              protocol: addresses[i].protocol,
-              timestamp: addresses[i].timestamp,
-            },
-            update: {
-              $set: {
-                ...addresses[i],
-              },
-            },
-            upsert: true,
-          },
-        });
-      }
-
-      if (operations.length > 0) {
-        await addressSnapshotCollection.bulkWrite(operations);
-      }
+      await this.syncSnapshotAddressData({ providers, timestamp: startDate, snapshot: true });
 
       await stateCollection.updateOne(
         {
@@ -159,18 +85,6 @@ class RegistryProvider implements Provider {
         },
         { upsert: true }
       );
-
-      const endExeTime = new Date().getTime();
-      const elapsed = (endExeTime - startExeTime) / 1000;
-      logger.onInfo({
-        source: this.name,
-        message: `collected ${operations.length} addresses snapshot data`,
-        props: {
-          name: this.configs.name,
-          timestamp: startDate,
-          elapsed: `${elapsed.toFixed(2)}s`,
-        },
-      });
 
       startDate += 24 * 60 * 60;
     }
