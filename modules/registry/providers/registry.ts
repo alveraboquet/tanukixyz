@@ -147,6 +147,19 @@ class RegistryProvider implements Provider {
         await addressSnapshotCollection.bulkWrite(operations);
       }
 
+      await stateCollection.updateOne(
+        {
+          name: `registry-address-${this.configs.name}`,
+        },
+        {
+          $set: {
+            name: `registry-address-${this.configs.name}`,
+            timestamp: startDate,
+          },
+        },
+        { upsert: true }
+      );
+
       const endExeTime = new Date().getTime();
       const elapsed = (endExeTime - startExeTime) / 1000;
       logger.onInfo({
