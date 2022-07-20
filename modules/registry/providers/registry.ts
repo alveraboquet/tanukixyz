@@ -1,18 +1,13 @@
-import { InitialSyncDate } from '../../../configs';
 import envConfig from '../../../configs/env';
 import { RegistryProtocolConfig } from '../../../configs/types';
-import { getTimestamp } from '../../../lib/helper';
 import logger from '../../../lib/logger';
-import { RegistryTransactionData, ShareProviders } from '../../../lib/types';
-import { IRegistryProvider } from '../types';
+import { Provider, RegistryAddressData, ShareProviders } from '../../../lib/types';
 
 export interface StartRegistryServiceProps {
-  initialTime: number;
-  forceSync: boolean;
   providers: ShareProviders;
 }
 
-class RegistryProvider implements IRegistryProvider {
+class RegistryProvider implements Provider {
   public readonly name: string = 'provider.registry';
 
   public readonly configs: any;
@@ -21,111 +16,66 @@ class RegistryProvider implements IRegistryProvider {
     this.configs = configs;
   }
 
-  public async getTransactionInTimeFrame(
-    providers: ShareProviders,
-    fromTime: number,
-    toTime: number
-  ): Promise<Array<RegistryTransactionData>> {
+  public async getAllAddressInfo(providers: ShareProviders): Promise<Array<RegistryAddressData>> {
     return [];
   }
 
   public async startService(props: StartRegistryServiceProps): Promise<void> {
-    const { initialTime, forceSync, providers } = props;
+    const { providers } = props;
 
-    const stateCollection = await providers.database.getCollection(envConfig.database.collections.globalState);
-    const transactionRegistryCollection = await providers.database.getCollection(
-      envConfig.database.collections.globalRegistryTransactions
-    );
-
-    // for every protocol, we default collect data from the beginning
-    // but if initialTime and forceSync were set, we will collect data from there
-    let startTime = initialTime === 0 ? InitialSyncDate : initialTime;
-    if (!forceSync) {
-      // we check last time in database and start from there
-      const states = await stateCollection
-        .find({
-          name: `registry-transactions-${(this.configs as RegistryProtocolConfig).name}`,
-        })
-        .limit(1)
-        .toArray();
-      if (states.length > 0) {
-        startTime = states[0].timestamp;
-      }
-    }
+    const startExeTime = new Date().getTime();
 
     logger.onInfo({
       source: this.name,
-      message: 'start collect registry data',
+      message: 'collecting address registry data',
       props: {
         name: (this.configs as RegistryProtocolConfig).name,
-        startTime: startTime,
       },
     });
 
-    // timeframe to query
-    const queryTimeframe = 60 * 60;
+    const addressRegistryCollection = await providers.database.getCollection(
+      envConfig.database.collections.globalRegistryAddresses
+    );
 
-    const currentTime = getTimestamp();
-    while (startTime <= currentTime) {
-      const startExeTime = new Date().getTime();
-      const transactions: Array<RegistryTransactionData> = await this.getTransactionInTimeFrame(
-        providers,
-        startTime,
-        startTime + queryTimeframe
-      );
+    // for every protocol, we default collect data from the beginning
+    const addresses: Array<RegistryAddressData> = await this.getAllAddressInfo(providers);
 
-      const operations: Array<any> = [];
-      for (let txIdx = 0; txIdx < transactions.length; txIdx++) {
-        operations.push({
-          updateOne: {
-            filter: {
-              protocol: transactions[txIdx].protocol,
-              chain: transactions[txIdx].chain,
-              transactionHash: transactions[txIdx].transactionHash,
-            },
-            update: {
-              $set: {
-                ...transactions[txIdx],
+    const operations: Array<any> = [];
+    for (let i = 0; i < addresses.length; i++) {
+      operations.push({
+        updateOne: {
+          filter: {
+            chain: addresses[i].chain,
+            address: addresses[i].address,
+          },
+          update: {
+            $set: {
+              protocols: {
+                [this.configs.name]: {
+                  ...addresses[i].protocols[this.configs.name],
+                },
               },
             },
-            upsert: true,
           },
-        });
-      }
-
-      if (operations.length > 0) {
-        await transactionRegistryCollection.bulkWrite(operations);
-      }
-
-      await stateCollection.updateOne(
-        {
-          name: `registry-transactions-${(this.configs as RegistryProtocolConfig).name}`,
-        },
-        {
-          $set: {
-            name: `registry-transactions-${(this.configs as RegistryProtocolConfig).name}`,
-            timestamp: startTime + queryTimeframe > currentTime ? currentTime : startTime + queryTimeframe,
-          },
-        },
-        {
           upsert: true,
-        }
-      );
-
-      const endExeTime = new Date().getTime();
-      const elapsed = (endExeTime - startExeTime) / 1000;
-      logger.onInfo({
-        source: this.name,
-        message: `collected ${operations.length} registry transactions`,
-        props: {
-          name: this.configs.name,
-          timestamp: startTime + queryTimeframe,
-          elapsed: `${elapsed.toFixed(2)}s`,
         },
       });
-
-      startTime += queryTimeframe;
     }
+
+    if (operations.length > 0) {
+      await addressRegistryCollection.bulkWrite(operations);
+    }
+
+    const endExeTime = new Date().getTime();
+    const elapsed = (endExeTime - startExeTime) / 1000;
+    logger.onInfo({
+      source: this.name,
+      message: `collected ${operations.length} addresses data`,
+      props: {
+        name: this.configs.name,
+        elapsed: `${elapsed.toFixed(2)}s`,
+      },
+    });
   }
 }
 

@@ -8,6 +8,12 @@ import { CompoundProtocolConfig } from '../types';
 export const IronBankConfigs: CompoundProtocolConfig = {
   name: 'ironbank',
   tokenomics: DefaultTokenList.IB,
+  subgraphs: [
+    {
+      chainConfig: getChainConfig('ethereum'),
+      lending: 'https://gateway.thegraph.com/api/5059cba3a9ff00f6d6878c45a8fc304e/subgraphs/id/0x197939c1ca20c2b506d6811d8b6cdb3394471074-0',
+    },
+  ],
   pools: [
     // ethereum
     getCompoundPoolConfig(

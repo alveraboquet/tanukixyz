@@ -42,3 +42,18 @@ export interface RegistryTransactionData {
   // protocol data
   breakdown?: any;
 }
+
+export interface RegistryAddressProtocolData {
+  protocol: string;
+  data: any;
+}
+
+export interface RegistryAddressData {
+  chain: string;
+  address: string;
+
+  // address data on specify protocol
+  protocols: {
+    [key: string]: RegistryAddressProtocolData;
+  };
+}
