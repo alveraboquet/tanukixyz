@@ -10,8 +10,8 @@ const MaxRecordLimit = 100;
 export function getRouter(providers: ShareProviders): Router {
   const router = Router({ mergeParams: true });
 
-  router.get('/tx', async (request, response) => {
-    const protocolQuery: string | null = request.query.protocol ? String(request.query.protocol) : null;
+  router.get('/address/:address', async (request, response) => {
+    const address: string = String(request.params.address).toLowerCase();
     const chainQuery: string | null = request.query.chain ? String(request.query.chain) : null;
 
     const limit: number = request.query.limit
@@ -20,24 +20,24 @@ export function getRouter(providers: ShareProviders): Router {
         : Number(request.query.limit)
       : MaxRecordLimit;
     const skip: number = request.query.skip ? Number(request.query.skip) : 0;
-    const sort: string = request.query.sort ? String(request.query.sort) : 'latest';
 
-    const transactionRegistryCollection = await providers.database.getCollection(
-      envConfig.database.collections.globalRegistryTransactions
+    const addressRegistryCollection = await providers.database.getCollection(
+      envConfig.database.collections.globalRegistryAddresses
     );
 
     try {
-      let query: any = protocolQuery ? { protocol: protocolQuery } : {};
-      query = chainQuery
+      const query = chainQuery
         ? {
-            ...query,
+            address: address,
             chain: chainQuery,
           }
-        : query;
+        : {
+            address: address,
+          };
 
-      const documents: Array<any> = await transactionRegistryCollection
+      const documents: Array<any> = await addressRegistryCollection
         .find(query)
-        .sort({ timestamp: sort === 'oldest' ? 1 : -1 })
+        .sort({ address: 1 })
         .limit(limit)
         .skip(skip)
         .toArray();
