@@ -85,9 +85,6 @@ class DatabaseProvider implements Provider {
     const eventCollection = await this.getCollection(envConfig.database.collections.globalContractEvents);
     const blocksCollection = await this.getCollection(envConfig.database.collections.globalBlockscanBlocks);
     const registryAddressCollection = await this.getCollection(envConfig.database.collections.globalRegistryAddresses);
-    const registryAddressSnapshotCollection = await this.getCollection(
-      envConfig.database.collections.globalRegistryAddressSnapshot
-    );
 
     stateCollection.createIndex({ name: 1 }, { background: true });
     dataDailyCollection.createIndex({ module: 1 }, { background: true });
@@ -97,9 +94,8 @@ class DatabaseProvider implements Provider {
     blocksCollection.createIndex({ chain: 1, blockTime: 1, blockNumber: 1 }, { background: true });
     registryAddressCollection.createIndex({ address: 1, protocol: 1 }, { background: true });
     registryAddressCollection.createIndex({ chain: 1, address: 1, protocol: 1 }, { background: true });
-    registryAddressSnapshotCollection.createIndex({ address: 1, protocol: 1, timestamp: 1 }, { background: true });
-    registryAddressSnapshotCollection.createIndex(
-      { chain: 1, address: 1, protocol: 1, timestamp: 1 },
+    registryAddressCollection.createIndex(
+      { chain: 1, address: 1, protocol: 1, breakdownVersion: 1 },
       { background: true }
     );
   }

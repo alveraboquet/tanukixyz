@@ -32,13 +32,10 @@ export class CompoundRegistryProvider extends RegistryProvider {
   }
 
   public async syncSnapshotAddressData(props: GetAddressSnapshotProps): Promise<void> {
-    const { providers, timestamp, snapshot } = props;
+    const { providers, timestamp } = props;
 
     const addressRegistryCollection = await providers.database.getCollection(
       envConfig.database.collections.globalRegistryAddresses
-    );
-    const addressSnapshotRegistryCollection = await providers.database.getCollection(
-      envConfig.database.collections.globalRegistryAddressSnapshot
     );
 
     const configs: CompoundProtocolConfig = this.configs as CompoundProtocolConfig;
@@ -103,6 +100,7 @@ export class CompoundRegistryProvider extends RegistryProvider {
               address: normalizeAddress(accounts[aIdx].id),
               protocol: configs.name,
               timestamp: timestamp,
+              breakdownVersion: 'compound',
               breakdown: {},
             };
 
@@ -137,25 +135,14 @@ export class CompoundRegistryProvider extends RegistryProvider {
 
             address.breakdown = addressData;
 
-            let filter: any = {};
-            if (snapshot) {
-              filter = {
-                chain: address.chain,
-                address: address.address,
-                protocol: address.protocol,
-                timestamp: timestamp,
-              };
-            } else {
-              filter = {
-                chain: address.chain,
-                address: address.address,
-                protocol: address.protocol,
-              };
-            }
-
             operations.push({
               updateOne: {
-                filter: filter,
+                filter: {
+                  chain: address.chain,
+                  address: address.address,
+                  protocol: address.protocol,
+                  breakdownVersion: address.breakdownVersion,
+                },
                 update: {
                   $set: {
                     ...address,
@@ -167,11 +154,7 @@ export class CompoundRegistryProvider extends RegistryProvider {
           }
 
           if (operations.length > 0) {
-            if (snapshot) {
-              await addressSnapshotRegistryCollection.bulkWrite(operations);
-            } else {
-              await addressRegistryCollection.bulkWrite(operations);
-            }
+            await addressRegistryCollection.bulkWrite(operations);
           }
 
           if (accounts.length > 0) {

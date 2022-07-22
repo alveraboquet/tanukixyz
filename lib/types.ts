@@ -49,6 +49,7 @@ export interface RegistryAddressData {
   address: string;
   protocol: string;
   timestamp: number;
+  breakdownVersion: 'univ2' | 'univ3' | 'compound';
 
   breakdown?: any;
 }

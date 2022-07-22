@@ -81,6 +81,19 @@ class GraphProvider implements Provider {
     if (blocks.blocks.length > 0) return Number(blocks.blocks[0].number);
     else return 0;
   }
+
+  public async safeQueryBlockAtTimestamp(
+    indexEndpoint: string,
+    blockEndpoint: string,
+    timestamp: number
+  ): Promise<number> {
+    let blockAtTimestamp = await this.queryBlockAtTimestamp(blockEndpoint, timestamp);
+    // in case the graph not full sync yet
+    const blockNumberMeta = await this.queryMetaLatestBlock(indexEndpoint);
+    blockAtTimestamp = blockAtTimestamp > blockNumberMeta ? blockNumberMeta : blockAtTimestamp;
+
+    return blockAtTimestamp;
+  }
 }
 
 export default GraphProvider;
