@@ -92,7 +92,7 @@ class RegistryProvider implements Provider {
 
   public async startService(props: StartRegistryServiceProps): Promise<void> {
     await this._syncCurrentInfo(props);
-    await this._syncSnapshotInfo(props);
+    // await this._syncSnapshotInfo(props);
   }
 }
 
