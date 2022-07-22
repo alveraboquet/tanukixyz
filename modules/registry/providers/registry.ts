@@ -1,5 +1,5 @@
-import { InitialSyncDate } from '../../../configs';
-import envConfig from '../../../configs/env';
+// import { InitialSyncDate } from '../../../configs';
+// import envConfig from '../../../configs/env';
 import { RegistryProtocolConfig } from '../../../configs/types';
 import { getTimestamp } from '../../../lib/helper';
 import logger from '../../../lib/logger';
