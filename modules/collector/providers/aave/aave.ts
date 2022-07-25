@@ -106,7 +106,7 @@ export class AaveProvider extends CollectorProvider {
         if (historyPrices[reserveConfig.coingeckoId]) {
           historyPrice = historyPrices[reserveConfig.coingeckoId];
         } else {
-          historyPrice = await getHistoryTokenPriceFromCoingecko(reserveConfig.coingeckoId, events[0].timestamp);
+          historyPrice = await getHistoryTokenPriceFromCoingecko(reserveConfig.coingeckoId, fromTime);
           historyPrices[reserveConfig.coingeckoId] = historyPrice;
         }
 
@@ -170,7 +170,7 @@ export class AaveProvider extends CollectorProvider {
         if (historyPrices[reserveConfig.coingeckoId]) {
           historyPrice = historyPrices[reserveConfig.coingeckoId];
         } else {
-          historyPrice = await getHistoryTokenPriceFromCoingecko(reserveConfig.coingeckoId, events[0].timestamp);
+          historyPrice = await getHistoryTokenPriceFromCoingecko(reserveConfig.coingeckoId, fromTime);
           historyPrices[reserveConfig.coingeckoId] = historyPrice;
         }
 
