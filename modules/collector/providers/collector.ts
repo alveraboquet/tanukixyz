@@ -12,20 +12,14 @@ export interface GetProtocolDataProps {
   providers: ShareProviders;
 }
 
-export enum StartCollectorServiceMode {
-  DAILY,
-  DATE,
-}
-
 export interface StartCollectorServiceProps {
-  mode: StartCollectorServiceMode;
   initialDate: number;
   forceSync: boolean;
   providers: ShareProviders;
 }
 
 export class CollectorProvider implements Provider {
-  public readonly name: string = 'provider.collector';
+  public readonly name: string = 'module.collector';
   public readonly configs: any;
   public hook: CollectorHook | null;
 
@@ -88,127 +82,127 @@ export class CollectorProvider implements Provider {
     return await this.getDataInTimeFrame(providers, date, date + 24 * 60 * 60);
   }
 
-  public async startService(props: StartCollectorServiceProps): Promise<any> {
-    const { mode, initialDate, forceSync, providers } = props;
+  public async start(props: StartCollectorServiceProps): Promise<any> {
+    const { initialDate, forceSync, providers } = props;
 
-    if (mode === StartCollectorServiceMode.DAILY) {
-      const startExeTime = new Date().getTime();
-      const dailyCollection = await providers.database.getCollection(envConfig.database.collections.globalDataDaily);
-      // update daily data
-      const currentTimestamp = getTimestamp();
-      const dailyData: ProtocolData = await this.getDailyData({
-        providers,
-        date: currentTimestamp,
+    // collect daily data
+    const startExeTime = new Date().getTime();
+    const dailyCollection = await providers.database.getCollection(envConfig.database.collections.globalDataDaily);
+    // update daily data
+    const currentTimestamp = getTimestamp();
+    const dailyData: ProtocolData = await this.getDailyData({
+      providers,
+      date: currentTimestamp,
+    });
+    // get tokenomics
+    if (this.configs.tokenomics) {
+      const tokenomicsProvider = new TokenomicsProvider(this.configs.tokenomics);
+      dailyData.tokenomics = await tokenomicsProvider.getTokenomicsStats(currentTimestamp);
+    }
+    await dailyCollection.updateOne(
+      {
+        module: DefiProtocolModuleCode,
+        name: this.configs.name,
+      },
+      {
+        $set: {
+          module: DefiProtocolModuleCode,
+          name: this.configs.name,
+          timestamp: currentTimestamp,
+          ...dailyData,
+        },
+      },
+      {
+        upsert: true,
+      }
+    );
+    const endExeTime = new Date().getTime();
+    const elapsed = (endExeTime - startExeTime) / 1000;
+    logger.onInfo({
+      source: this.name,
+      message: 'collected protocol daily data',
+      props: {
+        protocol: this.configs.name,
+        revenueUSD: dailyData.revenueUSD.toFixed(2),
+        tvlUSD: dailyData.totalValueLockedUSD.toFixed(2),
+        volumeUSD: dailyData.volumeInUseUSD.toFixed(2),
+        userCount: dailyData.userCount.toFixed(2),
+        txnCount: dailyData.transactionCount.toFixed(2),
+        elapsed: `${elapsed.toFixed(2)}s`,
+      },
+    });
+
+    // start to collect date data
+    const dateCollection = await providers.database.getCollection(envConfig.database.collections.globalDataDate);
+
+    let startDate = InitialSyncDate;
+    if (forceSync) {
+      startDate = initialDate;
+    } else {
+      const latestSyncData = await dateCollection
+        .find({
+          module: DefiProtocolModuleCode,
+          name: this.configs.name,
+        })
+        .sort({ date: -1 })
+        .limit(1)
+        .toArray();
+      if (latestSyncData.length > 0) {
+        startDate = latestSyncData[0].date > startDate ? latestSyncData[0].date : startDate;
+      }
+    }
+
+    const today = getTodayUTCTimestamp();
+    while (startDate <= today) {
+      const startExeTime = Math.floor(new Date().getTime() / 1000);
+      const dateData: ProtocolData = await this.getDateData({
+        providers: providers,
+        date: startDate,
       });
+
       // get tokenomics
       if (this.configs.tokenomics) {
         const tokenomicsProvider = new TokenomicsProvider(this.configs.tokenomics);
-        dailyData.tokenomics = await tokenomicsProvider.getTokenomicsStats(currentTimestamp);
+        dateData.tokenomics = await tokenomicsProvider.getTokenomicsStats(startDate);
       }
-      await dailyCollection.updateOne(
+
+      // save to database
+      await dateCollection.updateOne(
         {
           module: DefiProtocolModuleCode,
           name: this.configs.name,
+          date: startDate,
         },
         {
           $set: {
             module: DefiProtocolModuleCode,
             name: this.configs.name,
-            timestamp: currentTimestamp,
-            ...dailyData,
+            date: startDate,
+            ...dateData,
           },
         },
         {
           upsert: true,
         }
       );
-      const endExeTime = new Date().getTime();
-      const elapsed = (endExeTime - startExeTime) / 1000;
+
+      const endExeTime = Math.floor(new Date().getTime() / 1000);
+      const elapsed = endExeTime - startExeTime;
+
       logger.onInfo({
         source: this.name,
-        message: 'collected protocol daily data',
+        message: 'collected protocol date data',
         props: {
           protocol: this.configs.name,
-          revenueUSD: dailyData.revenueUSD.toFixed(2),
-          tvlUSD: dailyData.totalValueLockedUSD.toFixed(2),
-          volumeUSD: dailyData.volumeInUseUSD.toFixed(2),
-          userCount: dailyData.userCount.toFixed(2),
-          txnCount: dailyData.transactionCount.toFixed(2),
-          elapsed: `${elapsed.toFixed(2)}s`,
+          date: new Date(startDate * 1000).toISOString().split('T')[0],
+          revenueUSD: dateData.revenueUSD.toFixed(2),
+          tvlUSD: dateData.totalValueLockedUSD.toFixed(2),
+          volumeUSD: dateData.volumeInUseUSD.toFixed(2),
+          elapsed: `${elapsed}s`,
         },
       });
-    } else {
-      const dateCollection = await providers.database.getCollection(envConfig.database.collections.globalDataDate);
 
-      let startDate = InitialSyncDate;
-      if (forceSync) {
-        startDate = initialDate;
-      } else {
-        const latestSyncData = await dateCollection
-          .find({
-            module: DefiProtocolModuleCode,
-            name: this.configs.name,
-          })
-          .sort({ date: -1 })
-          .limit(1)
-          .toArray();
-        if (latestSyncData.length > 0) {
-          startDate = latestSyncData[0].date > startDate ? latestSyncData[0].date : startDate;
-        }
-      }
-
-      const today = getTodayUTCTimestamp();
-      while (startDate <= today) {
-        const startExeTime = Math.floor(new Date().getTime() / 1000);
-        const dateData: ProtocolData = await this.getDateData({
-          providers: providers,
-          date: startDate,
-        });
-
-        // get tokenomics
-        if (this.configs.tokenomics) {
-          const tokenomicsProvider = new TokenomicsProvider(this.configs.tokenomics);
-          dateData.tokenomics = await tokenomicsProvider.getTokenomicsStats(startDate);
-        }
-
-        // save to database
-        await dateCollection.updateOne(
-          {
-            module: DefiProtocolModuleCode,
-            name: this.configs.name,
-            date: startDate,
-          },
-          {
-            $set: {
-              module: DefiProtocolModuleCode,
-              name: this.configs.name,
-              date: startDate,
-              ...dateData,
-            },
-          },
-          {
-            upsert: true,
-          }
-        );
-
-        const endExeTime = Math.floor(new Date().getTime() / 1000);
-        const elapsed = endExeTime - startExeTime;
-
-        logger.onInfo({
-          source: this.name,
-          message: 'collected protocol date data',
-          props: {
-            protocol: this.configs.name,
-            date: new Date(startDate * 1000).toISOString().split('T')[0],
-            revenueUSD: dateData.revenueUSD.toFixed(2),
-            tvlUSD: dateData.totalValueLockedUSD.toFixed(2),
-            volumeUSD: dateData.volumeInUseUSD.toFixed(2),
-            elapsed: `${elapsed}s`,
-          },
-        });
-
-        startDate += 24 * 60 * 60;
-      }
+      startDate += 24 * 60 * 60;
     }
   }
 }

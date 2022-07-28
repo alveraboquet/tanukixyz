@@ -6,7 +6,7 @@ import { normalizeAddress } from '../../lib/helper';
 import logger from '../../lib/logger';
 import { ContractEventRawData } from '../../lib/types';
 import { Provider, ShareProviders } from '../../lib/types';
-import IndexerHook from './hooks/hook';
+import { EventIndexerHook } from './hooks/hook';
 
 export interface StartEventIndexerProps {
   forceSync: boolean;
@@ -18,14 +18,14 @@ export interface GetEventsProps {
 }
 
 export class EventIndexerProvider implements Provider {
-  public readonly name: string = 'provider.indexer';
+  public readonly name: string = 'module.indexer';
   public readonly providers: ShareProviders;
   public readonly config: EventIndexConfig;
 
   // special hook, additional steps to process the event data
-  public readonly hook: IndexerHook | null;
+  public readonly hook: EventIndexerHook | null;
 
-  constructor(providers: ShareProviders, config: EventIndexConfig, hook: IndexerHook | null) {
+  constructor(providers: ShareProviders, config: EventIndexConfig, hook: EventIndexerHook | null) {
     this.providers = providers;
     this.config = config;
     this.hook = hook;
@@ -78,6 +78,18 @@ export class EventIndexerProvider implements Provider {
 
     const web3 = new Web3(this.config.chainConfig.nodeRpcs.default);
     const currentBlockNumber = await web3.eth.getBlockNumber();
+
+    logger.onInfo({
+      source: this.name,
+      message: 'starting event indexer',
+      props: {
+        chain: this.config.chainConfig.name,
+        contract: normalizeAddress(this.config.contractAddress),
+        fromBlock: startBlock,
+        toBlock: currentBlockNumber,
+      },
+    });
+
     while (startBlock <= currentBlockNumber) {
       const startExeTime = Math.floor(new Date().getTime() / 1000);
       const toBlock = startBlock + 2000 > currentBlockNumber ? currentBlockNumber : startBlock + 2000;

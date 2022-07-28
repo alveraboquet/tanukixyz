@@ -3,7 +3,7 @@ import { EventIndexConfig, RegistryTransactionVersion } from '../../../../config
 import { normalizeAddress } from '../../../../lib/helper';
 import logger from '../../../../lib/logger';
 import { ContractEventRawData, RegistryTransactionData, ShareProviders } from '../../../../lib/types';
-import IndexerHook from '../hook';
+import { EventIndexerHook } from '../hook';
 
 export interface CompoundAction {
   action: 'Supply' | 'Withdraw' | 'Borrow' | 'Repay';
@@ -22,7 +22,7 @@ export interface CompoundTransactionData extends RegistryTransactionData {
   };
 }
 
-export class CompoundIndexerHook extends IndexerHook {
+export class CompoundIndexerHook extends EventIndexerHook {
   public readonly name: string = 'hook.compound';
 
   constructor(protocol: string, providers: ShareProviders, configs: EventIndexConfig) {

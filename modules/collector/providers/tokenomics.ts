@@ -6,7 +6,7 @@ import { Provider } from '../../../lib/types';
 import { ProtocolTokenomics } from '../types';
 
 class TokenomicsProvider implements Provider {
-  public readonly name: string = 'provider.tokenomics';
+  public readonly name: string = 'module.tokenomics';
   public readonly token: TokenConfig;
 
   constructor(token: TokenConfig) {

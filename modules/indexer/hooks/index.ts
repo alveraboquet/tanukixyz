@@ -1,8 +1,12 @@
 import { EventIndexConfig } from '../../../configs/types';
 import { ShareProviders } from '../../../lib/types';
-import IndexerHook from './hook';
+import { EventIndexerHook } from './hook';
 
-export function getHook(protocol: string, providers: ShareProviders, config: EventIndexConfig): IndexerHook | null {
+export function getHook(
+  protocol: string,
+  providers: ShareProviders,
+  config: EventIndexConfig
+): EventIndexerHook | null {
   switch (protocol) {
     // case 'compound':
     //   return new CompoundIndexerHook('compound', providers, config);

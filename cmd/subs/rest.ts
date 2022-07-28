@@ -6,7 +6,7 @@ import logger from '../../lib/logger';
 import getRouter from '../../restapi';
 import { BasicCommand } from '../basic';
 
-export class RestCommand extends BasicCommand {
+export class Rest extends BasicCommand {
   public readonly name: string = 'rest';
   public readonly describe: string = 'Run restful API service';
 

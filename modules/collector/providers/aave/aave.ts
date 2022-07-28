@@ -189,6 +189,7 @@ export class AaveProvider extends CollectorProvider {
               source: this.name,
               message: 'cannot query reserve data',
               props: {
+                chain: configs.pools[poolId].chainConfig.name,
                 token: normalizeAddress(reserveList[i]),
               },
             });

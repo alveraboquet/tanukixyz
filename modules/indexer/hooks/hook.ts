@@ -1,7 +1,7 @@
 import { EventIndexConfig } from '../../../configs/types';
 import { ContractEventRawData, Provider, ShareProviders } from '../../../lib/types';
 
-class IndexerHook implements Provider {
+export class EventIndexerHook implements Provider {
   public readonly name: string = 'hook.indexer';
 
   public readonly protocol: string;
@@ -18,5 +18,3 @@ class IndexerHook implements Provider {
   // for addition events processing steps
   public async processEvents(allEvents: Array<ContractEventRawData>): Promise<void> {}
 }
-
-export default IndexerHook;
