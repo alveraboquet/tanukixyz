@@ -9,7 +9,7 @@ import { CollectorProvider, GetProtocolDataProps } from '../collector';
 import { CollectorHook } from '../hook';
 
 export class EnsProvider extends CollectorProvider {
-  public readonly name: string = 'provider.ens';
+  public readonly name: string = 'collector.ens';
 
   constructor(configs: EnsProtocolConfig, hook: CollectorHook | null) {
     super(configs, hook);

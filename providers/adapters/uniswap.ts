@@ -6,9 +6,9 @@ import { DefiAdapter } from '../adapter';
 export class UniswapAdapter extends DefiAdapter {
   public readonly name: string = 'adapter.uniswap';
 
-  constructor(configs: UniswapProtocolConfig, providers: ShareProviders) {
+  constructor(configs: UniswapProtocolConfig, providers: ShareProviders, useCollector: UniswapProvider) {
     super(configs, providers);
 
-    this.collector = new UniswapProvider(configs, null);
+    this.collector = useCollector;
   }
 }

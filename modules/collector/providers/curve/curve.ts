@@ -7,7 +7,7 @@ import { CollectorProvider, GetProtocolDataProps } from '../collector';
 import { CollectorHook } from '../hook';
 
 export class CurveProvider extends CollectorProvider {
-  public readonly name: string = 'provider.curve';
+  public readonly name: string = 'collector.curve';
 
   constructor(configs: CurveProtocolConfig, hook: CollectorHook | null) {
     super(configs, hook);

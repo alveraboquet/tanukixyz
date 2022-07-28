@@ -7,7 +7,7 @@ import { CollectorProvider } from '../collector';
 import { CollectorHook } from '../hook';
 
 export class UniswapProvider extends CollectorProvider {
-  public readonly name: string = 'provider.uniswap';
+  public readonly name: string = 'collector.uniswap';
 
   constructor(configs: UniswapProtocolConfig, hook: CollectorHook | null) {
     super(configs, hook);

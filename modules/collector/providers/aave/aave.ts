@@ -13,7 +13,7 @@ import { CollectorHook } from '../hook';
 import { getReserveConfig } from './helpers';
 
 export class AaveProvider extends CollectorProvider {
-  public readonly name: string = 'provider.aave';
+  public readonly name: string = 'collector.aave';
 
   constructor(configs: AaveProtocolConfig, hook: CollectorHook | null) {
     super(configs, hook);

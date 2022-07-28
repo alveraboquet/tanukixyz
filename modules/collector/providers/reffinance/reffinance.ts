@@ -7,7 +7,7 @@ import { CollectorProvider, GetProtocolDataProps } from '../collector';
 import { CollectorHook } from '../hook';
 
 export class RefFinanceProvider extends CollectorProvider {
-  public readonly name: string = 'provider.reffinance';
+  public readonly name: string = 'collector.reffinance';
 
   constructor(configs: RefFinanceConfig, hook: CollectorHook | null) {
     super(configs, hook);

@@ -9,7 +9,7 @@ import { CollectorHook } from '../hook';
 import { queryVaultTransactions, queryVaults } from './helpers';
 
 export class RibbonProvider extends CollectorProvider {
-  public readonly name: string = 'provider.ribbon';
+  public readonly name: string = 'collector.ribbon';
 
   constructor(configs: RibbonProtocolConfig, hook: CollectorHook | null) {
     super(configs, hook);

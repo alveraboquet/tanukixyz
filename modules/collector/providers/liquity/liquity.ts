@@ -10,7 +10,7 @@ import { CollectorProvider } from '../collector';
 import { CollectorHook } from '../hook';
 
 export class LiquityProvider extends CollectorProvider {
-  public readonly name: string = 'provider.liquity';
+  public readonly name: string = 'collector.liquity';
 
   constructor(configs: LiquityProtocolConfig, hook: CollectorHook | null) {
     super(configs, hook);

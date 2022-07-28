@@ -9,7 +9,7 @@ import { CollectorProvider } from '../collector';
 import { CollectorHook } from '../hook';
 
 export class EulerProvider extends CollectorProvider {
-  public readonly name: string = 'provider.euler';
+  public readonly name: string = 'collector.euler';
 
   constructor(configs: EulerProtocolConfig, hook: CollectorHook | null) {
     super(configs, hook);

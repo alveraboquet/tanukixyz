@@ -12,7 +12,7 @@ import { CollectorHook } from '../hook';
 import { getHistoryPrice, getMarketConfigByAddress } from './helpers';
 
 export class AbracadabraProvider extends CollectorProvider {
-  public readonly name: string = 'provider.abracadabra';
+  public readonly name: string = 'collector.abracadabra';
 
   constructor(configs: AbracadabraProtocolConfig, hook: CollectorHook | null) {
     super(configs, hook);

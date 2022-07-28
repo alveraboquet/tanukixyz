@@ -7,7 +7,7 @@ import { CollectorProvider, GetProtocolDataProps } from '../collector';
 import { CollectorHook } from '../hook';
 
 export class DodoexProvider extends CollectorProvider {
-  public readonly name: string = 'provider.dodoex';
+  public readonly name: string = 'collector.dodoex';
 
   constructor(configs: DodoexProtocolConfig, hook: CollectorHook | null) {
     super(configs, hook);

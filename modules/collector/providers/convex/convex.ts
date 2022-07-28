@@ -10,7 +10,7 @@ import { CollectorHook } from '../hook';
 import { queryCvxLockingTransactions, queryCvxStakingTransactions, queryLpStakingTransactions } from './helpers';
 
 export class ConvexProvider extends CollectorProvider {
-  public readonly name: string = 'provider.convex';
+  public readonly name: string = 'collector.convex';
 
   constructor(configs: ConvexProtocolConfig, hook: CollectorHook | null) {
     super(configs, hook);

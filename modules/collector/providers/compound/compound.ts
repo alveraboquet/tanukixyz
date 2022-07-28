@@ -14,7 +14,7 @@ import { CollectorHook } from '../hook';
 import { getPoolConfigByAddress } from './helpers';
 
 export class CompoundProvider extends CollectorProvider {
-  public readonly name: string = 'provider.compound';
+  public readonly name: string = 'collector.compound';
 
   constructor(configs: CompoundProtocolConfig, hook: CollectorHook | null) {
     super(configs, hook);

@@ -9,7 +9,7 @@ import { CollectorProvider } from '../collector';
 import { CollectorHook } from '../hook';
 
 export class BalancerProvider extends CollectorProvider {
-  public readonly name: string = 'provider.balancer';
+  public readonly name: string = 'collector.balancer';
 
   constructor(configs: BalancerProtocolConfig, hook: CollectorHook | null) {
     super(configs, hook);

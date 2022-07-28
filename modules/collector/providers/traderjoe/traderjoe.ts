@@ -13,7 +13,7 @@ export interface TraderjoeProtocolConfig {
 }
 
 export class TraderjoeProvider extends CollectorProvider {
-  public readonly name: string = 'provider.traderjoe';
+  public readonly name: string = 'collector.traderjoe';
 
   private exchangeProvider: SushiswapProvider;
   private lendingProvider: CompoundProvider;

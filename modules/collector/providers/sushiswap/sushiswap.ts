@@ -3,7 +3,7 @@ import { CollectorHook } from '../hook';
 import { UniswapProvider } from '../uniswap/uniswap';
 
 export class SushiswapProvider extends UniswapProvider {
-  public readonly name: string = 'provider.sushiswap';
+  public readonly name: string = 'collector.sushiswap';
 
   constructor(configs: UniswapProtocolConfig, hook: CollectorHook | null) {
     super(configs, hook);

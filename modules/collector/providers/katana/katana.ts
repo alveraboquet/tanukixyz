@@ -3,7 +3,7 @@ import { CollectorHook } from '../hook';
 import { UniswapProvider } from '../uniswap/uniswap';
 
 export class RoninKatanaProvider extends UniswapProvider {
-  public readonly name: string = 'provider.katana';
+  public readonly name: string = 'collector.katana';
 
   constructor(configs: UniswapProtocolConfig, hook: CollectorHook | null) {
     super(configs, hook);
