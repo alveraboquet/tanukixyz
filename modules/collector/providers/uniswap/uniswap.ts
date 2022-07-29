@@ -82,6 +82,7 @@ export class UniswapProvider extends CollectorProvider {
         this.configs.subgraphs[i].exchange.includes('thegraph.com') ||
         this.configs.subgraphs[i].exchange.includes('streamingfast.io') ||
         this.configs.subgraphs[i].exchange.includes('graph.mm.finance') ||
+        this.configs.subgraphs[i].exchange.includes('graph.vvs.finance') ||
         this.configs.subgraphs[i].exchange.includes('thegraph.roninchain.com')
       ) {
         // thegraph
