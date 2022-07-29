@@ -1,5 +1,4 @@
 import { UniswapProtocolConfig } from '../../../../configs/types';
-import { normalizeAddress } from '../../../../lib/helper';
 import logger from '../../../../lib/logger';
 import { ShareProviders } from '../../../../lib/types';
 import { ProtocolData } from '../../types';
@@ -142,87 +141,87 @@ export class UniswapProvider extends CollectorProvider {
       }
 
       // count users
-      try {
-        logger.onDebug({
-          source: this.name,
-          message: 'querying transactions and events',
-          props: {
-            name: this.configs.name,
-            endpoint: this.configs.subgraphs[i].exchange,
-          },
-        });
-
-        const addresses: any = {};
-
-        let startTime = fromTime;
-        const limit = this.getQueryRecordLimit();
-        while (startTime <= toTime) {
-          const transactionsResponses = await providers.subgraph.querySubgraph(
-            this.configs.subgraphs[i].exchange,
-            `
-            {
-              transactions(first: ${limit}, where: {timestamp_gte: ${startTime}}, orderBy: timestamp, orderDirection: asc) {
-                timestamp
-                swaps(first: 1000) {
-                  sender
-                  ${this.configs.subgraphs[i].version === 2 ? 'to' : 'recipient'}
-                }
-                mints(first: 1000) {
-                  sender
-                  ${this.configs.subgraphs[i].version === 2 ? 'to' : 'owner'},
-                }
-                burns(first: 1000) {
-                  ${this.configs.subgraphs[i].version === 2 ? 'sender' : 'owner'}
-                  ${this.configs.subgraphs[i].version === 2 ? 'to' : ''}
-                }
-              }
-            }
-          `
-          );
-          const transactions =
-            transactionsResponses && transactionsResponses['transactions'] ? transactionsResponses['transactions'] : [];
-
-          for (let i = 0; i < transactions.length; i++) {
-            const events: Array<any> = transactions[i].swaps
-              .concat(transactions[i].mints)
-              .concat(transactions[i].burns);
-            for (let eIdx = 0; eIdx < events.length; eIdx++) {
-              if (events[eIdx].sender && !addresses[normalizeAddress(events[eIdx].sender)]) {
-                data.userCount += 1;
-                addresses[normalizeAddress(events[eIdx].sender)] = true;
-              }
-              if (events[eIdx].owner && !addresses[normalizeAddress(events[eIdx].owner)]) {
-                data.userCount += 1;
-                addresses[normalizeAddress(events[eIdx].owner)] = true;
-              }
-              if (events[eIdx].to && !addresses[normalizeAddress(events[eIdx].to)]) {
-                data.userCount += 1;
-                addresses[normalizeAddress(events[eIdx].to)] = true;
-              }
-              if (events[eIdx].recipient && !addresses[normalizeAddress(events[eIdx].recipient)]) {
-                data.userCount += 1;
-                addresses[normalizeAddress(events[eIdx].recipient)] = true;
-              }
-            }
-          }
-
-          if (transactions.length > 0) {
-            startTime = Number(transactions[transactions.length - 1]['timestamp']) + 1;
-          } else {
-            // no more records
-            break;
-          }
-        }
-      } catch (e: any) {
-        logger.onDebug({
-          source: this.name,
-          message: 'failed to count daily users',
-          props: {
-            name: this.configs.name,
-            error: e.message,
-          },
-        });
-      }
+      // try {
+      //   logger.onDebug({
+      //     source: this.name,
+      //     message: 'querying transactions and events',
+      //     props: {
+      //       name: this.configs.name,
+      //       endpoint: this.configs.subgraphs[i].exchange,
+      //     },
+      //   });
+      //
+      //   const addresses: any = {};
+      //
+      //   let startTime = fromTime;
+      //   const limit = this.getQueryRecordLimit();
+      //   while (startTime <= toTime) {
+      //     const transactionsResponses = await providers.subgraph.querySubgraph(
+      //       this.configs.subgraphs[i].exchange,
+      //       `
+      //       {
+      //         transactions(first: ${limit}, where: {timestamp_gte: ${startTime}}, orderBy: timestamp, orderDirection: asc) {
+      //           timestamp
+      //           swaps(first: 1000) {
+      //             sender
+      //             ${this.configs.subgraphs[i].version === 2 ? 'to' : 'recipient'}
+      //           }
+      //           mints(first: 1000) {
+      //             sender
+      //             ${this.configs.subgraphs[i].version === 2 ? 'to' : 'owner'},
+      //           }
+      //           burns(first: 1000) {
+      //             ${this.configs.subgraphs[i].version === 2 ? 'sender' : 'owner'}
+      //             ${this.configs.subgraphs[i].version === 2 ? 'to' : ''}
+      //           }
+      //         }
+      //       }
+      //     `
+      //     );
+      //     const transactions =
+      //       transactionsResponses && transactionsResponses['transactions'] ? transactionsResponses['transactions'] : [];
+      //
+      //     for (let i = 0; i < transactions.length; i++) {
+      //       const events: Array<any> = transactions[i].swaps
+      //         .concat(transactions[i].mints)
+      //         .concat(transactions[i].burns);
+      //       for (let eIdx = 0; eIdx < events.length; eIdx++) {
+      //         if (events[eIdx].sender && !addresses[normalizeAddress(events[eIdx].sender)]) {
+      //           data.userCount += 1;
+      //           addresses[normalizeAddress(events[eIdx].sender)] = true;
+      //         }
+      //         if (events[eIdx].owner && !addresses[normalizeAddress(events[eIdx].owner)]) {
+      //           data.userCount += 1;
+      //           addresses[normalizeAddress(events[eIdx].owner)] = true;
+      //         }
+      //         if (events[eIdx].to && !addresses[normalizeAddress(events[eIdx].to)]) {
+      //           data.userCount += 1;
+      //           addresses[normalizeAddress(events[eIdx].to)] = true;
+      //         }
+      //         if (events[eIdx].recipient && !addresses[normalizeAddress(events[eIdx].recipient)]) {
+      //           data.userCount += 1;
+      //           addresses[normalizeAddress(events[eIdx].recipient)] = true;
+      //         }
+      //       }
+      //     }
+      //
+      //     if (transactions.length > 0) {
+      //       startTime = Number(transactions[transactions.length - 1]['timestamp']) + 1;
+      //     } else {
+      //       // no more records
+      //       break;
+      //     }
+      //   }
+      // } catch (e: any) {
+      //   logger.onDebug({
+      //     source: this.name,
+      //     message: 'failed to count daily users',
+      //     props: {
+      //       name: this.configs.name,
+      //       error: e.message,
+      //     },
+      //   });
+      // }
     }
 
     return data;
