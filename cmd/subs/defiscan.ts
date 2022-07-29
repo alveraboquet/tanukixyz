@@ -1,3 +1,4 @@
+import { sleep } from '../../lib/helper';
 import logger from '../../lib/logger';
 import { getAdapter } from '../../providers';
 import { DefiAdapter } from '../../providers/adapter';
@@ -16,21 +17,25 @@ export class Defiscan extends BasicCommand {
 
     const protocols: Array<string> = argv.protocols.split(',');
 
-    for (let i = 0; i < protocols.length; i++) {
-      const adapter: DefiAdapter | null = getAdapter(protocols[i], providers);
-      if (adapter === null) {
-        logger.onWarn({
-          source: 'adapter',
-          message: `${protocols[i]} protocol adapter not found`,
-          props: {},
+    while (true) {
+      for (let i = 0; i < protocols.length; i++) {
+        const adapter: DefiAdapter | null = getAdapter(protocols[i], providers);
+        if (adapter === null) {
+          logger.onWarn({
+            source: 'adapter',
+            message: `${protocols[i]} protocol adapter not found`,
+            props: {},
+          });
+          continue;
+        }
+
+        await adapter.start({
+          initialDate: Number(argv.initialDate),
+          forceSync: argv.force ? argv.force : false,
         });
-        continue;
       }
 
-      await adapter.start({
-        initialDate: Number(argv.initialDate),
-        forceSync: argv.force ? argv.force : false,
-      });
+      await sleep(5 * 60);
     }
   }
 

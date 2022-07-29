@@ -1,4 +1,3 @@
-import { sleep } from '../lib/helper';
 import logger from '../lib/logger';
 import { Provider, ShareProviders } from '../lib/types';
 import { CollectorProvider } from '../modules/collector/providers/collector';
@@ -37,20 +36,16 @@ export class DefiAdapter implements Provider {
       },
     });
 
-    while (true) {
-      for (let i = 0; i < this.indexer.length; i++) {
-        await this.indexer[i].start({ forceSync: props.forceSync });
-      }
+    for (let i = 0; i < this.indexer.length; i++) {
+      await this.indexer[i].start({ forceSync: props.forceSync });
+    }
 
-      if (this.collector) {
-        await this.collector.start({
-          forceSync: props.forceSync,
-          initialDate: props.initialDate,
-          providers: this.providers,
-        });
-      }
-
-      await sleep(5 * 60);
+    if (this.collector) {
+      await this.collector.start({
+        forceSync: props.forceSync,
+        initialDate: props.initialDate,
+        providers: this.providers,
+      });
     }
   }
 }
