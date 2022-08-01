@@ -1,8 +1,6 @@
 import BigNumber from 'bignumber.js';
 
 import { BalancerProtocolConfig } from '../../../../configs/types';
-import { normalizeAddress } from '../../../../lib/helper';
-import logger from '../../../../lib/logger';
 import { ShareProviders } from '../../../../lib/types';
 import { ProtocolData } from '../../types';
 import { CollectorProvider } from '../collector';
@@ -78,54 +76,54 @@ export class BalancerProvider extends CollectorProvider {
       }
 
       // count user
-      try {
-        const addresses: any = {};
-        let startTime = fromTime;
-        while (startTime <= toTime) {
-          const transactionsResponses = await providers.subgraph.querySubgraph(
-            this.configs.subgraphs[i].exchange,
-            `
-            {
-              swaps(first: 1000, where: {timestamp_gte: ${startTime}}, orderBy: timestamp, orderDirection: asc) {
-                timestamp
-                caller
-                userAddress {
-                  id
-                }
-              }
-            }
-          `
-          );
-          const transactions =
-            transactionsResponses && transactionsResponses['swaps'] ? transactionsResponses['swaps'] : [];
-          for (let i = 0; i < transactions.length; i++) {
-            if (transactions[i].caller && !addresses[normalizeAddress(transactions[i].caller)]) {
-              dateData.userCount += 1;
-              addresses[normalizeAddress(transactions[i].caller)] = true;
-            }
-            if (transactions[i].userAddress.id && !addresses[normalizeAddress(transactions[i].userAddress.id)]) {
-              dateData.userCount += 1;
-              addresses[normalizeAddress(transactions[i].userAddress.id)] = true;
-            }
-          }
-
-          if (transactions.length > 0) {
-            startTime = Number(transactions[transactions.length - 1]['timestamp']) + 1;
-          } else {
-            // no more records
-            break;
-          }
-        }
-      } catch (e: any) {
-        logger.onDebug({
-          source: this.name,
-          message: 'failed to count daily users',
-          props: {
-            name: this.configs.name,
-            error: e.message,
-          },
-        });
-      }
+      // try {
+      //   const addresses: any = {};
+      //   let startTime = fromTime;
+      //   while (startTime <= toTime) {
+      //     const transactionsResponses = await providers.subgraph.querySubgraph(
+      //       this.configs.subgraphs[i].exchange,
+      //       `
+      //       {
+      //         swaps(first: 1000, where: {timestamp_gte: ${startTime}}, orderBy: timestamp, orderDirection: asc) {
+      //           timestamp
+      //           caller
+      //           userAddress {
+      //             id
+      //           }
+      //         }
+      //       }
+      //     `
+      //     );
+      //     const transactions =
+      //       transactionsResponses && transactionsResponses['swaps'] ? transactionsResponses['swaps'] : [];
+      //     for (let i = 0; i < transactions.length; i++) {
+      //       if (transactions[i].caller && !addresses[normalizeAddress(transactions[i].caller)]) {
+      //         dateData.userCount += 1;
+      //         addresses[normalizeAddress(transactions[i].caller)] = true;
+      //       }
+      //       if (transactions[i].userAddress.id && !addresses[normalizeAddress(transactions[i].userAddress.id)]) {
+      //         dateData.userCount += 1;
+      //         addresses[normalizeAddress(transactions[i].userAddress.id)] = true;
+      //       }
+      //     }
+      //
+      //     if (transactions.length > 0) {
+      //       startTime = Number(transactions[transactions.length - 1]['timestamp']) + 1;
+      //     } else {
+      //       // no more records
+      //       break;
+      //     }
+      //   }
+      // } catch (e: any) {
+      //   logger.onDebug({
+      //     source: this.name,
+      //     message: 'failed to count daily users',
+      //     props: {
+      //       name: this.configs.name,
+      //       error: e.message,
+      //     },
+      //   });
+      // }
     }
 
     return dateData;

@@ -21,5 +21,10 @@ export const BalancerConfigs: BalancerProtocolConfig = {
       chainConfig: getChainConfig('polygon'),
       exchange: 'https://api.thegraph.com/subgraphs/name/balancer-labs/balancer-polygon-v2',
     },
+    {
+      version: 2,
+      chainConfig: getChainConfig('arbitrum'),
+      exchange: 'https://api.thegraph.com/subgraphs/name/balancer-labs/balancer-arbitrum-v2',
+    },
   ],
 };
