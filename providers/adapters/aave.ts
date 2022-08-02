@@ -1,8 +1,8 @@
 import { AaveProtocolConfig } from '../../configs/types';
 import { ShareProviders } from '../../lib/types';
 import { AaveProvider } from '../../modules/collector/providers/aave/aave';
+import { EvmEventIndexer } from '../../modules/indexer/evm';
 import { DefiAdapter } from '../adapter';
-import {EvmEventIndexer} from "../../modules/indexer/evm";
 
 export class AaveAdapter extends DefiAdapter {
   public readonly name: string = 'adapter.aave';

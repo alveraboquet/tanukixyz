@@ -145,9 +145,7 @@ export class EvmEventIndexer implements Provider {
 
     let beautyEvents: Array<any> = [];
     for (let eventIdx = 0; eventIdx < config.events.length; eventIdx++) {
-      beautyEvents = beautyEvents.concat(
-        await this.getEvent(config.events[eventIdx], config, fromBlock, toBlock)
-      );
+      beautyEvents = beautyEvents.concat(await this.getEvent(config.events[eventIdx], config, fromBlock, toBlock));
     }
 
     return beautyEvents;

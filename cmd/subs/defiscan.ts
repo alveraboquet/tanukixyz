@@ -29,10 +29,29 @@ export class Defiscan extends BasicCommand {
           continue;
         }
 
-        await adapter.start({
-          initialDate: Number(argv.initialDate),
-          forceSync: argv.force ? argv.force : false,
-        });
+        const service = argv.service ? argv.service : '';
+        switch (service) {
+          case 'collector': {
+            await adapter.startCollector({
+              initialDate: Number(argv.initialDate),
+              forceSync: argv.force ? argv.force : false,
+            });
+            break;
+          }
+          case 'indexer': {
+            await adapter.startIndexer({
+              initialDate: Number(argv.initialDate),
+              forceSync: argv.force ? argv.force : false,
+            });
+            break;
+          }
+          default: {
+            await adapter.start({
+              initialDate: Number(argv.initialDate),
+              forceSync: argv.force ? argv.force : false,
+            });
+          }
+        }
       }
 
       await sleep(5 * 60);
@@ -45,6 +64,11 @@ export class Defiscan extends BasicCommand {
         type: 'string',
         default: '',
         describe: 'Run command with a list of protocol name - ex: compound, uniswap',
+      },
+      service: {
+        type: 'string',
+        default: '',
+        describe: 'The service to run: indexer or collector, default both',
       },
       initialDate: {
         type: 'number',

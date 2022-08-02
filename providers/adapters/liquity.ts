@@ -1,8 +1,8 @@
 import { LiquityProtocolConfig } from '../../configs/types';
 import { ShareProviders } from '../../lib/types';
 import { LiquityProvider } from '../../modules/collector/providers/liquity/liquity';
+import { EvmEventIndexer } from '../../modules/indexer/evm';
 import { DefiAdapter } from '../adapter';
-import {EvmEventIndexer} from "../../modules/indexer/evm";
 
 export class LiquityAdapter extends DefiAdapter {
   public readonly name: string = 'adapter.liquity';

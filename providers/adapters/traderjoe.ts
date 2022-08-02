@@ -1,7 +1,7 @@
 import { ShareProviders } from '../../lib/types';
 import { TraderjoeProtocolConfig, TraderjoeProvider } from '../../modules/collector/providers/traderjoe/traderjoe';
+import { EvmEventIndexer } from '../../modules/indexer/evm';
 import { DefiAdapter } from '../adapter';
-import {EvmEventIndexer} from "../../modules/indexer/evm";
 
 export class TraderJoeAdapter extends DefiAdapter {
   public readonly name: string = 'adapter.traderjoe';

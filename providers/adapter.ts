@@ -51,4 +51,38 @@ export class DefiAdapter implements Provider {
       });
     }
   }
+
+  public async startIndexer(props: StartAdapterProps): Promise<any> {
+    logger.onInfo({
+      source: `adapter.${this.configs.name}`,
+      message: `starting ${this.configs.name} indexer`,
+      props: {
+        protocol: this.configs.name,
+        token: this.configs.tokenomics ? this.configs.tokenomics.symbol : null,
+      },
+    });
+
+    if (this.indexer) {
+      await this.indexer.start({ forceSync: props.forceSync });
+    }
+  }
+
+  public async startCollector(props: StartAdapterProps): Promise<any> {
+    logger.onInfo({
+      source: `adapter.${this.configs.name}`,
+      message: `starting ${this.configs.name} collector`,
+      props: {
+        protocol: this.configs.name,
+        token: this.configs.tokenomics ? this.configs.tokenomics.symbol : null,
+      },
+    });
+
+    if (this.collector) {
+      await this.collector.start({
+        forceSync: props.forceSync,
+        initialDate: props.initialDate,
+        providers: this.providers,
+      });
+    }
+  }
 }
