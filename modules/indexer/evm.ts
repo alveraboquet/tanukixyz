@@ -6,45 +6,28 @@ import { normalizeAddress } from '../../lib/helper';
 import logger from '../../lib/logger';
 import { ContractEventRawData } from '../../lib/types';
 import { Provider, ShareProviders } from '../../lib/types';
-import { EventIndexerHook } from './hooks/hook';
 
 export interface StartEventIndexerProps {
   forceSync: boolean;
 }
 
 export interface GetEventsProps {
+  config: EventIndexConfig;
   fromBlock: number;
   toBlock: number;
 }
 
-export class EventIndexerProvider implements Provider {
+export class EvmEventIndexer implements Provider {
   public readonly name: string = 'module.indexer';
   public readonly providers: ShareProviders;
-  public readonly config: EventIndexConfig;
+  public readonly configs: Array<EventIndexConfig>;
 
-  // special hook, additional steps to process the event data
-  public readonly hook: EventIndexerHook | null;
-
-  constructor(providers: ShareProviders, config: EventIndexConfig, hook: EventIndexerHook | null) {
+  constructor(providers: ShareProviders, configs: Array<EventIndexConfig>) {
     this.providers = providers;
-    this.config = config;
-    this.hook = hook;
+    this.configs = configs;
   }
 
-  public async getEvents(props: GetEventsProps): Promise<Array<ContractEventRawData>> {
-    const { fromBlock, toBlock } = props;
-
-    let beautyEvents: Array<any> = [];
-    for (let eventIdx = 0; eventIdx < this.config.events.length; eventIdx++) {
-      beautyEvents = beautyEvents.concat(
-        await this.getEvent(this.config.events[eventIdx], this.config, fromBlock, toBlock)
-      );
-    }
-
-    return beautyEvents;
-  }
-
-  public async start(props: StartEventIndexerProps): Promise<void> {
+  private async startWithConfig(config: EventIndexConfig, props: StartEventIndexerProps): Promise<void> {
     const { forceSync } = props;
 
     const eventCollection = await this.providers.database.getCollection(
@@ -52,11 +35,11 @@ export class EventIndexerProvider implements Provider {
     );
     const stateCollection = await this.providers.database.getCollection(envConfig.database.collections.globalState);
 
-    let startBlock = this.config.contractBirthday;
+    let startBlock = config.contractBirthday;
     if (!forceSync) {
       const stateFromDb = await stateCollection
         .find({
-          name: `indexer-events-${this.config.chainConfig.name}-${normalizeAddress(this.config.contractAddress)}`,
+          name: `indexer-events-${config.chainConfig.name}-${normalizeAddress(config.contractAddress)}`,
         })
         .limit(1)
         .toArray();
@@ -65,7 +48,7 @@ export class EventIndexerProvider implements Provider {
       } else {
         const latestEventsFromDb = await eventCollection
           .find({
-            contract: normalizeAddress(this.config.contractAddress),
+            contract: normalizeAddress(config.contractAddress),
           })
           .sort({ timestamp: -1 })
           .limit(1)
@@ -76,15 +59,15 @@ export class EventIndexerProvider implements Provider {
       }
     }
 
-    const web3 = new Web3(this.config.chainConfig.nodeRpcs.default);
+    const web3 = new Web3(config.chainConfig.nodeRpcs.default);
     const currentBlockNumber = await web3.eth.getBlockNumber();
 
     logger.onInfo({
       source: this.name,
       message: 'starting event indexer',
       props: {
-        chain: this.config.chainConfig.name,
-        contract: normalizeAddress(this.config.contractAddress),
+        chain: config.chainConfig.name,
+        contract: normalizeAddress(config.contractAddress),
         fromBlock: startBlock,
         toBlock: currentBlockNumber,
       },
@@ -94,6 +77,7 @@ export class EventIndexerProvider implements Provider {
       const startExeTime = Math.floor(new Date().getTime() / 1000);
       const toBlock = startBlock + 2000 > currentBlockNumber ? currentBlockNumber : startBlock + 2000;
       const allEvents: Array<ContractEventRawData> = await this.getEvents({
+        config,
         fromBlock: startBlock,
         toBlock,
       });
@@ -102,7 +86,7 @@ export class EventIndexerProvider implements Provider {
         operations.push({
           updateOne: {
             filter: {
-              contract: normalizeAddress(this.config.contractAddress),
+              contract: normalizeAddress(config.contractAddress),
               event: allEvents[i].event,
               transactionId: allEvents[i].transactionId,
             },
@@ -123,11 +107,11 @@ export class EventIndexerProvider implements Provider {
       if (!forceSync) {
         await stateCollection.updateOne(
           {
-            name: `indexer-events-${this.config.chainConfig.name}-${normalizeAddress(this.config.contractAddress)}`,
+            name: `indexer-events-${config.chainConfig.name}-${normalizeAddress(config.contractAddress)}`,
           },
           {
             $set: {
-              name: `indexer-events-${this.config.chainConfig.name}-${normalizeAddress(this.config.contractAddress)}`,
+              name: `indexer-events-${config.chainConfig.name}-${normalizeAddress(config.contractAddress)}`,
               blockNumber: toBlock,
             },
           },
@@ -137,11 +121,6 @@ export class EventIndexerProvider implements Provider {
         );
       }
 
-      // pass events to hook for addition steps
-      if (this.hook) {
-        await this.hook.processEvents(allEvents);
-      }
-
       const endExeTime = Math.floor(new Date().getTime() / 1000);
       const elapsed = endExeTime - startExeTime;
 
@@ -149,8 +128,8 @@ export class EventIndexerProvider implements Provider {
         source: this.name,
         message: `collected ${operations.length} contract events`,
         props: {
-          chain: this.config.chainConfig.name,
-          contract: normalizeAddress(this.config.contractAddress),
+          chain: config.chainConfig.name,
+          contract: normalizeAddress(config.contractAddress),
           fromBlock: startBlock,
           toBlock: toBlock,
           elapsed: `${elapsed}s`,
@@ -159,6 +138,19 @@ export class EventIndexerProvider implements Provider {
 
       startBlock += 2000;
     }
+  }
+
+  private async getEvents(props: GetEventsProps): Promise<Array<ContractEventRawData>> {
+    const { config, fromBlock, toBlock } = props;
+
+    let beautyEvents: Array<any> = [];
+    for (let eventIdx = 0; eventIdx < config.events.length; eventIdx++) {
+      beautyEvents = beautyEvents.concat(
+        await this.getEvent(config.events[eventIdx], config, fromBlock, toBlock)
+      );
+    }
+
+    return beautyEvents;
   }
 
   private async getEvent(
@@ -219,6 +211,12 @@ export class EventIndexerProvider implements Provider {
         },
       });
       return [];
+    }
+  }
+
+  public async start(props: StartEventIndexerProps): Promise<void> {
+    for (let i = 0; i < this.configs.length; i++) {
+      await this.startWithConfig(this.configs[i], props);
     }
   }
 }

@@ -1,9 +1,9 @@
 import logger from '../lib/logger';
 import { Provider, ShareProviders } from '../lib/types';
 import { CollectorProvider } from '../modules/collector/providers/collector';
-import { EventIndexerProvider } from '../modules/indexer/provider';
+import { EvmEventIndexer } from '../modules/indexer/evm';
 
-export interface StartDefiProviderProps {
+export interface StartAdapterProps {
   forceSync: boolean;
   initialDate: number;
 }
@@ -14,19 +14,22 @@ export class DefiAdapter implements Provider {
   protected configs: any;
   protected providers: ShareProviders;
 
+  // event indexer service
+  protected indexer: EvmEventIndexer | null;
+
+  // protocol metrics collector service
   protected collector: CollectorProvider | null;
-  protected indexer: Array<EventIndexerProvider>;
 
   constructor(configs: any, providers: ShareProviders) {
     this.configs = configs;
     this.providers = providers;
 
     this.collector = null;
-    this.indexer = [];
+    this.indexer = null;
   }
 
   // implement this function for every defi protocol providers
-  public async start(props: StartDefiProviderProps): Promise<any> {
+  public async start(props: StartAdapterProps): Promise<any> {
     logger.onInfo({
       source: `adapter.${this.configs.name}`,
       message: `starting ${this.configs.name} adapter`,
@@ -36,8 +39,8 @@ export class DefiAdapter implements Provider {
       },
     });
 
-    for (let i = 0; i < this.indexer.length; i++) {
-      await this.indexer[i].start({ forceSync: props.forceSync });
+    if (this.indexer) {
+      await this.indexer.start({ forceSync: props.forceSync });
     }
 
     if (this.collector) {
