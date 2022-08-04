@@ -78,32 +78,24 @@ export class UniswapProvider extends CollectorProvider {
       let blockNumberToTime: number;
 
       if (
-        this.configs.subgraphs[i].exchange.includes('thegraph.com') ||
-        this.configs.subgraphs[i].exchange.includes('streamingfast.io') ||
-        this.configs.subgraphs[i].exchange.includes('graph.mm.finance') ||
-        this.configs.subgraphs[i].exchange.includes('graph.vvs.finance') ||
-        this.configs.subgraphs[i].exchange.includes('thegraph.roninchain.com')
+        this.configs.subgraphs[i].exchange.includes('api.fura.org') ||
+        this.configs.subgraphs[i].exchange.includes('polygon.furadao.org')
       ) {
-        // thegraph
-        blockNumberFromTime = await providers.subgraph.queryBlockAtTimestamp(
-          this.configs.subgraphs[i].chainConfig.subgraph?.blockSubgraph as string,
-          fromTime
-        );
-        blockNumberToTime = await providers.subgraph.queryBlockAtTimestamp(
-          this.configs.subgraphs[i].chainConfig.subgraph?.blockSubgraph as string,
-          toTime
-        );
-
-        // in case the graph not full sync yet
-        const blockNumberMeta = await providers.subgraph.queryMetaLatestBlock(this.configs.subgraphs[i].exchange);
-        blockNumberToTime = blockNumberToTime > blockNumberMeta ? blockNumberMeta : blockNumberToTime;
-      } else {
-        // fura
         blockNumberFromTime = await providers.subgraph.queryBlockAtTimestamp(
           this.configs.subgraphs[i].exchange,
           fromTime
         );
         blockNumberToTime = await providers.subgraph.queryBlockAtTimestamp(this.configs.subgraphs[i].exchange, toTime);
+      } else {
+        blockNumberFromTime = await providers.subgraph.queryBlockAtTimestamp(
+          this.configs.subgraphs[i].chainConfig.subgraph?.blockSubgraph as string,
+          fromTime
+        );
+        blockNumberToTime = await providers.subgraph.safeQueryBlockAtTimestamp(
+          this.configs.subgraphs[i].exchange as string,
+          this.configs.subgraphs[i].chainConfig.subgraph?.blockSubgraph as string,
+          toTime
+        );
       }
 
       const response = await providers.subgraph.querySubgraph(

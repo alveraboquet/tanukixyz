@@ -24,4 +24,10 @@ export interface ProtocolData {
   // bad debts metrics on lending platform
   badDebtUSD?: number;
   insolventUserCount?: number;
+
+  revenue?: any;
+  totalValueLocked?: any;
+  volume?: any;
+  user?: any;
+  transaction?: any;
 }
