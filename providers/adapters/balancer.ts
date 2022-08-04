@@ -9,6 +9,6 @@ export class BalancerAdapter extends DefiAdapter {
   constructor(configs: BalancerProtocolConfig, providers: ShareProviders) {
     super(configs, providers);
 
-    this.collector = new BalancerProvider(configs, null);
+    this.collector = new BalancerProvider(configs);
   }
 }

@@ -10,7 +10,7 @@ export class CompoundAdapter extends DefiAdapter {
   constructor(configs: CompoundProtocolConfig, providers: ShareProviders) {
     super(configs, providers);
 
-    this.collector = new CompoundProvider(configs, null);
+    this.collector = new CompoundProvider(configs);
     this.indexer = new EvmEventIndexer(providers, configs.pools);
   }
 }

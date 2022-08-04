@@ -1,6 +1,6 @@
 import logger from '../lib/logger';
 import { Provider, ShareProviders } from '../lib/types';
-import { CollectorProvider } from '../modules/collector/providers/collector';
+import { CollectorProvider } from '../modules/collector/collector';
 import { EvmEventIndexer } from '../modules/indexer/evm';
 
 export interface StartAdapterProps {

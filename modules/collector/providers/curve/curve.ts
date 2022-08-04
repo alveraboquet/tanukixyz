@@ -2,15 +2,14 @@ import axios from 'axios';
 
 import { CurveProtocolConfig } from '../../../../configs/protocols/curve';
 import logger from '../../../../lib/logger';
+import { CollectorProvider, GetProtocolDataProps } from '../../collector';
 import { ProtocolData } from '../../types';
-import { CollectorProvider, GetProtocolDataProps } from '../collector';
-import { CollectorHook } from '../hook';
 
 export class CurveProvider extends CollectorProvider {
   public readonly name: string = 'collector.curve';
 
-  constructor(configs: CurveProtocolConfig, hook: CollectorHook | null) {
-    super(configs, hook);
+  constructor(configs: CurveProtocolConfig) {
+    super(configs);
   }
 
   public async getDailyData(props: GetProtocolDataProps): Promise<ProtocolData> {

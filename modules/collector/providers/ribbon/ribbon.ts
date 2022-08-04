@@ -3,16 +3,15 @@ import BigNumber from 'bignumber.js';
 import { RibbonProtocolConfig } from '../../../../configs/protocols/ribbon';
 import { getHistoryTokenPriceFromCoingecko, normalizeAddress } from '../../../../lib/helper';
 import { ShareProviders } from '../../../../lib/types';
+import { CollectorProvider } from '../../collector';
 import { ProtocolData } from '../../types';
-import { CollectorProvider } from '../collector';
-import { CollectorHook } from '../hook';
 import { queryVaultTransactions, queryVaults } from './helpers';
 
 export class RibbonProvider extends CollectorProvider {
   public readonly name: string = 'collector.ribbon';
 
-  constructor(configs: RibbonProtocolConfig, hook: CollectorHook | null) {
-    super(configs, hook);
+  constructor(configs: RibbonProtocolConfig) {
+    super(configs);
   }
 
   public async getDataInTimeFrame(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {

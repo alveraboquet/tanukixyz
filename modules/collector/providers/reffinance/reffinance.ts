@@ -2,15 +2,14 @@ import axios from 'axios';
 
 import { RefFinanceConfig } from '../../../../configs/protocols/reffinance';
 import logger from '../../../../lib/logger';
+import { CollectorProvider, GetProtocolDataProps } from '../../collector';
 import { ProtocolData } from '../../types';
-import { CollectorProvider, GetProtocolDataProps } from '../collector';
-import { CollectorHook } from '../hook';
 
 export class RefFinanceProvider extends CollectorProvider {
   public readonly name: string = 'collector.reffinance';
 
-  constructor(configs: RefFinanceConfig, hook: CollectorHook | null) {
-    super(configs, hook);
+  constructor(configs: RefFinanceConfig) {
+    super(configs);
   }
 
   public async getDailyData(props: GetProtocolDataProps): Promise<ProtocolData> {

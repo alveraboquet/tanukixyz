@@ -8,16 +8,15 @@ import { CompoundProtocolConfig } from '../../../../configs/types';
 import { getHistoryTokenPriceFromCoingecko, normalizeAddress } from '../../../../lib/helper';
 import logger from '../../../../lib/logger';
 import { ShareProviders } from '../../../../lib/types';
+import { CollectorProvider } from '../../collector';
 import { ProtocolData } from '../../types';
-import { CollectorProvider } from '../collector';
-import { CollectorHook } from '../hook';
 import { getPoolConfigByAddress } from './helpers';
 
 export class CompoundProvider extends CollectorProvider {
   public readonly name: string = 'collector.compound';
 
-  constructor(configs: CompoundProtocolConfig, hook: CollectorHook | null) {
-    super(configs, hook);
+  constructor(configs: CompoundProtocolConfig) {
+    super(configs);
   }
 
   public async getDataInTimeFrame(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {

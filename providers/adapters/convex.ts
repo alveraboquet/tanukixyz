@@ -9,6 +9,6 @@ export class ConvexAdapter extends DefiAdapter {
   constructor(configs: ConvexProtocolConfig, providers: ShareProviders) {
     super(configs, providers);
 
-    this.collector = new ConvexProvider(configs, null);
+    this.collector = new ConvexProvider(configs);
   }
 }

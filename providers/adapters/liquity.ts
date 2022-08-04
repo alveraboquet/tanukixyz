@@ -10,7 +10,7 @@ export class LiquityAdapter extends DefiAdapter {
   constructor(configs: LiquityProtocolConfig, providers: ShareProviders) {
     super(configs, providers);
 
-    this.collector = new LiquityProvider(configs, null);
+    this.collector = new LiquityProvider(configs);
 
     this.indexer = new EvmEventIndexer(providers, [configs.troveManager, configs.borrowOperation]);
   }

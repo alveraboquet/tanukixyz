@@ -1,15 +1,14 @@
 import { UniswapProtocolConfig } from '../../../../configs/types';
 import logger from '../../../../lib/logger';
 import { ShareProviders } from '../../../../lib/types';
+import { CollectorProvider } from '../../collector';
 import { ProtocolData } from '../../types';
-import { CollectorProvider } from '../collector';
-import { CollectorHook } from '../hook';
 
 export class UniswapProvider extends CollectorProvider {
   public readonly name: string = 'collector.uniswap';
 
-  constructor(configs: UniswapProtocolConfig, hook: CollectorHook | null) {
-    super(configs, hook);
+  constructor(configs: UniswapProtocolConfig) {
+    super(configs);
   }
 
   public getQueryRecordLimit(): number {

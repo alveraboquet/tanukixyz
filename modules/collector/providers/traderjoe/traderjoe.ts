@@ -1,8 +1,7 @@
 import { CompoundProtocolConfig, TokenConfig, UniswapProtocolConfig } from '../../../../configs/types';
+import { CollectorProvider, GetProtocolDataProps } from '../../collector';
 import { ProtocolData } from '../../types';
-import { CollectorProvider, GetProtocolDataProps } from '../collector';
 import { CompoundProvider } from '../compound/compound';
-import { CollectorHook } from '../hook';
 import { SushiswapProvider } from '../sushiswap/sushiswap';
 
 export interface TraderjoeProtocolConfig {
@@ -18,11 +17,11 @@ export class TraderjoeProvider extends CollectorProvider {
   private exchangeProvider: SushiswapProvider;
   private lendingProvider: CompoundProvider;
 
-  constructor(configs: TraderjoeProtocolConfig, hook: CollectorHook | null) {
-    super(configs, hook);
+  constructor(configs: TraderjoeProtocolConfig) {
+    super(configs);
 
-    this.exchangeProvider = new SushiswapProvider(this.configs.exchange, null);
-    this.lendingProvider = new CompoundProvider(this.configs.lending, null);
+    this.exchangeProvider = new SushiswapProvider(this.configs.exchange);
+    this.lendingProvider = new CompoundProvider(this.configs.lending);
   }
 
   public async getDailyData(props: GetProtocolDataProps): Promise<ProtocolData> {

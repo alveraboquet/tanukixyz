@@ -9,7 +9,7 @@ export class TraderJoeAdapter extends DefiAdapter {
   constructor(configs: TraderjoeProtocolConfig, providers: ShareProviders) {
     super(configs, providers);
 
-    this.collector = new TraderjoeProvider(configs, null);
+    this.collector = new TraderjoeProvider(configs);
     this.indexer = new EvmEventIndexer(providers, configs.lending.pools);
   }
 }

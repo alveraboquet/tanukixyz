@@ -9,6 +9,6 @@ export class EulerAdapter extends DefiAdapter {
   constructor(configs: EulerProtocolConfig, providers: ShareProviders) {
     super(configs, providers);
 
-    this.collector = new EulerProvider(configs, null);
+    this.collector = new EulerProvider(configs);
   }
 }

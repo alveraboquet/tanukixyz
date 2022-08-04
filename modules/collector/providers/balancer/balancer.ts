@@ -2,15 +2,14 @@ import BigNumber from 'bignumber.js';
 
 import { BalancerProtocolConfig } from '../../../../configs/types';
 import { ShareProviders } from '../../../../lib/types';
+import { CollectorProvider } from '../../collector';
 import { ProtocolData } from '../../types';
-import { CollectorProvider } from '../collector';
-import { CollectorHook } from '../hook';
 
 export class BalancerProvider extends CollectorProvider {
   public readonly name: string = 'collector.balancer';
 
-  constructor(configs: BalancerProtocolConfig, hook: CollectorHook | null) {
-    super(configs, hook);
+  constructor(configs: BalancerProtocolConfig) {
+    super(configs);
   }
 
   public async getDataInTimeFrame(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {

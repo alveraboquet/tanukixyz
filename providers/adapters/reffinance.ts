@@ -9,6 +9,6 @@ export class RefFinanceAdapter extends DefiAdapter {
   constructor(configs: RefFinanceConfig, providers: ShareProviders) {
     super(configs, providers);
 
-    this.collector = new RefFinanceProvider(configs, null);
+    this.collector = new RefFinanceProvider(configs);
   }
 }

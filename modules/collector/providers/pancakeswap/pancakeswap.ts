@@ -1,12 +1,11 @@
 import { UniswapProtocolConfig } from '../../../../configs/types';
-import { CollectorHook } from '../hook';
 import { UniswapProvider } from '../uniswap/uniswap';
 
 export class PancakeswapProvider extends UniswapProvider {
   public readonly name: string = 'collector.pancakeswap';
 
-  constructor(configs: UniswapProtocolConfig, hook: CollectorHook | null) {
-    super(configs, hook);
+  constructor(configs: UniswapProtocolConfig) {
+    super(configs);
   }
 
   // due to streamingfast performance

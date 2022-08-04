@@ -53,25 +53,25 @@ export function getAdapter(protocol: string, providers: ShareProviders): DefiAda
   switch (protocol) {
     // uniswap and forks
     case 'uniswap':
-      return new UniswapAdapter(UniswapConfigs, providers, new UniswapProvider(UniswapConfigs, null));
+      return new UniswapAdapter(UniswapConfigs, providers, new UniswapProvider(UniswapConfigs));
     case 'sushiswap':
-      return new UniswapAdapter(SushiswapConfigs, providers, new SushiswapProvider(SushiswapConfigs, null));
+      return new UniswapAdapter(SushiswapConfigs, providers, new SushiswapProvider(SushiswapConfigs));
     case 'spookyswap':
-      return new UniswapAdapter(SpookyswapConfigs, providers, new UniswapProvider(SpookyswapConfigs, null));
+      return new UniswapAdapter(SpookyswapConfigs, providers, new UniswapProvider(SpookyswapConfigs));
     case 'pancakeswap':
-      return new UniswapAdapter(PancakeswapConfigs, providers, new PancakeswapProvider(PancakeswapConfigs, null));
+      return new UniswapAdapter(PancakeswapConfigs, providers, new PancakeswapProvider(PancakeswapConfigs));
     case 'biswap':
-      return new UniswapAdapter(BiswapConfigs, providers, new PancakeswapProvider(BiswapConfigs, null));
+      return new UniswapAdapter(BiswapConfigs, providers, new PancakeswapProvider(BiswapConfigs));
     case 'babyswap':
-      return new UniswapAdapter(BabyswapConfigs, providers, new PancakeswapProvider(BabyswapConfigs, null));
+      return new UniswapAdapter(BabyswapConfigs, providers, new PancakeswapProvider(BabyswapConfigs));
     case 'quickswap':
-      return new UniswapAdapter(QuickswapConfigs, providers, new UniswapProvider(QuickswapConfigs, null));
+      return new UniswapAdapter(QuickswapConfigs, providers, new UniswapProvider(QuickswapConfigs));
     case 'vvsfinance':
-      return new UniswapAdapter(VvsfinanceConfigs, providers, new VvsfinanceProvider(VvsfinanceConfigs, null));
+      return new UniswapAdapter(VvsfinanceConfigs, providers, new VvsfinanceProvider(VvsfinanceConfigs));
     case 'mmfinance':
-      return new UniswapAdapter(MmfinanceConfigs, providers, new PancakeswapProvider(MmfinanceConfigs, null));
+      return new UniswapAdapter(MmfinanceConfigs, providers, new PancakeswapProvider(MmfinanceConfigs));
     case 'katana':
-      return new UniswapAdapter(RoninKatanaConfigs, providers, new RoninKatanaProvider(RoninKatanaConfigs, null));
+      return new UniswapAdapter(RoninKatanaConfigs, providers, new RoninKatanaProvider(RoninKatanaConfigs));
     case 'traderjoe':
       return new TraderJoeAdapter(
         {

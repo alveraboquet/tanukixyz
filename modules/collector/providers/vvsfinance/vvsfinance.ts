@@ -1,12 +1,11 @@
 import { UniswapProtocolConfig } from '../../../../configs/types';
-import { CollectorHook } from '../hook';
 import { UniswapProvider } from '../uniswap/uniswap';
 
 export class VvsfinanceProvider extends UniswapProvider {
   public readonly name: string = 'collector.vvsfinance';
 
-  constructor(configs: UniswapProtocolConfig, hook: CollectorHook | null) {
-    super(configs, hook);
+  constructor(configs: UniswapProtocolConfig) {
+    super(configs);
   }
 
   // override this methods match with new project definitions

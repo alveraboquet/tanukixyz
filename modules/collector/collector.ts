@@ -1,11 +1,10 @@
-import { DefiProtocolModuleCode, InitialSyncDate } from '../../../configs';
-import envConfig from '../../../configs/env';
-import { getTimestamp, getTodayUTCTimestamp } from '../../../lib/helper';
-import logger from '../../../lib/logger';
-import { Provider, ShareProviders } from '../../../lib/types';
-import { ProtocolData } from '../types';
-import { CollectorHook } from './hook';
+import { DefiProtocolModuleCode, InitialSyncDate } from '../../configs';
+import envConfig from '../../configs/env';
+import { getTimestamp, getTodayUTCTimestamp } from '../../lib/helper';
+import logger from '../../lib/logger';
+import { Provider, ShareProviders } from '../../lib/types';
 import TokenomicsProvider from './tokenomics';
+import { ProtocolData } from './types';
 
 export interface GetProtocolDataProps {
   date: number;
@@ -21,11 +20,9 @@ export interface StartCollectorServiceProps {
 export class CollectorProvider implements Provider {
   public readonly name: string = 'module.collector';
   public readonly configs: any;
-  public hook: CollectorHook | null;
 
-  constructor(configs: any, hook: CollectorHook | null) {
+  constructor(configs: any) {
     this.configs = configs;
-    this.hook = hook;
   }
 
   // override this function
@@ -43,7 +40,7 @@ export class CollectorProvider implements Provider {
     const last24HoursData = await this.getDataInTimeFrame(providers, last24HoursTimestamp, date);
     const last48HoursData = await this.getDataInTimeFrame(providers, last48HoursTimestamp, last24HoursTimestamp);
 
-    const data: ProtocolData = {
+    return {
       revenueUSD: last24HoursData.revenueUSD,
       volumeInUseUSD: last24HoursData.volumeInUseUSD,
       totalValueLockedUSD: last24HoursData.totalValueLockedUSD,
@@ -66,15 +63,6 @@ export class CollectorProvider implements Provider {
           100,
       },
     };
-
-    // call hooks
-    if (this.hook) {
-      const hookData: any = await this.hook.getHookData({ providers, date });
-      data.badDebtUSD = hookData.badDebtUSD;
-      data.insolventUserCount = hookData.insolventUserCount;
-    }
-
-    return data;
   }
 
   public async getDateData(argv: GetProtocolDataProps): Promise<any> {

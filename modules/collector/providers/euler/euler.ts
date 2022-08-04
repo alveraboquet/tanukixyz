@@ -4,15 +4,14 @@ import { EulerProtocolConfig } from '../../../../configs/types';
 import { normalizeAddress } from '../../../../lib/helper';
 import logger from '../../../../lib/logger';
 import { ShareProviders } from '../../../../lib/types';
+import { CollectorProvider } from '../../collector';
 import { ProtocolData } from '../../types';
-import { CollectorProvider } from '../collector';
-import { CollectorHook } from '../hook';
 
 export class EulerProvider extends CollectorProvider {
   public readonly name: string = 'collector.euler';
 
-  constructor(configs: EulerProtocolConfig, hook: CollectorHook | null) {
-    super(configs, hook);
+  constructor(configs: EulerProtocolConfig) {
+    super(configs);
   }
 
   public async getDataInTimeFrame(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {

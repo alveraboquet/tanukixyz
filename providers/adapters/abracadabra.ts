@@ -10,7 +10,7 @@ export class AbracadabraAdapter extends DefiAdapter {
   constructor(configs: AbracadabraProtocolConfig, providers: ShareProviders) {
     super(configs, providers);
 
-    this.collector = new AbracadabraProvider(configs, null);
+    this.collector = new AbracadabraProvider(configs);
     this.indexer = new EvmEventIndexer(providers, configs.markets);
   }
 }

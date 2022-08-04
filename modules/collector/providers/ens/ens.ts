@@ -4,15 +4,14 @@ import Web3 from 'web3';
 import { EnsProtocolConfig } from '../../../../configs/protocols/ens';
 import { getHistoryTokenPriceFromCoingecko, getTimestamp, normalizeAddress } from '../../../../lib/helper';
 import { ShareProviders } from '../../../../lib/types';
+import { CollectorProvider, GetProtocolDataProps } from '../../collector';
 import { ProtocolData } from '../../types';
-import { CollectorProvider, GetProtocolDataProps } from '../collector';
-import { CollectorHook } from '../hook';
 
 export class EnsProvider extends CollectorProvider {
   public readonly name: string = 'collector.ens';
 
-  constructor(configs: EnsProtocolConfig, hook: CollectorHook | null) {
-    super(configs, hook);
+  constructor(configs: EnsProtocolConfig) {
+    super(configs);
   }
 
   private async getDataInRange(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {

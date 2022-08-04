@@ -9,6 +9,6 @@ export class DodoexAdapter extends DefiAdapter {
   constructor(configs: DodoexProtocolConfig, providers: ShareProviders) {
     super(configs, providers);
 
-    this.collector = new DodoexProvider(configs, null);
+    this.collector = new DodoexProvider(configs);
   }
 }

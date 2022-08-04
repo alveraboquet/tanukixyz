@@ -5,15 +5,14 @@ import envConfig from '../../../../configs/env';
 import { LiquityProtocolConfig } from '../../../../configs/types';
 import { getHistoryTokenPriceFromCoingecko, normalizeAddress } from '../../../../lib/helper';
 import { ShareProviders } from '../../../../lib/types';
+import { CollectorProvider } from '../../collector';
 import { ProtocolData } from '../../types';
-import { CollectorProvider } from '../collector';
-import { CollectorHook } from '../hook';
 
 export class LiquityProvider extends CollectorProvider {
   public readonly name: string = 'collector.liquity';
 
-  constructor(configs: LiquityProtocolConfig, hook: CollectorHook | null) {
-    super(configs, hook);
+  constructor(configs: LiquityProtocolConfig) {
+    super(configs);
   }
 
   public async getDataInTimeFrame(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {

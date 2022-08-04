@@ -9,6 +9,6 @@ export class RibbonAdapter extends DefiAdapter {
   constructor(configs: RibbonProtocolConfig, providers: ShareProviders) {
     super(configs, providers);
 
-    this.collector = new RibbonProvider(configs, null);
+    this.collector = new RibbonProvider(configs);
   }
 }

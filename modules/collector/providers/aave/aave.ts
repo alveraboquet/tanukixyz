@@ -7,16 +7,15 @@ import { AaveProtocolConfig, TokenConfig } from '../../../../configs/types';
 import { getHistoryTokenPriceFromCoingecko, normalizeAddress } from '../../../../lib/helper';
 import logger from '../../../../lib/logger';
 import { ShareProviders } from '../../../../lib/types';
+import { CollectorProvider } from '../../collector';
 import { ProtocolData } from '../../types';
-import { CollectorProvider } from '../collector';
-import { CollectorHook } from '../hook';
 import { getReserveConfig } from './helpers';
 
 export class AaveProvider extends CollectorProvider {
   public readonly name: string = 'collector.aave';
 
-  constructor(configs: AaveProtocolConfig, hook: CollectorHook | null) {
-    super(configs, hook);
+  constructor(configs: AaveProtocolConfig) {
+    super(configs);
   }
 
   public async getDataInTimeFrame(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {

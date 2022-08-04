@@ -6,16 +6,15 @@ import { AbracadabraProtocolConfig } from '../../../../configs/protocols/abracad
 import { normalizeAddress } from '../../../../lib/helper';
 import logger from '../../../../lib/logger';
 import { ShareProviders } from '../../../../lib/types';
+import { CollectorProvider } from '../../collector';
 import { ProtocolData } from '../../types';
-import { CollectorProvider } from '../collector';
-import { CollectorHook } from '../hook';
 import { getHistoryPrice, getMarketConfigByAddress } from './helpers';
 
 export class AbracadabraProvider extends CollectorProvider {
   public readonly name: string = 'collector.abracadabra';
 
-  constructor(configs: AbracadabraProtocolConfig, hook: CollectorHook | null) {
-    super(configs, hook);
+  constructor(configs: AbracadabraProtocolConfig) {
+    super(configs);
   }
 
   public async getDataInTimeFrame(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {

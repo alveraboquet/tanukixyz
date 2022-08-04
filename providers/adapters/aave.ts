@@ -10,7 +10,7 @@ export class AaveAdapter extends DefiAdapter {
   constructor(configs: AaveProtocolConfig, providers: ShareProviders) {
     super(configs, providers);
 
-    this.collector = new AaveProvider(configs, null);
+    this.collector = new AaveProvider(configs);
     this.indexer = new EvmEventIndexer(providers, configs.pools);
   }
 }

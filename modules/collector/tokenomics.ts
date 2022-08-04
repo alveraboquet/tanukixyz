@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-import { TokenConfig } from '../../../configs/types';
-import logger from '../../../lib/logger';
-import { Provider } from '../../../lib/types';
-import { ProtocolTokenomics } from '../types';
+import { TokenConfig } from '../../configs/types';
+import logger from '../../lib/logger';
+import { Provider } from '../../lib/types';
+import { ProtocolTokenomics } from './types';
 
 class TokenomicsProvider implements Provider {
   public readonly name: string = 'module.tokenomics';

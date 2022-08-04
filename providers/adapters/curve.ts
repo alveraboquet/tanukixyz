@@ -9,6 +9,6 @@ export class CurveAdapter extends DefiAdapter {
   constructor(configs: CurveProtocolConfig, providers: ShareProviders) {
     super(configs, providers);
 
-    this.collector = new CurveProvider(configs, null);
+    this.collector = new CurveProvider(configs);
   }
 }
