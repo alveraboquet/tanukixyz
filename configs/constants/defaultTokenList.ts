@@ -19,7 +19,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
       },
       binance: {
         decimals: 18,
-        address: '',
+        address: '0x2170ed0880ac9a755fd29b2688956bd959f933f8',
       },
       polygon: {
         decimals: 18,
@@ -241,7 +241,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
       },
       binance: {
         decimals: 18,
-        address: '',
+        address: '0x14016e85a25aeb13065688cafb43044c2ef86784',
       },
     },
   },
@@ -281,7 +281,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
       },
       binance: {
         decimals: 18,
-        address: '',
+        address: '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d',
       },
       polygon: {
         decimals: 6,
@@ -329,7 +329,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
       },
       binance: {
         decimals: 18,
-        address: '',
+        address: '0x55d398326f99059ff775485246999027b3197955',
       },
       polygon: {
         decimals: 6,
@@ -367,7 +367,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
       },
       binance: {
         decimals: 18,
-        address: '',
+        address: '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c',
       },
       polygon: {
         decimals: 8,
@@ -509,7 +509,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
       },
       binance: {
         decimals: 18,
-        address: '',
+        address: '0xe9e7cea3dedca5984780bafc599bd69add087d56',
       },
     },
   },
@@ -607,7 +607,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
     chains: {
       binance: {
         decimals: 18,
-        address: '',
+        address: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c', // WBNB
       },
     },
   },
@@ -617,7 +617,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
     chains: {
       binance: {
         decimals: 18,
-        address: '',
+        address: '0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82',
       },
     },
   },

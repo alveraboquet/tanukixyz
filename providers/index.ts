@@ -1,6 +1,7 @@
 import { DefaultTokenList } from '../configs/constants/defaultTokenList';
 import { AaveConfigs } from '../configs/protocols/aave';
 import { AbracadabraConfigs } from '../configs/protocols/abracadabra';
+import { AlpacaConfigs } from '../configs/protocols/alpaca';
 import { AurigamiConfigs } from '../configs/protocols/aurigami';
 import { BabyswapConfigs } from '../configs/protocols/babyswap';
 import { BalancerConfigs } from '../configs/protocols/balancer';
@@ -37,6 +38,7 @@ import { VvsfinanceProvider } from '../modules/collector/providers/vvsfinance/vv
 import { DefiAdapter } from './adapter';
 import { AaveAdapter } from './adapters/aave';
 import { AbracadabraAdapter } from './adapters/abracadabra';
+import { AlpacaAdapter } from './adapters/alpaca';
 import { BalancerAdapter } from './adapters/balancer';
 import { CompoundAdapter } from './adapters/compound';
 import { ConvexAdapter } from './adapters/convex';
@@ -120,6 +122,8 @@ export function getAdapter(protocol: string, providers: ShareProviders): DefiAda
       return new LiquityAdapter(LiquityConfigs, providers);
     case 'euler':
       return new EulerAdapter(EulerConfigs, providers);
+    case 'alpaca':
+      return new AlpacaAdapter(AlpacaConfigs, providers);
 
     // use API
     case 'curve':

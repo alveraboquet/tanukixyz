@@ -13,7 +13,7 @@ const ALPACA_TOKEN: TokenConfig = {
   chains: {
     binance: {
       decimals: 18,
-      address: '',
+      address: '0x8f0528ce5ef7b51152a59745befdd91d97091d2f',
     },
   },
 };
