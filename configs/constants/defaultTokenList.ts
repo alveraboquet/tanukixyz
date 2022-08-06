@@ -849,7 +849,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
     symbol: 'sAVAX',
     coingeckoId: 'benqi-liquid-staked-avax',
     chains: {
-      binance: {
+      avalanche: {
         decimals: 18,
         address: '',
       },
