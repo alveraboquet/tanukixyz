@@ -859,7 +859,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
     symbol: 'QI',
     coingeckoId: 'benqi',
     chains: {
-      binance: {
+      avalanche: {
         decimals: 18,
         address: '',
       },
