@@ -27,37 +27,45 @@ class LogProvider {
   }
 
   public onInfo(entry: LogEntry): void {
-    console.info(
-      `${new Date().toISOString()} ${chalk.green('info'.padEnd(5))} | ${(entry.source + ': ' + entry.message).padEnd(
-        50
-      )}    ${LogProvider.buildPropsLog(entry.props)}`
-    );
+    if (!Boolean(process.env.SILENT_MODE)) {
+      console.info(
+        `${new Date().toISOString()} ${chalk.green('info'.padEnd(5))} | ${(entry.source + ': ' + entry.message).padEnd(
+          50
+        )}    ${LogProvider.buildPropsLog(entry.props)}`
+      );
+    }
   }
 
   public onDebug(entry: LogEntry): void {
-    console.info(
-      `${new Date().toISOString()} ${chalk.grey('debug'.padEnd(5))} | ${(entry.source + ': ' + entry.message).padEnd(
-        50
-      )}    ${LogProvider.buildPropsLog(entry.props)}`
-    );
+    if (!Boolean(process.env.SILENT_MODE)) {
+      console.info(
+        `${new Date().toISOString()} ${chalk.grey('debug'.padEnd(5))} | ${(entry.source + ': ' + entry.message).padEnd(
+          50
+        )}    ${LogProvider.buildPropsLog(entry.props)}`
+      );
+    }
   }
 
   public onWarn(entry: LogEntry): void {
-    console.info(
-      `${new Date().toISOString()} ${chalk.yellow('warn'.padEnd(5))} | ${(entry.source + ': ' + entry.message).padEnd(
-        50
-      )}    ${LogProvider.buildPropsLog(entry.props)}`
-    );
+    if (!Boolean(process.env.SILENT_MODE)) {
+      console.info(
+        `${new Date().toISOString()} ${chalk.yellow('warn'.padEnd(5))} | ${(entry.source + ': ' + entry.message).padEnd(
+          50
+        )}    ${LogProvider.buildPropsLog(entry.props)}`
+      );
+    }
   }
 
   public onError(entry: LogEntry): void {
-    console.info(
-      `${new Date().toISOString()} ${chalk.red('error'.padEnd(5))} | ${(entry.source + ': ' + entry.message).padEnd(
-        50
-      )}    ${LogProvider.buildPropsLog(entry.props)}`
-    );
-    if (entry.error) {
-      console.error(entry.error);
+    if (!Boolean(process.env.SILENT_MODE)) {
+      console.info(
+        `${new Date().toISOString()} ${chalk.red('error'.padEnd(5))} | ${(entry.source + ': ' + entry.message).padEnd(
+          50
+        )}    ${LogProvider.buildPropsLog(entry.props)}`
+      );
+      if (entry.error) {
+        console.error(entry.error);
+      }
     }
   }
 }

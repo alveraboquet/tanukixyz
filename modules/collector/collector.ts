@@ -32,37 +32,7 @@ export class CollectorProvider implements Provider {
 
   public async getDailyData(argv: GetProtocolDataProps): Promise<ProtocolData> {
     const { providers, date } = argv;
-
-    // last 24 hours
-    const last24HoursTimestamp = date - 24 * 60 * 60;
-    const last48HoursTimestamp = date - 48 * 60 * 60;
-
-    const last24HoursData = await this.getDataInTimeFrame(providers, last24HoursTimestamp, date);
-    const last48HoursData = await this.getDataInTimeFrame(providers, last48HoursTimestamp, last24HoursTimestamp);
-
-    return {
-      revenueUSD: last24HoursData.revenueUSD,
-      volumeInUseUSD: last24HoursData.volumeInUseUSD,
-      totalValueLockedUSD: last24HoursData.totalValueLockedUSD,
-      userCount: last24HoursData.userCount,
-      transactionCount: last24HoursData.transactionCount,
-
-      changes: {
-        revenueChangePercentage:
-          ((last24HoursData.revenueUSD - last48HoursData.revenueUSD) / last48HoursData.revenueUSD) * 100,
-        volumeInUseChangePercentage:
-          ((last24HoursData.volumeInUseUSD - last48HoursData.volumeInUseUSD) / last48HoursData.volumeInUseUSD) * 100,
-        totalValueLockedChangePercentage:
-          ((last24HoursData.totalValueLockedUSD - last48HoursData.totalValueLockedUSD) /
-            last48HoursData.totalValueLockedUSD) *
-          100,
-        userCountChangePercentage:
-          ((last24HoursData.userCount - last48HoursData.userCount) / last48HoursData.userCount) * 100,
-        transactionCountChangePercentage:
-          ((last24HoursData.transactionCount - last48HoursData.transactionCount) / last48HoursData.transactionCount) *
-          100,
-      },
-    };
+    return await this.getDataInTimeFrame(providers, date - 24 * 60 * 60, date);
   }
 
   public async getDateData(argv: GetProtocolDataProps): Promise<any> {
@@ -70,7 +40,7 @@ export class CollectorProvider implements Provider {
     return await this.getDataInTimeFrame(providers, date, date + 24 * 60 * 60);
   }
 
-  public async start(props: StartCollectorServiceProps): Promise<any> {
+  public async start(props: StartCollectorServiceProps): Promise<void> {
     const { initialDate, forceSync, providers } = props;
 
     // collect daily data

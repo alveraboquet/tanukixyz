@@ -23,6 +23,11 @@ export class SushiswapProvider extends UniswapProvider {
         totalLiquidity: 'liquidityUSD',
         totalTransaction: 'txCount',
       },
+      token: {
+        tokenTradeVolume: 'volumeUSD',
+        tokenLiquidity: 'liquidity',
+        tokenTxCount: 'txCount',
+      },
     };
   }
 }

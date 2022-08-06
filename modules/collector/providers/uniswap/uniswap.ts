@@ -1,8 +1,27 @@
+import { getDefaultTokenAddresses, getDefaultTokenLogoURI } from '../../../../configs/helpers';
 import { UniswapProtocolConfig } from '../../../../configs/types';
+import { normalizeAddress } from '../../../../lib/helper';
 import logger from '../../../../lib/logger';
 import { ShareProviders } from '../../../../lib/types';
 import { CollectorProvider } from '../../collector';
-import { ProtocolData } from '../../types';
+import { ProtocolData, ProtocolDetailData } from '../../types';
+
+export interface UniswapTokenData {
+  chain: string;
+  address: string;
+  symbol: string;
+  decimals: number;
+  logoURI: string | null;
+  totalVolumeUSD: number;
+  totalLiquidityUSD: number;
+  totalTxCount: number;
+}
+
+export interface UniswapDetailData extends ProtocolDetailData {
+  data: {
+    tokens: Array<UniswapTokenData>;
+  };
+}
 
 export class UniswapProvider extends CollectorProvider {
   public readonly name: string = 'collector.uniswap';
@@ -32,6 +51,12 @@ export class UniswapProvider extends CollectorProvider {
         totalTransaction: 'txCount',
       },
 
+      token: {
+        tokenTradeVolume: 'tradeVolumeUSD',
+        tokenLiquidity: 'totalLiquidity',
+        tokenTxCount: 'txCount',
+      },
+
       // support uniswap v3 queries
       v3: {
         dayData: {
@@ -49,6 +74,12 @@ export class UniswapProvider extends CollectorProvider {
           totalLiquidity: 'totalValueLockedUSD',
           totalTransaction: 'txCount',
         },
+
+        token: {
+          tokenTradeVolume: 'volumeUSD',
+          tokenLiquidity: 'totalValueLockedUSD',
+          tokenTxCount: 'txCount',
+        },
       },
     };
   }
@@ -60,6 +91,13 @@ export class UniswapProvider extends CollectorProvider {
       volumeInUseUSD: 0,
       userCount: 0,
       transactionCount: 0,
+    };
+
+    const detailData: UniswapDetailData = {
+      version: 'univ2',
+      data: {
+        tokens: [],
+      },
     };
 
     for (let i = 0; i < this.configs.subgraphs.length; i++) {
@@ -131,6 +169,43 @@ export class UniswapProvider extends CollectorProvider {
         data.totalValueLockedUSD += Number(parsed[filters.totalLiquidity]);
         data.transactionCount += Number(parsed[filters.totalTransaction]) - Number(parsed24[filters.totalTransaction]);
       }
+
+      // get tokens liquidity
+      const tokenAddresses: Array<string> = getDefaultTokenAddresses(this.configs.subgraphs[i].chainConfig.name);
+      const tokenFilters: any =
+        this.configs.subgraphs[i].version === 2 ? this.getFilters().token : this.getFilters().v3.token;
+
+      for (let address of tokenAddresses) {
+        const tokenQuery = `
+          {
+            token(block: {number: ${blockNumberToTime}}, id: "${normalizeAddress(address)}") {
+              id
+              symbol
+              decimals
+              ${tokenFilters.tokenTradeVolume}
+              ${tokenFilters.tokenLiquidity}
+              ${tokenFilters.tokenTxCount}
+            }
+          }
+        `;
+
+        const tokenResponse = await providers.subgraph.querySubgraph(this.configs.subgraphs[i].exchange, tokenQuery);
+        const parsedToken: any = tokenResponse && tokenResponse.token ? tokenResponse.token : null;
+        if (parsedToken) {
+          detailData.data.tokens.push({
+            chain: this.configs.subgraphs[i].chainConfig.name,
+            address: normalizeAddress(parsedToken.id),
+            symbol: parsedToken.symbol,
+            decimals: Number(parsedToken.decimals),
+            logoURI: getDefaultTokenLogoURI(this.configs.subgraphs[i].chainConfig.name, parsedToken.id),
+            totalVolumeUSD: Number(parsedToken[tokenFilters.tokenTradeVolume]),
+            totalLiquidityUSD: Number(parsedToken[tokenFilters.tokenLiquidity]),
+            totalTxCount: Number(parsedToken[tokenFilters.tokenTxCount]),
+          });
+        }
+      }
+
+      // get pool liquidity
 
       // count users
       // try {
@@ -215,6 +290,8 @@ export class UniswapProvider extends CollectorProvider {
       //   });
       // }
     }
+
+    data.detail = detailData;
 
     return data;
   }

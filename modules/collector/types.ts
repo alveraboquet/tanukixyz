@@ -3,12 +3,9 @@ export interface ProtocolTokenomics {
   marketCapUSD: number;
 }
 
-export interface ProtocolDataChange {
-  revenueChangePercentage: number;
-  totalValueLockedChangePercentage: number;
-  volumeInUseChangePercentage: number;
-  userCountChangePercentage: number;
-  transactionCountChangePercentage: number;
+export interface ProtocolDetailData {
+  version: 'univ2' | 'univ3' | 'compound' | 'aave';
+  data: any;
 }
 
 export interface ProtocolData {
@@ -18,16 +15,12 @@ export interface ProtocolData {
   userCount: number;
   transactionCount: number;
 
+  // protocol tokenomics
+  // some protocols don't have any token
+  // this field is not required
   tokenomics?: ProtocolTokenomics;
-  changes?: ProtocolDataChange;
 
-  // bad debts metrics on lending platform
-  badDebtUSD?: number;
-  insolventUserCount?: number;
-
-  revenue?: any;
-  totalValueLocked?: any;
-  volume?: any;
-  user?: any;
-  transaction?: any;
+  // breakdown data about protocol
+  // every protocol have diff type of data
+  detail?: ProtocolDetailData;
 }

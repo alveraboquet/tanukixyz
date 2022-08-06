@@ -28,6 +28,11 @@ export class PancakeswapProvider extends UniswapProvider {
         totalLiquidity: 'totalLiquidityUSD',
         totalTransaction: 'totalTransactions',
       },
+      token: {
+        tokenTradeVolume: 'tradeVolumeUSD',
+        tokenLiquidity: 'totalLiquidity',
+        tokenTxCount: 'totalTransactions',
+      },
     };
   }
 }

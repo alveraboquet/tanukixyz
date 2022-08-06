@@ -21,7 +21,6 @@
     "cmd/**/*.ts",
     "configs/**/*.ts",
     "modules/**/*.ts",
-    "scripts/**/*.ts",
     "providers/**/*.ts",
     "restapi/**/*.ts"
   ],

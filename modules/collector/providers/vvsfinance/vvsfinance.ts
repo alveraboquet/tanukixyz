@@ -23,6 +23,11 @@ export class VvsfinanceProvider extends UniswapProvider {
         totalLiquidity: 'totalLiquidityUSD',
         totalTransaction: 'totalTransactions',
       },
+      token: {
+        tokenTradeVolume: 'tradeVolumeUSD',
+        tokenLiquidity: 'totalLiquidity',
+        tokenTxCount: 'totalTransactions',
+      },
     };
   }
 }

@@ -23,6 +23,11 @@ export class RoninKatanaProvider extends UniswapProvider {
         totalLiquidity: 'totalLiquidityUSD',
         totalTransaction: 'txCount',
       },
+      token: {
+        tokenTradeVolume: 'tradeVolumeUSD',
+        tokenLiquidity: 'totalLiquidity',
+        tokenTxCount: 'txCount',
+      },
     };
   }
 }
