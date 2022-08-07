@@ -56,11 +56,24 @@ export function getAlpacaPoolConfig(
 export function getDefaultTokenAddresses(chain: string): Array<string> {
   const tokenLists: Array<string> = [];
 
+  function checkDupAddress(list: Array<string>, address: string): boolean {
+    for (let item of list) {
+      if (normalizeAddress(item) === normalizeAddress(address)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   if (DefaultTokenLists[chain]) {
     for (let list of DefaultTokenLists[chain].lists) {
       for (let token of list) {
         if (Number(token.chainId) === DefaultTokenLists[chain].chainId) {
-          tokenLists.push(normalizeAddress(token.address));
+          // make sure no dup address
+          if (!checkDupAddress(tokenLists, token.address)) {
+            tokenLists.push(normalizeAddress(token.address));
+          }
         }
       }
     }
