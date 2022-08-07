@@ -7,10 +7,6 @@ export interface EnvConfig {
       globalDataDaily: string;
       globalDataDate: string;
       globalContractEvents: string;
-      globalBlockscanBlocks: string;
-      globalRegistryAddresses: string;
-      globalRegistryAddressSnapshot: string;
-      globalRegistryTransactions: string;
     };
   };
   apiKeys: {
