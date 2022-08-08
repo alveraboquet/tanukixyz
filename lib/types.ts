@@ -18,38 +18,3 @@ export interface ContractEventRawData {
   event: string;
   returnValues: any;
 }
-
-export interface BlockscanBlockInfo {
-  chain: string;
-  blockNumber: number;
-  blockTime: number;
-  transferVolume: number;
-  transactionCount: number;
-  addressList: Array<string>;
-
-  miner?: string;
-  collectedFees?: number;
-  burntFees?: number;
-}
-
-export interface RegistryTransactionData {
-  transactionHash: string;
-  blockNumber: number;
-  timestamp: number;
-  protocol: string;
-  chain: string;
-
-  // protocol data
-  breakdown?: any;
-}
-
-export interface RegistryAddressData {
-  // index
-  chain: string;
-  address: string;
-  protocol: string;
-  timestamp: number;
-  breakdownVersion: 'univ2' | 'univ3' | 'compound';
-
-  breakdown?: any;
-}

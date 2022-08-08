@@ -3,9 +3,16 @@ export interface ProtocolTokenomics {
   marketCapUSD: number;
 }
 
-export interface ProtocolDetailData {
-  version: 'univ2' | 'univ3' | 'compound' | 'aave';
-  data: any;
+export interface ProtocolTokenData {
+  chain: string;
+  address: string;
+  symbol: string;
+  decimals: number;
+  logoURI: string | null;
+
+  volumeUSD: number;
+  liquidityUSD: number;
+  txCount: number;
 }
 
 export interface ProtocolData {
@@ -22,5 +29,7 @@ export interface ProtocolData {
 
   // breakdown data about protocol
   // every protocol have diff type of data
-  detail?: ProtocolDetailData;
+  detail?: {
+    tokens: Array<ProtocolTokenData>;
+  };
 }

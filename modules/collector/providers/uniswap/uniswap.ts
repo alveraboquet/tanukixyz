@@ -4,25 +4,7 @@ import { normalizeAddress } from '../../../../lib/helper';
 import logger from '../../../../lib/logger';
 import { ShareProviders } from '../../../../lib/types';
 import { CollectorProvider } from '../../collector';
-import { ProtocolData, ProtocolDetailData } from '../../types';
-
-export interface UniswapTokenData {
-  chain: string;
-  address: string;
-  symbol: string;
-  decimals: number;
-  logoURI: string | null;
-
-  volumeUSD: number;
-  liquidityUSD: number;
-  txCount: number;
-}
-
-export interface UniswapDetailData extends ProtocolDetailData {
-  data: {
-    tokens: Array<UniswapTokenData>;
-  };
-}
+import { ProtocolData, ProtocolTokenData } from '../../types';
 
 export class UniswapProvider extends CollectorProvider {
   public readonly name: string = 'collector.uniswap';
@@ -153,8 +135,8 @@ export class UniswapProvider extends CollectorProvider {
     subgraph: any,
     fromBlockNumber: number,
     toBlockNumber: number
-  ): Promise<Array<UniswapTokenData>> {
-    let tokenData: Array<UniswapTokenData> = [];
+  ): Promise<Array<ProtocolTokenData>> {
+    let tokenData: Array<ProtocolTokenData> = [];
 
     logger.onDebug({
       source: this.name,
@@ -209,7 +191,7 @@ export class UniswapProvider extends CollectorProvider {
     }
 
     // sort by trading volume
-    tokenData = tokenData.sort(function (a: UniswapTokenData, b: UniswapTokenData) {
+    tokenData = tokenData.sort(function (a: ProtocolTokenData, b: ProtocolTokenData) {
       return a.volumeUSD > b.volumeUSD ? -1 : 1;
     });
 
@@ -223,11 +205,7 @@ export class UniswapProvider extends CollectorProvider {
       volumeInUseUSD: 0,
       userCount: 0,
       transactionCount: 0,
-    };
-
-    const detailData: UniswapDetailData = {
-      version: 'univ2',
-      data: {
+      detail: {
         tokens: [],
       },
     };
@@ -268,122 +246,41 @@ export class UniswapProvider extends CollectorProvider {
 
       // token data
       // we check existed token in list
-      const tokenData: Array<UniswapTokenData> = await this.queryTokenData(
-        providers,
-        subgraph,
-        blockNumberFromTime,
-        blockNumberToTime
-      );
+      if (data.detail) {
+        const tokenData: Array<ProtocolTokenData> = await this.queryTokenData(
+          providers,
+          subgraph,
+          blockNumberFromTime,
+          blockNumberToTime
+        );
 
-      function findDupToken(address: string, tokenList: Array<UniswapTokenData>): number {
-        for (let i = 0; i < tokenList.length; i++) {
-          if (normalizeAddress(address) === normalizeAddress(tokenList[i].address)) {
-            return i;
+        function findDupToken(address: string, tokenList: Array<ProtocolTokenData>): number {
+          for (let i = 0; i < tokenList.length; i++) {
+            if (normalizeAddress(address) === normalizeAddress(tokenList[i].address)) {
+              return i;
+            }
+          }
+
+          return -1;
+        }
+
+        for (const token of tokenData) {
+          const index = findDupToken(token.address, data.detail.tokens);
+          if (index < 0) {
+            data.detail.tokens.push(token);
+          } else {
+            data.detail.tokens[index].volumeUSD += token.volumeUSD;
+            data.detail.tokens[index].liquidityUSD += token.liquidityUSD;
+            data.detail.tokens[index].txCount += token.txCount;
           }
         }
 
-        return -1;
-      }
-
-      for (const token of tokenData) {
-        const index = findDupToken(token.address, detailData.data.tokens);
-        if (index < 0) {
-          detailData.data.tokens.push(token);
-        } else {
-          detailData.data.tokens[index].volumeUSD += token.volumeUSD;
-          detailData.data.tokens[index].liquidityUSD += token.liquidityUSD;
-          detailData.data.tokens[index].txCount += token.txCount;
-        }
+        // sort token by volume
+        data.detail.tokens = data.detail.tokens.sort(function (a: ProtocolTokenData, b: ProtocolTokenData) {
+          return a.volumeUSD > b.volumeUSD ? -1 : 1;
+        });
       }
     }
-
-    for (let i = 0; i < this.configs.subgraphs.length; i++) {
-      // get pool liquidity
-      // count users
-      // try {
-      //   logger.onDebug({
-      //     source: this.name,
-      //     message: 'querying transactions and events',
-      //     props: {
-      //       name: this.configs.name,
-      //       endpoint: this.configs.subgraphs[i].exchange,
-      //     },
-      //   });
-      //
-      //   const addresses: any = {};
-      //
-      //   let startTime = fromTime;
-      //   const limit = this.getQueryRecordLimit();
-      //   while (startTime <= toTime) {
-      //     const transactionsResponses = await providers.subgraph.querySubgraph(
-      //       this.configs.subgraphs[i].exchange,
-      //       `
-      //       {
-      //         transactions(first: ${limit}, where: {timestamp_gte: ${startTime}}, orderBy: timestamp, orderDirection: asc) {
-      //           timestamp
-      //           swaps(first: 1000) {
-      //             sender
-      //             ${this.configs.subgraphs[i].version === 2 ? 'to' : 'recipient'}
-      //           }
-      //           mints(first: 1000) {
-      //             sender
-      //             ${this.configs.subgraphs[i].version === 2 ? 'to' : 'owner'},
-      //           }
-      //           burns(first: 1000) {
-      //             ${this.configs.subgraphs[i].version === 2 ? 'sender' : 'owner'}
-      //             ${this.configs.subgraphs[i].version === 2 ? 'to' : ''}
-      //           }
-      //         }
-      //       }
-      //     `
-      //     );
-      //     const transactions =
-      //       transactionsResponses && transactionsResponses['transactions'] ? transactionsResponses['transactions'] : [];
-      //
-      //     for (let i = 0; i < transactions.length; i++) {
-      //       const events: Array<any> = transactions[i].swaps
-      //         .concat(transactions[i].mints)
-      //         .concat(transactions[i].burns);
-      //       for (let eIdx = 0; eIdx < events.length; eIdx++) {
-      //         if (events[eIdx].sender && !addresses[normalizeAddress(events[eIdx].sender)]) {
-      //           data.userCount += 1;
-      //           addresses[normalizeAddress(events[eIdx].sender)] = true;
-      //         }
-      //         if (events[eIdx].owner && !addresses[normalizeAddress(events[eIdx].owner)]) {
-      //           data.userCount += 1;
-      //           addresses[normalizeAddress(events[eIdx].owner)] = true;
-      //         }
-      //         if (events[eIdx].to && !addresses[normalizeAddress(events[eIdx].to)]) {
-      //           data.userCount += 1;
-      //           addresses[normalizeAddress(events[eIdx].to)] = true;
-      //         }
-      //         if (events[eIdx].recipient && !addresses[normalizeAddress(events[eIdx].recipient)]) {
-      //           data.userCount += 1;
-      //           addresses[normalizeAddress(events[eIdx].recipient)] = true;
-      //         }
-      //       }
-      //     }
-      //
-      //     if (transactions.length > 0) {
-      //       startTime = Number(transactions[transactions.length - 1]['timestamp']) + 1;
-      //     } else {
-      //       // no more records
-      //       break;
-      //     }
-      //   }
-      // } catch (e: any) {
-      //   logger.onDebug({
-      //     source: this.name,
-      //     message: 'failed to count daily users',
-      //     props: {
-      //       name: this.configs.name,
-      //       error: e.message,
-      //     },
-      //   });
-      // }
-    }
-
-    data.detail = detailData;
 
     return data;
   }
