@@ -267,7 +267,9 @@ export class UniswapProvider extends CollectorProvider {
       data.transactionCount += factoryData.transactionCount;
 
       // token data
-      detailData.data.tokens = await this.queryTokenData(providers, subgraph, blockNumberFromTime, blockNumberToTime);
+      detailData.data.tokens = detailData.data.tokens.concat(
+        await this.queryTokenData(providers, subgraph, blockNumberFromTime, blockNumberToTime)
+      );
     }
 
     for (let i = 0; i < this.configs.subgraphs.length; i++) {
