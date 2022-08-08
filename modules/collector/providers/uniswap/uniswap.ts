@@ -267,9 +267,34 @@ export class UniswapProvider extends CollectorProvider {
       data.transactionCount += factoryData.transactionCount;
 
       // token data
-      detailData.data.tokens = detailData.data.tokens.concat(
-        await this.queryTokenData(providers, subgraph, blockNumberFromTime, blockNumberToTime)
+      // we check existed token in list
+      const tokenData: Array<UniswapTokenData> = await this.queryTokenData(
+        providers,
+        subgraph,
+        blockNumberFromTime,
+        blockNumberToTime
       );
+
+      function findDupToken(address: string, tokenList: Array<UniswapTokenData>): number {
+        for (let i = 0; i < tokenList.length; i++) {
+          if (normalizeAddress(address) === normalizeAddress(tokenList[i].address)) {
+            return i;
+          }
+        }
+
+        return -1;
+      }
+
+      for (const token of tokenData) {
+        const index = findDupToken(token.address, detailData.data.tokens);
+        if (index < 0) {
+          detailData.data.tokens.push(token);
+        } else {
+          detailData.data.tokens[index].volumeUSD += token.volumeUSD;
+          detailData.data.tokens[index].liquidityUSD += token.liquidityUSD;
+          detailData.data.tokens[index].txCount += token.txCount;
+        }
+      }
     }
 
     for (let i = 0; i < this.configs.subgraphs.length; i++) {
