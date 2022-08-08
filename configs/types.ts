@@ -117,8 +117,7 @@ export interface BalancerProtocolConfig {
   }>;
 }
 
-export interface RegistryProtocolConfig {
-  name: string;
+export interface CurvePoolConfig extends EventIndexConfig {
+  poolType: 'meta' | 'lending';
+  tokens: Array<TokenConfig>;
 }
-
-export type RegistryTransactionVersion = 'univ2' | 'univ3' | 'compound';
