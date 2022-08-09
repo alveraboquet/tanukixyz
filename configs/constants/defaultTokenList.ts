@@ -11,11 +11,11 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
       },
       avalanche: {
         decimals: 18,
-        address: '',
+        address: '0x49d5c2bdffac6ce2bfdb6640f4f80f226bc10bab',
       },
       fantom: {
         decimals: 18,
-        address: '',
+        address: '0x74b23882a30290451A17c44f4F05243b6b58C76d',
       },
       binance: {
         decimals: 18,
@@ -151,7 +151,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
       },
       avalanche: {
         decimals: 18,
-        address: '',
+        address: '0x514910771af9ca656af840dff83e8264ecf986ca',
       },
       fantom: {
         decimals: 18,
@@ -181,7 +181,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
     chains: {
       ethereum: {
         decimals: 18,
-        address: '',
+        address: '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2',
       },
     },
   },
@@ -191,7 +191,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
     chains: {
       ethereum: {
         decimals: 18,
-        address: '',
+        address: '0x221657776846890989a759ba2973e427dff5c9bb',
       },
     },
   },
@@ -201,7 +201,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
     chains: {
       ethereum: {
         decimals: 18,
-        address: '',
+        address: '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359',
       },
     },
   },
@@ -211,7 +211,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
     chains: {
       ethereum: {
         decimals: 18,
-        address: '',
+        address: '0x6b3595068778dd592e39a122f4f5a5cf09c90fe2',
       },
       fantom: {
         decimals: 18,
@@ -233,7 +233,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
     chains: {
       ethereum: {
         decimals: 18,
-        address: '',
+        address: '0x0000000000085d4780B73119b644AE5ecd22b376',
       },
       fantom: {
         decimals: 18,
@@ -251,7 +251,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
     chains: {
       ethereum: {
         decimals: 18,
-        address: '',
+        address: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
       },
       polygon: {
         decimals: 18,
@@ -269,7 +269,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
     chains: {
       ethereum: {
         decimals: 6,
-        address: '',
+        address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
       },
       avalanche: {
         decimals: 6,
@@ -307,7 +307,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
     chains: {
       ethereum: {
         decimals: 18,
-        address: '',
+        address: '0x8e870d67f660d95d5be530380d0ec0bd388289e1',
       },
     },
   },
@@ -317,7 +317,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
     chains: {
       ethereum: {
         decimals: 6,
-        address: '',
+        address: '0xdac17f958d2ee523a2206206994597c13d831ec7',
       },
       avalanche: {
         decimals: 6,
@@ -355,7 +355,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
     chains: {
       ethereum: {
         decimals: 8,
-        address: '',
+        address: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
       },
       avalanche: {
         decimals: 8,
@@ -393,7 +393,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
     chains: {
       ethereum: {
         decimals: 18,
-        address: '',
+        address: '0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e',
       },
       fantom: {
         decimals: 18,
@@ -411,7 +411,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
     chains: {
       ethereum: {
         decimals: 18,
-        address: '',
+        address: '0xe41d2489571d322189246dafa5ebde1f4699f498',
       },
     },
   },

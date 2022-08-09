@@ -12,7 +12,7 @@ export interface ProtocolTokenData {
 
   volumeUSD: number;
   liquidityUSD: number;
-  txCount: number;
+  transactionCount: number;
 }
 
 export interface ProtocolData {

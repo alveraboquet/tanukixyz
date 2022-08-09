@@ -185,7 +185,7 @@ export class UniswapProvider extends CollectorProvider {
 
           volumeUSD: Number(parsed[tokenFilters.tokenTradeVolume]) - Number(parsed24[tokenFilters.tokenTradeVolume]),
           liquidityUSD: Number(parsed[tokenFilters.tokenLiquidity]),
-          txCount: Number(parsed[tokenFilters.tokenTxCount]) - Number(parsed24[tokenFilters.tokenTxCount]),
+          transactionCount: Number(parsed[tokenFilters.tokenTxCount]) - Number(parsed24[tokenFilters.tokenTxCount]),
         });
       }
     }
@@ -271,7 +271,7 @@ export class UniswapProvider extends CollectorProvider {
           } else {
             data.detail.tokens[index].volumeUSD += token.volumeUSD;
             data.detail.tokens[index].liquidityUSD += token.liquidityUSD;
-            data.detail.tokens[index].txCount += token.txCount;
+            data.detail.tokens[index].transactionCount += token.transactionCount;
           }
         }
 

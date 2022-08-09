@@ -4,13 +4,13 @@ import Web3 from 'web3';
 import CompoundPriceOracle from '../../../../configs/abi/compound/PriceOracle.json';
 import CompoundLendAbi from '../../../../configs/abi/compound/cToken.json';
 import envConfig from '../../../../configs/env';
+import { getTokenFromTokenList } from '../../../../configs/helpers';
 import { CompoundProtocolConfig } from '../../../../configs/types';
 import { getHistoryTokenPriceFromCoingecko, normalizeAddress } from '../../../../lib/helper';
 import logger from '../../../../lib/logger';
 import { ShareProviders } from '../../../../lib/types';
 import { CollectorProvider } from '../../collector';
-import { ProtocolData } from '../../types';
-import { getPoolConfigByAddress } from './helpers';
+import { ProtocolData, ProtocolTokenData } from '../../types';
 
 export class CompoundProvider extends CollectorProvider {
   public readonly name: string = 'collector.compound';
@@ -26,6 +26,10 @@ export class CompoundProvider extends CollectorProvider {
       volumeInUseUSD: 0,
       userCount: 0,
       transactionCount: 0,
+
+      detail: {
+        tokens: [],
+      },
     };
 
     const eventCollection = await providers.database.getCollection(envConfig.database.collections.globalContractEvents);
@@ -34,10 +38,24 @@ export class CompoundProvider extends CollectorProvider {
     const transactions: any = {};
     const historyPrices: any = {};
 
-    for (let poolId = 0; poolId < this.configs.pools.length; poolId++) {
+    for (const poolConfig of this.configs.pools) {
+      const underlyingAddress = normalizeAddress(poolConfig.underlying.chains[poolConfig.chainConfig.name].address);
+      const token: any = getTokenFromTokenList(poolConfig.chainConfig.name, underlyingAddress);
+      const tokenData: ProtocolTokenData = {
+        chain: poolConfig.chainConfig.name,
+        symbol: poolConfig.underlying.symbol,
+        address: underlyingAddress,
+        decimals: poolConfig.underlying.chains[poolConfig.chainConfig.name].decimals,
+        logoURI: token ? token.logoURI : '',
+
+        volumeUSD: 0,
+        liquidityUSD: 0,
+        transactionCount: 0,
+      };
+
       const events = await eventCollection
         .find({
-          contract: normalizeAddress(this.configs.pools[poolId].contractAddress),
+          contract: normalizeAddress(poolConfig.contractAddress),
           timestamp: {
             $gte: fromTime,
             $lt: toTime,
@@ -45,17 +63,6 @@ export class CompoundProvider extends CollectorProvider {
         })
         .sort({ timestamp: -1 }) // get the latest event by index 0
         .toArray();
-      const poolConfig = getPoolConfigByAddress(this.configs.pools[poolId].contractAddress, this.configs.pools);
-      if (!poolConfig) {
-        logger.onDebug({
-          source: this.name,
-          message: 'pool config not found',
-          props: {
-            contract: normalizeAddress(this.configs.pools[poolId].contractAddress),
-          },
-        });
-        continue;
-      }
 
       const web3 = new Web3(
         poolConfig.chainConfig.nodeRpcs.archive
@@ -79,85 +86,66 @@ export class CompoundProvider extends CollectorProvider {
         historyPrice = new BigNumber(underlyingPrice.toString()).dividedBy(1e18).toNumber();
       }
 
-      for (let i = 0; i < events.length; i++) {
+      for (const event of events) {
         // count transaction
-        if (!transactions[events[i].transactionId.split(':')[0]]) {
+        if (!transactions[event.transactionId.split(':')[0]]) {
+          tokenData.transactionCount += 1;
           data.transactionCount += 1;
-          transactions[events[i].transactionId.split(':')[0]] = true;
+          transactions[event.transactionId.split(':')[0]] = true;
         }
 
         // count user
-        if (!addresses[normalizeAddress(events[i].returnValues['minter'])]) {
+        if (!addresses[normalizeAddress(event.returnValues['minter'])]) {
           data.userCount += 1;
-          addresses[normalizeAddress(events[i].returnValues['minter'])] = true;
+          addresses[normalizeAddress(event.returnValues['minter'])] = true;
         }
-        if (!addresses[normalizeAddress(events[i].returnValues['redeemer'])]) {
+        if (!addresses[normalizeAddress(event.returnValues['redeemer'])]) {
           data.userCount += 1;
-          addresses[normalizeAddress(events[i].returnValues['redeemer'])] = true;
+          addresses[normalizeAddress(event.returnValues['redeemer'])] = true;
         }
-        if (!addresses[normalizeAddress(events[i].returnValues['borrower'])]) {
+        if (!addresses[normalizeAddress(event.returnValues['borrower'])]) {
           data.userCount += 1;
-          addresses[normalizeAddress(events[i].returnValues['borrower'])] = true;
+          addresses[normalizeAddress(event.returnValues['borrower'])] = true;
         }
-        if (!addresses[normalizeAddress(events[i].returnValues['payer'])]) {
+        if (!addresses[normalizeAddress(event.returnValues['payer'])]) {
           data.userCount += 1;
-          addresses[normalizeAddress(events[i].returnValues['payer'])] = true;
+          addresses[normalizeAddress(event.returnValues['payer'])] = true;
         }
 
         // count volume
-        switch (events[i].event) {
+        let volume = 0;
+        switch (event.event) {
           case 'Mint': {
-            data.volumeInUseUSD += new BigNumber(events[i].returnValues.mintAmount)
+            volume = new BigNumber(event.returnValues.mintAmount)
               .dividedBy(new BigNumber(10).pow(poolConfig.underlying.chains[poolConfig.chainConfig.name].decimals))
               .multipliedBy(historyPrice)
               .toNumber();
             break;
           }
           case 'Redeem': {
-            data.volumeInUseUSD += new BigNumber(events[i].returnValues.redeemAmount)
+            volume = new BigNumber(event.returnValues.redeemAmount)
               .dividedBy(new BigNumber(10).pow(poolConfig.underlying.chains[poolConfig.chainConfig.name].decimals))
               .multipliedBy(historyPrice)
               .toNumber();
             break;
           }
           case 'Borrow': {
-            data.volumeInUseUSD += new BigNumber(events[i].returnValues.borrowAmount)
+            volume = new BigNumber(event.returnValues.borrowAmount)
               .dividedBy(new BigNumber(10).pow(poolConfig.underlying.chains[poolConfig.chainConfig.name].decimals))
               .multipliedBy(historyPrice)
               .toNumber();
             break;
           }
           case 'RepayBorrow': {
-            data.volumeInUseUSD += new BigNumber(events[i].returnValues.repayAmount)
+            volume = new BigNumber(event.returnValues.repayAmount)
               .dividedBy(new BigNumber(10).pow(poolConfig.underlying.chains[poolConfig.chainConfig.name].decimals))
               .multipliedBy(historyPrice)
               .toNumber();
-
-            // try {
-            //   // count revenue = totalBorrowAfterWithRepay - totalBorrowBeforeRepay
-            //   const contract = new web3.eth.Contract(CompoundLendAbi as any, poolConfig.contractAddress);
-            //   const totalBorrows = await contract.methods.totalBorrows().call(events[i].blockNumber - 1);
-            //   const multiplier = new BigNumber(10).pow(
-            //     poolConfig.underlying.chains[poolConfig.chainConfig.name].decimals
-            //   );
-            //   const borrowBefore = new BigNumber(totalBorrows.toString()).dividedBy(multiplier).toNumber();
-            //   const borrowAfter = new BigNumber(events[i].returnValues.totalBorrows).dividedBy(multiplier).toNumber();
-            //   const repayAmount = new BigNumber(events[i].returnValues.repayAmount).dividedBy(multiplier).toNumber();
-            //   data.revenueUSD +=
-            //     repayAmount + borrowAfter > borrowBefore ? repayAmount + borrowAfter - borrowBefore : 0;
-            // } catch (e: any) {
-            //   logger.onDebug({
-            //     source: this.name,
-            //     message: 'cannot query history data',
-            //     props: {
-            //       chain: poolConfig.chainConfig.name,
-            //       contract: normalizeAddress(poolConfig.contractAddress),
-            //       error: e.message,
-            //     },
-            //   });
-            // }
           }
         }
+
+        data.volumeInUseUSD += volume;
+        tokenData.volumeUSD += volume;
       }
 
       try {
@@ -172,10 +160,11 @@ export class CompoundProvider extends CollectorProvider {
           .dividedBy(new BigNumber(10).pow(poolConfig.underlying.chains[poolConfig.chainConfig.name].decimals))
           .toNumber();
         data.totalValueLockedUSD += underlyingLiquidity * historyPrice;
+        tokenData.liquidityUSD += underlyingLiquidity * historyPrice;
       } catch (e: any) {
         logger.onDebug({
           source: this.name,
-          message: 'cannot query history tvl',
+          message: 'cannot query pool liquidity',
           props: {
             chain: poolConfig.chainConfig.name,
             contract: normalizeAddress(poolConfig.contractAddress),
@@ -183,6 +172,8 @@ export class CompoundProvider extends CollectorProvider {
           },
         });
       }
+
+      data.detail?.tokens.push(tokenData);
     }
 
     return data;
