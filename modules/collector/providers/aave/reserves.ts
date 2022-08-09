@@ -167,6 +167,16 @@ export const ReserveMap: { [key: string]: TokenConfig } = {
   },
   '0x4e3fbd56cd56c3e72c1403e103b45db9da5b9d2b': DefaultTokenList.CVX,
   '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': DefaultTokenList.ETH,
+  '0x111111111117dc0aa78b770fa6a738034120c302': {
+    symbol: '1INCH',
+    coingeckoId: '1inch',
+    chains: {
+      ethereum: {
+        decimals: 18,
+        address: '',
+      },
+    },
+  },
 
   // polygon
   '0x8f3cf7ad23cd3cadbd9735aff958023239c6a063': DefaultTokenList.DAI,

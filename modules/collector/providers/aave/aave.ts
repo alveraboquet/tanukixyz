@@ -3,13 +3,14 @@ import Web3 from 'web3';
 
 import ERC20 from '../../../../configs/abi/ERC20.json';
 import envConfig from '../../../../configs/env';
+import { getTokenFromTokenList } from '../../../../configs/helpers';
 import { AaveProtocolConfig, TokenConfig } from '../../../../configs/types';
 import { getHistoryTokenPriceFromCoingecko, normalizeAddress } from '../../../../lib/helper';
 import logger from '../../../../lib/logger';
 import { ShareProviders } from '../../../../lib/types';
 import { CollectorProvider } from '../../collector';
 import { ProtocolData } from '../../types';
-import { getReserveConfig } from './helpers';
+import { findTokenData, getReserveConfig } from './helpers';
 
 export class AaveProvider extends CollectorProvider {
   public readonly name: string = 'collector.aave';
@@ -25,6 +26,10 @@ export class AaveProvider extends CollectorProvider {
       volumeInUseUSD: 0,
       userCount: 0,
       transactionCount: 0,
+
+      detail: {
+        tokens: [],
+      },
     };
 
     const configs: AaveProtocolConfig = this.configs;
@@ -34,10 +39,10 @@ export class AaveProvider extends CollectorProvider {
     const transactions: any = {};
     const historyPrices: any = {};
 
-    for (let poolId = 0; poolId < configs.pools.length; poolId++) {
+    for (const poolConfig of configs.pools) {
       const events = await eventCollection
         .find({
-          contract: normalizeAddress(this.configs.pools[poolId].contractAddress),
+          contract: normalizeAddress(poolConfig.contractAddress),
           timestamp: {
             $gte: fromTime,
             $lt: toTime,
@@ -46,23 +51,58 @@ export class AaveProvider extends CollectorProvider {
         .sort({ timestamp: -1 }) // get the latest event by index 0
         .toArray();
 
-      for (let i = 0; i < events.length; i++) {
+      for (const event of events) {
+        const reserveAddress = event.returnValues.reserve ? event.returnValues.reserve : event.returnValues['_reserve'];
+        const reserveConfig: TokenConfig | undefined = getReserveConfig(reserveAddress);
+        if (reserveConfig === undefined) {
+          logger.onDebug({
+            source: this.name,
+            message: 'reserve config not found',
+            props: {
+              chain: event.chain,
+              reserve: normalizeAddress(reserveAddress),
+            },
+          });
+          continue;
+        }
+
+        let tokenIndex: number = -1;
+        if (data.detail) {
+          tokenIndex = findTokenData(reserveAddress, data.detail.tokens);
+          if (tokenIndex < 0) {
+            const token: any = getTokenFromTokenList(event.chain, reserveAddress);
+
+            data.detail.tokens.push({
+              chain: event.chain,
+              symbol: reserveConfig.symbol,
+              address: reserveAddress,
+              decimals: reserveConfig.chains[event.chain].decimals,
+              logoURI: token ? token.logoURI : '',
+
+              volumeInUseUSD: 0,
+              totalValueLockedUSD: 0,
+              transactionCount: 0,
+            });
+            tokenIndex = data.detail.tokens.length - 1;
+          }
+        }
+
         // count transaction
-        if (!transactions[events[i].transactionId.split(':')[0]]) {
-          transactions[events[i].transactionId.split(':')[0]] = true;
+        if (!transactions[event.transactionId.split(':')[0]]) {
+          transactions[event.transactionId.split(':')[0]] = true;
           data.transactionCount += 1;
+
+          if (data.detail) {
+            data.detail.tokens[tokenIndex].transactionCount += 1;
+          }
         }
 
         // count user
-        const _user = events[i].returnValues['_user'] ? normalizeAddress(events[i].returnValues['_user']) : null;
-        const _repayer = events[i].returnValues['_repayer']
-          ? normalizeAddress(events[i].returnValues['_repayer'])
-          : null;
-        const user = events[i].returnValues['user'] ? normalizeAddress(events[i].returnValues['user']) : null;
-        const onBehalfOf = events[i].returnValues['onBehalfOf']
-          ? normalizeAddress(events[i].returnValues['onBehalfOf'])
-          : null;
-        const repayer = events[i].returnValues['repayer'] ? normalizeAddress(events[i].returnValues['repayer']) : null;
+        const _user = event.returnValues['_user'] ? normalizeAddress(event.returnValues['_user']) : null;
+        const _repayer = event.returnValues['_repayer'] ? normalizeAddress(event.returnValues['_repayer']) : null;
+        const user = event.returnValues['user'] ? normalizeAddress(event.returnValues['user']) : null;
+        const onBehalfOf = event.returnValues['onBehalfOf'] ? normalizeAddress(event.returnValues['onBehalfOf']) : null;
+        const repayer = event.returnValues['repayer'] ? normalizeAddress(event.returnValues['repayer']) : null;
         if (_user && !addresses[_user]) {
           addresses[_user] = true;
           data.userCount += 1;
@@ -84,22 +124,6 @@ export class AaveProvider extends CollectorProvider {
           data.userCount += 1;
         }
 
-        const reserveAddress = events[i].returnValues.reserve
-          ? events[i].returnValues.reserve
-          : events[i].returnValues['_reserve'];
-        const reserveConfig: TokenConfig | undefined = getReserveConfig(reserveAddress);
-        if (reserveConfig === undefined) {
-          logger.onDebug({
-            source: this.name,
-            message: 'reserve config not found',
-            props: {
-              chain: events[i].chain,
-              reserve: normalizeAddress(reserveAddress),
-            },
-          });
-          continue;
-        }
-
         // get history price
         let historyPrice: number;
         if (historyPrices[reserveConfig.coingeckoId]) {
@@ -110,39 +134,35 @@ export class AaveProvider extends CollectorProvider {
         }
 
         let volume: number = 0;
-        if (events[i].returnValues['_amount']) {
+        if (event.returnValues['_amount']) {
           volume =
-            new BigNumber(events[i].returnValues['_amount'])
-              .dividedBy(new BigNumber(10).pow(reserveConfig.chains[events[i].chain].decimals))
+            new BigNumber(event.returnValues['_amount'])
+              .dividedBy(new BigNumber(10).pow(reserveConfig.chains[event.chain].decimals))
               .toNumber() * historyPrice;
         }
-        if (events[i].returnValues['_amountMinusFees']) {
+        if (event.returnValues['_amountMinusFees']) {
           volume =
-            new BigNumber(events[i].returnValues['_amountMinusFees'])
-              .dividedBy(new BigNumber(10).pow(reserveConfig.chains[events[i].chain].decimals))
+            new BigNumber(event.returnValues['_amountMinusFees'])
+              .dividedBy(new BigNumber(10).pow(reserveConfig.chains[event.chain].decimals))
               .toNumber() * historyPrice;
         }
-        if (events[i].returnValues['amount']) {
+        if (event.returnValues['amount']) {
           volume =
-            new BigNumber(events[i].returnValues['amount'])
-              .dividedBy(new BigNumber(10).pow(reserveConfig.chains[events[i].chain].decimals))
+            new BigNumber(event.returnValues['amount'])
+              .dividedBy(new BigNumber(10).pow(reserveConfig.chains[event.chain].decimals))
               .toNumber() * historyPrice;
         }
 
-        if (volume > 100000000000) {
-          console.info(events[i]);
-          process.exit(0);
+        if (data.detail) {
+          data.detail.tokens[tokenIndex].volumeInUseUSD += volume;
         }
 
         data.volumeInUseUSD += volume;
       }
 
       // count liquidity
-      const web3 = new Web3(configs.pools[poolId].chainConfig.nodeRpcs.default);
-      const poolContract = new web3.eth.Contract(
-        configs.pools[poolId].contractAbi,
-        configs.pools[poolId].contractAddress
-      );
+      const web3 = new Web3(poolConfig.chainConfig.nodeRpcs.default);
+      const poolContract = new web3.eth.Contract(poolConfig.contractAbi, poolConfig.contractAddress);
       let reserveList: any;
       try {
         reserveList = await poolContract.methods.getReserves().call();
@@ -151,15 +171,15 @@ export class AaveProvider extends CollectorProvider {
       }
 
       reserveList = reserveList as Array<string>;
-      for (let i = 0; i < reserveList.length; i++) {
-        const reserveConfig: TokenConfig | undefined = getReserveConfig(reserveList[i]);
+      for (const reserveAddress of reserveList) {
+        const reserveConfig: TokenConfig | undefined = getReserveConfig(reserveAddress);
         if (reserveConfig === undefined) {
           logger.onDebug({
             source: this.name,
             message: 'reserve config not found',
             props: {
-              chain: configs.pools[poolId].chainConfig.name,
-              reserve: normalizeAddress(reserveList[i]),
+              chain: poolConfig.chainConfig.name,
+              reserve: normalizeAddress(reserveAddress),
             },
           });
           continue;
@@ -174,24 +194,45 @@ export class AaveProvider extends CollectorProvider {
         }
 
         let reserveAmount = 0;
-        if (normalizeAddress(reserveList[i]) !== '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee') {
+        if (normalizeAddress(reserveAddress) !== '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee') {
           try {
-            const reserveData = await poolContract.methods.getReserveData(reserveList[i]).call();
-            const reserveContract = new web3.eth.Contract(ERC20 as any, reserveList[i]);
+            const reserveData = await poolContract.methods.getReserveData(reserveAddress).call();
+            const reserveContract = new web3.eth.Contract(ERC20 as any, reserveAddress);
             const reserveBalance = await reserveContract.methods.balanceOf(reserveData.aTokenAddress).call();
             reserveAmount =
               new BigNumber(reserveBalance.toString())
-                .dividedBy(new BigNumber(10).pow(reserveConfig.chains[configs.pools[poolId].chainConfig.name].decimals))
+                .dividedBy(new BigNumber(10).pow(reserveConfig.chains[poolConfig.chainConfig.name].decimals))
                 .toNumber() * historyPrice;
           } catch (e: any) {
             logger.onDebug({
               source: this.name,
               message: 'cannot query reserve data',
               props: {
-                chain: configs.pools[poolId].chainConfig.name,
-                token: normalizeAddress(reserveList[i]),
+                chain: poolConfig.chainConfig.name,
+                token: normalizeAddress(reserveAddress),
               },
             });
+          }
+        }
+
+        if (data.detail) {
+          const tokenIndex = findTokenData(reserveAddress, data.detail.tokens);
+          if (tokenIndex < 0) {
+            const token: any = getTokenFromTokenList(poolConfig.chainConfig.name, reserveAddress);
+
+            data.detail.tokens.push({
+              chain: poolConfig.chainConfig.name,
+              symbol: reserveConfig.symbol,
+              address: reserveAddress,
+              decimals: reserveConfig.chains[poolConfig.chainConfig.name].decimals,
+              logoURI: token ? token.logoURI : '',
+
+              volumeInUseUSD: 0,
+              totalValueLockedUSD: reserveAmount,
+              transactionCount: 0,
+            });
+          } else {
+            data.detail.tokens[tokenIndex].totalValueLockedUSD += reserveAmount;
           }
         }
 

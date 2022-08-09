@@ -48,8 +48,8 @@ export class CompoundProvider extends CollectorProvider {
         decimals: poolConfig.underlying.chains[poolConfig.chainConfig.name].decimals,
         logoURI: token ? token.logoURI : '',
 
-        volumeUSD: 0,
-        liquidityUSD: 0,
+        volumeInUseUSD: 0,
+        totalValueLockedUSD: 0,
         transactionCount: 0,
       };
 
@@ -145,7 +145,7 @@ export class CompoundProvider extends CollectorProvider {
         }
 
         data.volumeInUseUSD += volume;
-        tokenData.volumeUSD += volume;
+        tokenData.volumeInUseUSD += volume;
       }
 
       try {
@@ -160,7 +160,7 @@ export class CompoundProvider extends CollectorProvider {
           .dividedBy(new BigNumber(10).pow(poolConfig.underlying.chains[poolConfig.chainConfig.name].decimals))
           .toNumber();
         data.totalValueLockedUSD += underlyingLiquidity * historyPrice;
-        tokenData.liquidityUSD += underlyingLiquidity * historyPrice;
+        tokenData.totalValueLockedUSD += underlyingLiquidity * historyPrice;
       } catch (e: any) {
         logger.onDebug({
           source: this.name,

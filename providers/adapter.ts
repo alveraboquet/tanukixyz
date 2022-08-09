@@ -40,7 +40,7 @@ export class DefiAdapter implements Provider {
     });
 
     if (this.indexer) {
-      await this.indexer.start({ forceSync: props.forceSync });
+      // await this.indexer.start({ forceSync: props.forceSync });
     }
 
     if (this.collector) {

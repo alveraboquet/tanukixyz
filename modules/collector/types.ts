@@ -10,8 +10,8 @@ export interface ProtocolTokenData {
   decimals: number;
   logoURI: string | null;
 
-  volumeUSD: number;
-  liquidityUSD: number;
+  volumeInUseUSD: number;
+  totalValueLockedUSD: number;
   transactionCount: number;
 }
 

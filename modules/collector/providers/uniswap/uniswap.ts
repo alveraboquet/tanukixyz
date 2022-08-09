@@ -183,8 +183,9 @@ export class UniswapProvider extends CollectorProvider {
           decimals: Number(parsed.decimals),
           logoURI: getDefaultTokenLogoURI(subgraph.chainConfig.name, parsed.id),
 
-          volumeUSD: Number(parsed[tokenFilters.tokenTradeVolume]) - Number(parsed24[tokenFilters.tokenTradeVolume]),
-          liquidityUSD: Number(parsed[tokenFilters.tokenLiquidity]),
+          volumeInUseUSD:
+            Number(parsed[tokenFilters.tokenTradeVolume]) - Number(parsed24[tokenFilters.tokenTradeVolume]),
+          totalValueLockedUSD: Number(parsed[tokenFilters.tokenLiquidity]),
           transactionCount: Number(parsed[tokenFilters.tokenTxCount]) - Number(parsed24[tokenFilters.tokenTxCount]),
         });
       }
@@ -192,7 +193,7 @@ export class UniswapProvider extends CollectorProvider {
 
     // sort by trading volume
     tokenData = tokenData.sort(function (a: ProtocolTokenData, b: ProtocolTokenData) {
-      return a.volumeUSD > b.volumeUSD ? -1 : 1;
+      return a.volumeInUseUSD > b.volumeInUseUSD ? -1 : 1;
     });
 
     return tokenData;
@@ -269,15 +270,15 @@ export class UniswapProvider extends CollectorProvider {
           if (index < 0) {
             data.detail.tokens.push(token);
           } else {
-            data.detail.tokens[index].volumeUSD += token.volumeUSD;
-            data.detail.tokens[index].liquidityUSD += token.liquidityUSD;
+            data.detail.tokens[index].volumeInUseUSD += token.volumeInUseUSD;
+            data.detail.tokens[index].totalValueLockedUSD += token.totalValueLockedUSD;
             data.detail.tokens[index].transactionCount += token.transactionCount;
           }
         }
 
         // sort token by volume
         data.detail.tokens = data.detail.tokens.sort(function (a: ProtocolTokenData, b: ProtocolTokenData) {
-          return a.volumeUSD > b.volumeUSD ? -1 : 1;
+          return a.volumeInUseUSD > b.volumeInUseUSD ? -1 : 1;
         });
       }
     }
