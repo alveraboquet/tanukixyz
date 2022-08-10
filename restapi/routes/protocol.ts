@@ -9,12 +9,11 @@ import { removeIdFields, writeResponseData, writeResponseError } from '../helper
 export function getRouter(providers: ShareProviders): Router {
   const router = Router({ mergeParams: true });
 
-  // daily endpoint doesn't return full data
-  router.get('/date/:protocol', async (request, response) => {
+  router.get('/:protocol', async (request, response) => {
     const protocol = request.params.protocol || '';
 
     // query cache
-    const cacheKey = `${protocol}.date.metrics`;
+    const cacheKey = `${protocol}.data`;
     const cacheData = getCache(cacheKey);
     if (cacheData) {
       writeResponseData(response, {
@@ -25,24 +24,44 @@ export function getRouter(providers: ShareProviders): Router {
       return;
     }
 
+    const dailyMetricCollection = await providers.database.getCollection(
+      envConfig.database.collections.globalDataDaily
+    );
     const dateMetricCollection = await providers.database.getCollection(envConfig.database.collections.globalDataDate);
 
     try {
-      const documents: Array<any> = await dateMetricCollection
+      const data: any = {};
+
+      const dailyData: Array<any> = await dailyMetricCollection
         .find({
           module: 'defi',
           name: protocol,
         })
         .toArray();
 
+      if (dailyData.length > 0) {
+        data.daily = dailyData[0];
+      } else {
+        data.daily = null;
+      }
+
+      const dateData: Array<any> = await dateMetricCollection
+        .find({
+          module: 'defi',
+          name: protocol,
+        })
+        .toArray();
+
+      data.date = removeIdFields(dateData);
+
       writeResponseData(response, {
         status: 200,
-        data: documents,
-        removeIdField: true,
+        data: data,
+        removeIdField: false,
       });
 
       // set caching
-      setCache(cacheKey, removeIdFields(documents));
+      setCache(cacheKey, removeIdFields(data));
     } catch (e: any) {
       logger.onError({
         source: 'router.metrics',
