@@ -10,6 +10,7 @@ import { removeIdFields, writeResponseData, writeResponseError } from '../helper
 export function getRouter(providers: ShareProviders): Router {
   const router = Router({ mergeParams: true });
 
+  // daily endpoint doesn't return full data
   router.get('/daily/:module', async (request, response) => {
     const module = request.params.module || 'unknown';
 
@@ -35,14 +36,22 @@ export function getRouter(providers: ShareProviders): Router {
           module: module,
         })
         .toArray();
+
+      // remove detail data for lightweight transmission
+      const beautyData: Array<any> = [];
+      for (const item of documents) {
+        delete item.detail;
+        beautyData.push(item);
+      }
+
       writeResponseData(response, {
         status: 200,
-        data: documents,
+        data: beautyData,
         removeIdField: true,
       });
 
       // set caching
-      setCache(cacheKey, removeIdFields(documents));
+      setCache(cacheKey, removeIdFields(beautyData));
     } catch (e: any) {
       logger.onError({
         source: 'router.metrics',
@@ -101,9 +110,17 @@ export function getRouter(providers: ShareProviders): Router {
               })
               .sort({ date: -1 })
               .toArray();
+
+      // remove detail data for lightweight transmission
+      const beautyData: Array<any> = [];
+      for (const item of documents) {
+        delete item.detail;
+        beautyData.push(item);
+      }
+
       writeResponseData(response, {
         status: 200,
-        data: documents,
+        data: beautyData,
         removeIdField: true,
       });
     } catch (e: any) {
