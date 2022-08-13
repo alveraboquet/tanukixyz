@@ -184,9 +184,16 @@ export class UniswapProvider extends CollectorProvider {
       if (parsed && parsed24) {
         // uniswap v2 need multiple liquidity by ethPrice
         let liquidity = Number(parsed[tokenFilters.tokenLiquidity]);
-        if (subgraph.version === 2) {
-          const ethPrice = await getNativeTokenPrice(subgraph.chainConfig.name, timestamp);
+
+        // quickswap use ETH as native token
+        if (this.configs.name === 'quickswap') {
+          const ethPrice = await getNativeTokenPrice('ethereum', timestamp);
           liquidity = Number(parsed[derivedETHFilter]) * liquidity * ethPrice;
+        } else {
+          if (subgraph.version === 2) {
+            const ethPrice = await getNativeTokenPrice(subgraph.chainConfig.name, timestamp);
+            liquidity = Number(parsed[derivedETHFilter]) * liquidity * ethPrice;
+          }
         }
 
         tokenData.push({
