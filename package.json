@@ -7,7 +7,7 @@
     "build": "rm -rf ./build && tsc",
     "compile": "rm -rf ./build && tsc",
     "pretty": "prettier --write ./",
-    "test": "export SILENT_MODE=true && ts-mocha --timeout 0 'tests/**/*.ts'",
+    "test": "export SILENT_MODE=true && ts-mocha --timeout 0 --exit 'tests/**/*.ts'",
     "start": "node build/cmd/index.js"
   },
   "dependencies": {

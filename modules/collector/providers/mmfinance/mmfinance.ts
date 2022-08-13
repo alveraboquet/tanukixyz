@@ -1,16 +1,11 @@
 import { UniswapProtocolConfig } from '../../../../configs/types';
 import { UniswapProvider } from '../uniswap/uniswap';
 
-export class PancakeswapProvider extends UniswapProvider {
-  public readonly name: string = 'collector.pancakeswap';
+export class MmfinanceProvider extends UniswapProvider {
+  public readonly name: string = 'collector.mmfinance';
 
   constructor(configs: UniswapProtocolConfig) {
     super(configs);
-  }
-
-  // due to streamingfast performance
-  public getQueryRecordLimit(): number {
-    return 50;
   }
 
   // override this methods match with new project definitions
@@ -32,7 +27,7 @@ export class PancakeswapProvider extends UniswapProvider {
         tokenTradeVolume: 'tradeVolumeUSD',
         tokenLiquidity: 'totalLiquidity',
         tokenTxCount: 'totalTransactions',
-        derivedETH: 'derivedBNB',
+        derivedETH: 'derivedCRO',
       },
     };
   }

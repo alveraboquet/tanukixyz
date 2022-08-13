@@ -27,6 +27,7 @@ export class VvsfinanceProvider extends UniswapProvider {
         tokenTradeVolume: 'tradeVolumeUSD',
         tokenLiquidity: 'totalLiquidity',
         tokenTxCount: 'totalTransactions',
+        derivedETH: 'derivedCRO',
       },
     };
   }

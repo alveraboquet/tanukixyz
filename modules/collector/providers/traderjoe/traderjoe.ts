@@ -2,7 +2,7 @@ import { CompoundProtocolConfig, TokenConfig, UniswapProtocolConfig } from '../.
 import { CollectorProvider, GetProtocolDataProps } from '../../collector';
 import { ProtocolData } from '../../types';
 import { CompoundProvider } from '../compound/compound';
-import { SushiswapProvider } from '../sushiswap/sushiswap';
+import { UniswapProvider } from '../uniswap/uniswap';
 
 export interface TraderjoeProtocolConfig {
   name: string;
@@ -11,16 +11,48 @@ export interface TraderjoeProtocolConfig {
   tokenomics: TokenConfig;
 }
 
+class TraderjoeDexProvider extends UniswapProvider {
+  public readonly name: string = 'collector.traderjoe';
+
+  constructor(configs: UniswapProtocolConfig) {
+    super(configs);
+  }
+
+  // override this methods match with new project definitions
+  public getFilters(): any {
+    return {
+      dayData: {
+        dayDataVar: 'dayDatas',
+        totalVolume: 'volumeUSD',
+        totalLiquidity: 'liquidityUSD',
+        totalTransaction: 'txCount',
+      },
+      factory: {
+        factoryVar: 'factories',
+        totalVolume: 'volumeUSD',
+        totalLiquidity: 'liquidityUSD',
+        totalTransaction: 'txCount',
+      },
+      token: {
+        tokenTradeVolume: 'volumeUSD',
+        tokenLiquidity: 'liquidity',
+        tokenTxCount: 'txCount',
+        derivedETH: 'derivedAVAX',
+      },
+    };
+  }
+}
+
 export class TraderjoeProvider extends CollectorProvider {
   public readonly name: string = 'collector.traderjoe';
 
-  private exchangeProvider: SushiswapProvider;
+  private exchangeProvider: TraderjoeDexProvider;
   private lendingProvider: CompoundProvider;
 
   constructor(configs: TraderjoeProtocolConfig) {
     super(configs);
 
-    this.exchangeProvider = new SushiswapProvider(this.configs.exchange);
+    this.exchangeProvider = new TraderjoeDexProvider(this.configs.exchange);
     this.lendingProvider = new CompoundProvider(this.configs.lending);
   }
 

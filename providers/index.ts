@@ -31,6 +31,7 @@ import { VenusConfigs } from '../configs/protocols/venus';
 import { VvsfinanceConfigs } from '../configs/protocols/vvsfinance';
 import { ShareProviders } from '../lib/types';
 import { RoninKatanaProvider } from '../modules/collector/providers/katana/katana';
+import { MmfinanceProvider } from '../modules/collector/providers/mmfinance/mmfinance';
 import { PancakeswapProvider } from '../modules/collector/providers/pancakeswap/pancakeswap';
 import { SushiswapProvider } from '../modules/collector/providers/sushiswap/sushiswap';
 import { UniswapProvider } from '../modules/collector/providers/uniswap/uniswap';
@@ -71,7 +72,7 @@ export function getAdapter(protocol: string, providers: ShareProviders): DefiAda
     case 'vvsfinance':
       return new UniswapAdapter(VvsfinanceConfigs, providers, new VvsfinanceProvider(VvsfinanceConfigs));
     case 'mmfinance':
-      return new UniswapAdapter(MmfinanceConfigs, providers, new PancakeswapProvider(MmfinanceConfigs));
+      return new UniswapAdapter(MmfinanceConfigs, providers, new MmfinanceProvider(MmfinanceConfigs));
     case 'katana':
       return new UniswapAdapter(RoninKatanaConfigs, providers, new RoninKatanaProvider(RoninKatanaConfigs));
     case 'traderjoe':

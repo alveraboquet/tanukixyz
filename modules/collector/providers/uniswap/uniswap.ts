@@ -1,6 +1,6 @@
 import { getDefaultTokenAddresses } from '../../../../configs/helpers';
 import { UniswapProtocolConfig } from '../../../../configs/types';
-import { normalizeAddress } from '../../../../lib/helper';
+import { getNativeTokenPrice, normalizeAddress } from '../../../../lib/helper';
 import logger from '../../../../lib/logger';
 import { ShareProviders } from '../../../../lib/types';
 import { CollectorProvider } from '../../collector';
@@ -38,6 +38,7 @@ export class UniswapProvider extends CollectorProvider {
         tokenTradeVolume: 'tradeVolumeUSD',
         tokenLiquidity: 'totalLiquidity',
         tokenTxCount: 'txCount',
+        derivedETH: 'derivedETH',
       },
 
       // support uniswap v3 queries
@@ -133,6 +134,7 @@ export class UniswapProvider extends CollectorProvider {
   private async queryTokenData(
     providers: ShareProviders,
     subgraph: any,
+    timestamp: number,
     fromBlockNumber: number,
     toBlockNumber: number
   ): Promise<Array<ProtocolTokenData>> {
@@ -149,6 +151,7 @@ export class UniswapProvider extends CollectorProvider {
 
     const tokenAddresses: Array<string> = getDefaultTokenAddresses(subgraph.chainConfig.name);
     const tokenFilters: any = subgraph.version === 2 ? this.getFilters().token : this.getFilters().v3.token;
+    const derivedETHFilter: string = tokenFilters.derivedETH;
 
     for (let address of tokenAddresses) {
       const tokenQuery = `
@@ -160,6 +163,7 @@ export class UniswapProvider extends CollectorProvider {
             ${tokenFilters.tokenTradeVolume}
             ${tokenFilters.tokenLiquidity}
             ${tokenFilters.tokenTxCount}
+            ${subgraph.version === 2 ? derivedETHFilter : ''}
           }
           token24: token(block: {number: ${fromBlockNumber}}, id: "${normalizeAddress(address)}") {
             id
@@ -168,6 +172,7 @@ export class UniswapProvider extends CollectorProvider {
             ${tokenFilters.tokenTradeVolume}
             ${tokenFilters.tokenLiquidity}
             ${tokenFilters.tokenTxCount}
+            ${subgraph.version === 2 ? derivedETHFilter : ''}
           }
         }
       `;
@@ -175,7 +180,15 @@ export class UniswapProvider extends CollectorProvider {
       const tokenResponse = await providers.subgraph.querySubgraph(subgraph.exchange, tokenQuery);
       const parsed: any = tokenResponse && tokenResponse.token ? tokenResponse.token : null;
       const parsed24: any = tokenResponse && tokenResponse.token24 ? tokenResponse.token24 : null;
+
       if (parsed && parsed24) {
+        // uniswap v2 need multiple liquidity by ethPrice
+        let liquidity = Number(parsed[tokenFilters.tokenLiquidity]);
+        if (subgraph.version === 2) {
+          const ethPrice = await getNativeTokenPrice(subgraph.chainConfig.name, timestamp);
+          liquidity = Number(parsed[derivedETHFilter]) * liquidity * ethPrice;
+        }
+
         tokenData.push({
           chain: subgraph.chainConfig.name,
           address: normalizeAddress(parsed.id),
@@ -184,7 +197,7 @@ export class UniswapProvider extends CollectorProvider {
 
           volumeInUseUSD:
             Number(parsed[tokenFilters.tokenTradeVolume]) - Number(parsed24[tokenFilters.tokenTradeVolume]),
-          totalValueLockedUSD: Number(parsed[tokenFilters.tokenLiquidity]),
+          totalValueLockedUSD: liquidity,
           transactionCount: Number(parsed[tokenFilters.tokenTxCount]) - Number(parsed24[tokenFilters.tokenTxCount]),
         });
       }
@@ -250,6 +263,7 @@ export class UniswapProvider extends CollectorProvider {
         const tokenData: Array<ProtocolTokenData> = await this.queryTokenData(
           providers,
           subgraph,
+          toTime,
           blockNumberFromTime,
           blockNumberToTime
         );
