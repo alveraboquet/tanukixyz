@@ -8,7 +8,6 @@ export interface ProtocolTokenData {
   address: string;
   symbol: string;
   decimals: number;
-  logoURI: string | null;
 
   volumeInUseUSD: number;
   totalValueLockedUSD: number;

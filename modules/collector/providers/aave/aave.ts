@@ -3,14 +3,13 @@ import Web3 from 'web3';
 
 import ERC20 from '../../../../configs/abi/ERC20.json';
 import envConfig from '../../../../configs/env';
-import { getTokenFromTokenList } from '../../../../configs/helpers';
 import { AaveProtocolConfig, TokenConfig } from '../../../../configs/types';
 import { getHistoryTokenPriceFromCoingecko, normalizeAddress } from '../../../../lib/helper';
 import logger from '../../../../lib/logger';
 import { ShareProviders } from '../../../../lib/types';
 import { CollectorProvider } from '../../collector';
-import { ProtocolData } from '../../types';
-import { findTokenData, getReserveConfig } from './helpers';
+import { ProtocolData, ProtocolTokenData } from '../../types';
+import { getReserveConfig } from './helpers';
 
 export class AaveProvider extends CollectorProvider {
   public readonly name: string = 'collector.aave';
@@ -38,6 +37,7 @@ export class AaveProvider extends CollectorProvider {
     const addresses: any = {};
     const transactions: any = {};
     const historyPrices: any = {};
+    const tokens: any = {};
 
     for (const poolConfig of configs.pools) {
       const events = await eventCollection
@@ -52,6 +52,9 @@ export class AaveProvider extends CollectorProvider {
         .toArray();
 
       for (const event of events) {
+        // will support liquidation volume later, skip for now
+        if (event.event === 'LiquidationCall') continue;
+
         const reserveAddress = event.returnValues.reserve ? event.returnValues.reserve : event.returnValues['_reserve'];
         const reserveConfig: TokenConfig | undefined = getReserveConfig(reserveAddress);
         if (reserveConfig === undefined) {
@@ -66,34 +69,24 @@ export class AaveProvider extends CollectorProvider {
           continue;
         }
 
-        let tokenIndex: number = -1;
-        if (data.detail) {
-          tokenIndex = findTokenData(reserveAddress, data.detail.tokens);
-          if (tokenIndex < 0) {
-            const token: any = getTokenFromTokenList(event.chain, reserveAddress);
-
-            data.detail.tokens.push({
-              chain: event.chain,
-              symbol: reserveConfig.symbol,
-              address: reserveAddress,
-              decimals: reserveConfig.chains[event.chain].decimals,
-              logoURI: token ? token.logoURI : '',
-
-              volumeInUseUSD: 0,
-              totalValueLockedUSD: 0,
-              transactionCount: 0,
-            });
-            tokenIndex = data.detail.tokens.length - 1;
-          }
-        }
-
         // count transaction
         if (!transactions[event.transactionId.split(':')[0]]) {
           transactions[event.transactionId.split(':')[0]] = true;
           data.transactionCount += 1;
 
-          if (data.detail) {
-            data.detail.tokens[tokenIndex].transactionCount += 1;
+          if (tokens[`${poolConfig.chainConfig.name}:${normalizeAddress(reserveAddress)}`]) {
+            tokens[`${poolConfig.chainConfig.name}:${normalizeAddress(reserveAddress)}`].transactionCount += 1;
+          } else {
+            tokens[`${poolConfig.chainConfig.name}:${normalizeAddress(reserveAddress)}`] = {
+              chain: poolConfig.chainConfig.name,
+              symbol: reserveConfig.symbol,
+              address: reserveAddress,
+              decimals: reserveConfig.chains[poolConfig.chainConfig.name].decimals,
+
+              volumeInUseUSD: 0,
+              totalValueLockedUSD: 0,
+              transactionCount: 1,
+            };
           }
         }
 
@@ -153,8 +146,19 @@ export class AaveProvider extends CollectorProvider {
               .toNumber() * historyPrice;
         }
 
-        if (data.detail) {
-          data.detail.tokens[tokenIndex].volumeInUseUSD += volume;
+        if (tokens[`${poolConfig.chainConfig.name}:${normalizeAddress(reserveAddress)}`]) {
+          tokens[`${poolConfig.chainConfig.name}:${normalizeAddress(reserveAddress)}`].volumeInUseUSD += volume;
+        } else {
+          tokens[`${poolConfig.chainConfig.name}:${normalizeAddress(reserveAddress)}`] = {
+            chain: poolConfig.chainConfig.name,
+            symbol: reserveConfig.symbol,
+            address: reserveAddress,
+            decimals: reserveConfig.chains[poolConfig.chainConfig.name].decimals,
+
+            volumeInUseUSD: volume,
+            totalValueLockedUSD: 0,
+            transactionCount: 0,
+          };
         }
 
         data.volumeInUseUSD += volume;
@@ -215,30 +219,31 @@ export class AaveProvider extends CollectorProvider {
           }
         }
 
-        if (data.detail) {
-          const tokenIndex = findTokenData(reserveAddress, data.detail.tokens);
-          if (tokenIndex < 0) {
-            const token: any = getTokenFromTokenList(poolConfig.chainConfig.name, reserveAddress);
+        if (tokens[`${poolConfig.chainConfig.name}:${normalizeAddress(reserveAddress)}`]) {
+          tokens[`${poolConfig.chainConfig.name}:${normalizeAddress(reserveAddress)}`].totalValueLockedUSD +=
+            reserveAmount;
+        } else {
+          tokens[`${poolConfig.chainConfig.name}:${normalizeAddress(reserveAddress)}`] = {
+            chain: poolConfig.chainConfig.name,
+            symbol: reserveConfig.symbol,
+            address: reserveAddress,
+            decimals: reserveConfig.chains[poolConfig.chainConfig.name].decimals,
 
-            data.detail.tokens.push({
-              chain: poolConfig.chainConfig.name,
-              symbol: reserveConfig.symbol,
-              address: reserveAddress,
-              decimals: reserveConfig.chains[poolConfig.chainConfig.name].decimals,
-              logoURI: token ? token.logoURI : '',
-
-              volumeInUseUSD: 0,
-              totalValueLockedUSD: reserveAmount,
-              transactionCount: 0,
-            });
-          } else {
-            data.detail.tokens[tokenIndex].totalValueLockedUSD += reserveAmount;
-          }
+            volumeInUseUSD: reserveAmount,
+            totalValueLockedUSD: 0,
+            transactionCount: 0,
+          };
         }
 
         data.totalValueLockedUSD += reserveAmount;
       }
     }
+
+    for (const [, token] of Object.entries(tokens)) {
+      data.detail?.tokens.push(token as ProtocolTokenData);
+    }
+
+    console.info(data.detail?.tokens);
 
     return data;
   }

@@ -4,7 +4,6 @@ import Web3 from 'web3';
 import CompoundPriceOracle from '../../../../configs/abi/compound/PriceOracle.json';
 import CompoundLendAbi from '../../../../configs/abi/compound/cToken.json';
 import envConfig from '../../../../configs/env';
-import { getTokenFromTokenList } from '../../../../configs/helpers';
 import { CompoundProtocolConfig } from '../../../../configs/types';
 import { getHistoryTokenPriceFromCoingecko, normalizeAddress } from '../../../../lib/helper';
 import logger from '../../../../lib/logger';
@@ -40,13 +39,11 @@ export class CompoundProvider extends CollectorProvider {
 
     for (const poolConfig of this.configs.pools) {
       const underlyingAddress = normalizeAddress(poolConfig.underlying.chains[poolConfig.chainConfig.name].address);
-      const token: any = getTokenFromTokenList(poolConfig.chainConfig.name, underlyingAddress);
       const tokenData: ProtocolTokenData = {
         chain: poolConfig.chainConfig.name,
         symbol: poolConfig.underlying.symbol,
         address: underlyingAddress,
         decimals: poolConfig.underlying.chains[poolConfig.chainConfig.name].decimals,
-        logoURI: token ? token.logoURI : '',
 
         volumeInUseUSD: 0,
         totalValueLockedUSD: 0,

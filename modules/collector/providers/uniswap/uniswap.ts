@@ -1,4 +1,4 @@
-import { getDefaultTokenAddresses, getDefaultTokenLogoURI } from '../../../../configs/helpers';
+import { getDefaultTokenAddresses } from '../../../../configs/helpers';
 import { UniswapProtocolConfig } from '../../../../configs/types';
 import { normalizeAddress } from '../../../../lib/helper';
 import logger from '../../../../lib/logger';
@@ -181,7 +181,6 @@ export class UniswapProvider extends CollectorProvider {
           address: normalizeAddress(parsed.id),
           symbol: parsed.symbol,
           decimals: Number(parsed.decimals),
-          logoURI: getDefaultTokenLogoURI(subgraph.chainConfig.name, parsed.id),
 
           volumeInUseUSD:
             Number(parsed[tokenFilters.tokenTradeVolume]) - Number(parsed24[tokenFilters.tokenTradeVolume]),
