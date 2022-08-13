@@ -179,7 +179,7 @@ export class UniswapProvider extends CollectorProvider {
         tokenData.push({
           chain: subgraph.chainConfig.name,
           address: normalizeAddress(parsed.id),
-          symbol: parsed.symbol,
+          symbol: parsed.symbol.toUpperCase(),
           decimals: Number(parsed.decimals),
 
           volumeInUseUSD:
