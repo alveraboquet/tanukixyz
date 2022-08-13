@@ -1,5 +1,5 @@
-import ArbitrumDefaultPolygon from '../lists/arbitrum-default.json';
-import CeloDefaultPolygon from '../lists/celo-default.json';
+import ArbitrumDefault from '../lists/arbitrum-default.json';
+import CeloDefault from '../lists/celo-default.json';
 import PancakeswapDefault from '../lists/pancakeswap-default.json';
 import SushiswapDefaultFantom from '../lists/sushiswap-fantom.json';
 import TraderjoeDefault from '../lists/traderjoe-default.json';
@@ -34,10 +34,10 @@ export const DefaultTokenLists: { [key: string]: TokenList } = {
   },
   arbitrum: {
     chainId: 42161,
-    lists: [ArbitrumDefaultPolygon],
+    lists: [ArbitrumDefault],
   },
   celo: {
-    chainId: 44787,
-    lists: [CeloDefaultPolygon],
+    chainId: 42220,
+    lists: [CeloDefault],
   },
 };

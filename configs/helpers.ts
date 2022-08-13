@@ -81,31 +81,3 @@ export function getDefaultTokenAddresses(chain: string): Array<string> {
 
   return tokenLists;
 }
-
-export function getDefaultTokenLogoURI(chain: string, address: string): string | null {
-  if (DefaultTokenLists[chain]) {
-    for (let list of DefaultTokenLists[chain].lists) {
-      for (let token of list) {
-        if (normalizeAddress(address) === normalizeAddress(token.address)) {
-          return token.logoURI;
-        }
-      }
-    }
-  }
-
-  return null;
-}
-
-export function getTokenFromTokenList(chain: string, address: string): any {
-  if (DefaultTokenLists[chain]) {
-    for (let list of DefaultTokenLists[chain].lists) {
-      for (let token of list) {
-        if (normalizeAddress(address) === normalizeAddress(token.address)) {
-          return token;
-        }
-      }
-    }
-  }
-
-  return null;
-}
