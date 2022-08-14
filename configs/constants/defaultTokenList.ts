@@ -693,6 +693,10 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
         decimals: 18,
         address: '',
       },
+      avalanche: {
+        decimals: 18,
+        address: '',
+      },
     },
   },
   DOGE: {
@@ -984,6 +988,10 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
         address: '',
       },
       polygon: {
+        decimals: 18,
+        address: '',
+      },
+      avalanche: {
         decimals: 18,
         address: '',
       },

@@ -42,6 +42,7 @@ export class AaveProvider extends CollectorProvider {
     for (const poolConfig of configs.pools) {
       const events = await eventCollection
         .find({
+          chain: poolConfig.chainConfig.name,
           contract: normalizeAddress(poolConfig.contractAddress),
           timestamp: {
             $gte: fromTime,
@@ -52,10 +53,11 @@ export class AaveProvider extends CollectorProvider {
         .toArray();
 
       for (const event of events) {
-        // will support liquidation volume later, skip for now
-        if (event.event === 'LiquidationCall') continue;
-
         const reserveAddress = event.returnValues.reserve ? event.returnValues.reserve : event.returnValues['_reserve'];
+
+        // will support liquidation volume later, skip for now
+        if (event.event === 'LiquidationCall' || !reserveAddress) continue;
+
         const reserveConfig: TokenConfig | undefined = getReserveConfig(reserveAddress);
         if (reserveConfig === undefined) {
           logger.onDebug({
@@ -67,6 +69,12 @@ export class AaveProvider extends CollectorProvider {
             },
           });
           continue;
+        }
+
+        if (!reserveConfig.chains[poolConfig.chainConfig.name]) {
+          console.info(poolConfig);
+          console.info(reserveConfig);
+          console.info(event);
         }
 
         // count transaction
@@ -238,6 +246,8 @@ export class AaveProvider extends CollectorProvider {
         data.totalValueLockedUSD += reserveAmount;
       }
     }
+
+    console.info(tokens);
 
     for (const [, token] of Object.entries(tokens)) {
       data.detail?.tokens.push(token as ProtocolTokenData);
