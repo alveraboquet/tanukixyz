@@ -247,13 +247,9 @@ export class AaveProvider extends CollectorProvider {
       }
     }
 
-    console.info(tokens);
-
     for (const [, token] of Object.entries(tokens)) {
       data.detail?.tokens.push(token as ProtocolTokenData);
     }
-
-    console.info(data.detail?.tokens);
 
     return data;
   }
