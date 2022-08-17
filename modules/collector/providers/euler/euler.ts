@@ -1,7 +1,6 @@
 import BigNumber from 'bignumber.js';
 
 import { EulerProtocolConfig } from '../../../../configs/types';
-import { normalizeAddress } from '../../../../lib/helper';
 import logger from '../../../../lib/logger';
 import { ShareProviders } from '../../../../lib/types';
 import { CollectorProvider } from '../../collector';
@@ -59,25 +58,30 @@ export class EulerProvider extends CollectorProvider {
 			`;
         const response = await providers.subgraph.querySubgraph(this.configs.graphEndpoint as string, query);
 
-        if (response['deposit'].length > 0) {
-          data.volumeInUseUSD += new BigNumber(response['deposit'][0].totalUsdAmount).dividedBy(1e18).toNumber();
-          data.transactionCount += Number(response['deposit'][0].count);
-        }
-        if (response['withdraw'].length > 0) {
-          data.volumeInUseUSD += new BigNumber(response['withdraw'][0].totalUsdAmount).dividedBy(1e18).toNumber();
-          data.transactionCount += Number(response['withdraw'][0].count);
-        }
-        if (response['borrow'].length > 0) {
-          data.volumeInUseUSD += new BigNumber(response['borrow'][0].totalUsdAmount).dividedBy(1e18).toNumber();
-          data.transactionCount += Number(response['borrow'][0].count);
-        }
-        if (response['repay'].length > 0) {
-          data.volumeInUseUSD += new BigNumber(response['repay'][0].totalUsdAmount).dividedBy(1e18).toNumber();
-          data.transactionCount += Number(response['repay'][0].count);
+        const deposits: Array<any> = response && response.deposit ? response.deposit : [];
+        const withdraws: Array<any> = response && response.withdraw ? response.withdraw : [];
+        const borrows: Array<any> = response && response.borrow ? response.borrow : [];
+        const repays: Array<any> = response && response.repay ? response.repay : [];
+
+        const events: Array<any> = deposits.concat(withdraws).concat(borrows).concat(repays);
+
+        const overview: any = response && response.overview && response.overview.length > 0 ? response.overview[0] : null;
+
+        for (const event of events) {
+          let volume = new BigNumber(event.totalUsdAmount).dividedBy(1e18);
+
+          // handle subgraph data errors
+          if (volume.gte(1e18)) {
+            volume = volume.dividedBy(1e18);
+          }
+          data.volumeInUseUSD += volume.toNumber();
+          data.transactionCount += Number(event.count);
         }
 
-        // count liquidity
-        data.totalValueLockedUSD = new BigNumber(response['overview'][0].totalBalancesUsd).dividedBy(1e18).toNumber();
+        if (overview) {
+          // count liquidity
+          data.totalValueLockedUSD = new BigNumber(overview.totalBalancesUsd).dividedBy(1e18).toNumber();
+        }
       } catch (e: any) {
         logger.onError({
           source: this.name,
@@ -95,59 +99,59 @@ export class EulerProvider extends CollectorProvider {
     }
 
     // count user & transaction
-    try {
-      startTime = fromTime;
-      const addresses: any = {};
-      const transactions: any = {};
-
-      while (startTime < toTime) {
-        const balanceChangesResponses = await providers.subgraph.querySubgraph(
-          this.configs.graphEndpoint,
-          `
-            {
-              balanceChanges(first: 1000, where: {timestamp_gte: ${startTime}}, orderBy: timestamp, orderDirection: asc) {
-                timestamp
-                transactionHash
-                account {
-                  id
-                }
-              }
-            }
-          `
-        );
-
-        const balanceChanges: Array<any> =
-          balanceChangesResponses && balanceChangesResponses['balanceChanges']
-            ? balanceChangesResponses['balanceChanges']
-            : [];
-        for (let i = 0; i < balanceChanges.length; i++) {
-          if (balanceChanges[i].transactionHash && !transactions[balanceChanges[i].transactionHash]) {
-            data.transactionCount += 1;
-            transactions[balanceChanges[i].transactionHash] = true;
-          }
-          if (balanceChanges[i].account.id && !addresses[normalizeAddress(balanceChanges[i].account.id)]) {
-            data.userCount += 1;
-            addresses[normalizeAddress(balanceChanges[i].account.id)] = true;
-          }
-        }
-
-        if (balanceChanges.length > 0) {
-          startTime = Number(balanceChanges[balanceChanges.length - 1]['timestamp']) + 1;
-        } else {
-          // no more records
-          break;
-        }
-      }
-    } catch (e: any) {
-      logger.onDebug({
-        source: this.name,
-        message: 'failed to count daily users',
-        props: {
-          name: this.configs.name,
-          error: e.message,
-        },
-      });
-    }
+    // try {
+    //   startTime = fromTime;
+    //   const addresses: any = {};
+    //   const transactions: any = {};
+    //
+    //   while (startTime < toTime) {
+    //     const balanceChangesResponses = await providers.subgraph.querySubgraph(
+    //       this.configs.graphEndpoint,
+    //       `
+    //         {
+    //           balanceChanges(first: 1000, where: {timestamp_gte: ${startTime}}, orderBy: timestamp, orderDirection: asc) {
+    //             timestamp
+    //             transactionHash
+    //             account {
+    //               id
+    //             }
+    //           }
+    //         }
+    //       `
+    //     );
+    //
+    //     const balanceChanges: Array<any> =
+    //       balanceChangesResponses && balanceChangesResponses['balanceChanges']
+    //         ? balanceChangesResponses['balanceChanges']
+    //         : [];
+    //     for (let i = 0; i < balanceChanges.length; i++) {
+    //       if (balanceChanges[i].transactionHash && !transactions[balanceChanges[i].transactionHash]) {
+    //         data.transactionCount += 1;
+    //         transactions[balanceChanges[i].transactionHash] = true;
+    //       }
+    //       if (balanceChanges[i].account.id && !addresses[normalizeAddress(balanceChanges[i].account.id)]) {
+    //         data.userCount += 1;
+    //         addresses[normalizeAddress(balanceChanges[i].account.id)] = true;
+    //       }
+    //     }
+    //
+    //     if (balanceChanges.length > 0) {
+    //       startTime = Number(balanceChanges[balanceChanges.length - 1]['timestamp']) + 1;
+    //     } else {
+    //       // no more records
+    //       break;
+    //     }
+    //   }
+    // } catch (e: any) {
+    //   logger.onDebug({
+    //     source: this.name,
+    //     message: 'failed to count daily users',
+    //     props: {
+    //       name: this.configs.name,
+    //       error: e.message,
+    //     },
+    //   });
+    // }
 
     return data;
   }
