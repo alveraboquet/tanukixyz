@@ -1,6 +1,7 @@
 import ArbitrumDefault from '../lists/arbitrum-default.json';
 import CeloDefault from '../lists/celo-default.json';
 import CronosDefault from '../lists/cronos-default.json';
+import OptimismDefault from '../lists/optimism-default.json';
 import PancakeswapDefault from '../lists/pancakeswap-default.json';
 import SushiswapDefaultFantom from '../lists/sushiswap-fantom.json';
 import TraderjoeDefault from '../lists/traderjoe-default.json';
@@ -44,5 +45,9 @@ export const DefaultTokenLists: { [key: string]: TokenList } = {
   cronos: {
     chainId: 25,
     lists: [CronosDefault],
+  },
+  optimism: {
+    chainId: 10,
+    lists: [OptimismDefault],
   },
 };

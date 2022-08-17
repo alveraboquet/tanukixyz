@@ -36,5 +36,10 @@ export const UniswapConfigs: UniswapProtocolConfig = {
       chainConfig: getChainConfig('celo'),
       exchange: 'https://api.thegraph.com/subgraphs/name/jesse-sawa/uniswap-celo',
     },
+    {
+      version: 3,
+      chainConfig: getChainConfig('optimism'),
+      exchange: 'https://api.thegraph.com/subgraphs/name/ianlapham/optimism-post-regenesis',
+    },
   ],
 };
