@@ -81,3 +81,17 @@ export function getDefaultTokenAddresses(chain: string): Array<string> {
 
   return tokenLists;
 }
+
+export function getTokenByAddress(chain: string, address: string): any {
+  if (DefaultTokenLists[chain]) {
+    for (let list of DefaultTokenLists[chain].lists) {
+      for (let token of list) {
+        if (Number(token.chainId) === DefaultTokenLists[chain].chainId && normalizeAddress(address) === token.address) {
+          return token;
+        }
+      }
+    }
+  }
+
+  return null;
+}

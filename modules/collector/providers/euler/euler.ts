@@ -65,7 +65,8 @@ export class EulerProvider extends CollectorProvider {
 
         const events: Array<any> = deposits.concat(withdraws).concat(borrows).concat(repays);
 
-        const overview: any = response && response.overview && response.overview.length > 0 ? response.overview[0] : null;
+        const overview: any =
+          response && response.overview && response.overview.length > 0 ? response.overview[0] : null;
 
         for (const event of events) {
           let volume = new BigNumber(event.totalUsdAmount).dividedBy(1e18);
