@@ -1,10 +1,11 @@
 import BigNumber from 'bignumber.js';
 
 import { EulerProtocolConfig } from '../../../../configs/types';
+import { normalizeAddress } from '../../../../lib/helper';
 import logger from '../../../../lib/logger';
 import { ShareProviders } from '../../../../lib/types';
 import { CollectorProvider } from '../../collector';
-import { ProtocolData } from '../../types';
+import { ProtocolData, ProtocolTokenData } from '../../types';
 
 export class EulerProvider extends CollectorProvider {
   public readonly name: string = 'collector.euler';
@@ -13,7 +14,7 @@ export class EulerProvider extends CollectorProvider {
     super(configs);
   }
 
-  public async getDataInTimeFrame(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {
+  public async queryOverviewData(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {
     const data: ProtocolData = {
       revenueUSD: 0,
       totalValueLockedUSD: 0,
@@ -99,60 +100,112 @@ export class EulerProvider extends CollectorProvider {
       startTime += 60 * 60;
     }
 
-    // count user & transaction
-    // try {
-    //   startTime = fromTime;
-    //   const addresses: any = {};
-    //   const transactions: any = {};
-    //
-    //   while (startTime < toTime) {
-    //     const balanceChangesResponses = await providers.subgraph.querySubgraph(
-    //       this.configs.graphEndpoint,
-    //       `
-    //         {
-    //           balanceChanges(first: 1000, where: {timestamp_gte: ${startTime}}, orderBy: timestamp, orderDirection: asc) {
-    //             timestamp
-    //             transactionHash
-    //             account {
-    //               id
-    //             }
-    //           }
-    //         }
-    //       `
-    //     );
-    //
-    //     const balanceChanges: Array<any> =
-    //       balanceChangesResponses && balanceChangesResponses['balanceChanges']
-    //         ? balanceChangesResponses['balanceChanges']
-    //         : [];
-    //     for (let i = 0; i < balanceChanges.length; i++) {
-    //       if (balanceChanges[i].transactionHash && !transactions[balanceChanges[i].transactionHash]) {
-    //         data.transactionCount += 1;
-    //         transactions[balanceChanges[i].transactionHash] = true;
-    //       }
-    //       if (balanceChanges[i].account.id && !addresses[normalizeAddress(balanceChanges[i].account.id)]) {
-    //         data.userCount += 1;
-    //         addresses[normalizeAddress(balanceChanges[i].account.id)] = true;
-    //       }
-    //     }
-    //
-    //     if (balanceChanges.length > 0) {
-    //       startTime = Number(balanceChanges[balanceChanges.length - 1]['timestamp']) + 1;
-    //     } else {
-    //       // no more records
-    //       break;
-    //     }
-    //   }
-    // } catch (e: any) {
-    //   logger.onDebug({
-    //     source: this.name,
-    //     message: 'failed to count daily users',
-    //     props: {
-    //       name: this.configs.name,
-    //       error: e.message,
-    //     },
-    //   });
-    // }
+    return data;
+  }
+
+  public async queryTokenData(
+    providers: ShareProviders,
+    fromTime: number,
+    toTime: number
+  ): Promise<Array<ProtocolTokenData>> {
+    const tokenData: Array<ProtocolTokenData> = [];
+
+    // query all asset configs
+    const assetResponse = await providers.subgraph.querySubgraph(
+      this.configs.graphEndpoint,
+      `
+      {
+        assets(first: 100) {
+          id,
+          symbol,
+          decimals,
+          totalBalancesUsd,
+        }
+      }
+    `
+    );
+    const assets: Array<any> = assetResponse && assetResponse.assets ? assetResponse.assets : [];
+
+    const tokens: { [key: string]: ProtocolTokenData } = {};
+    for (const asset of assets) {
+      tokens[normalizeAddress(asset.id)] = {
+        chain: this.configs.chainConfig.name,
+        address: normalizeAddress(asset.id),
+        symbol: asset.symbol.toUpperCase(),
+        decimals: Number(asset.decimals),
+
+        volumeInUseUSD: 0,
+        totalValueLockedUSD: new BigNumber(asset.totalBalancesUsd).dividedBy(1e18).toNumber(),
+        transactionCount: 0,
+      };
+
+      let startTime = fromTime;
+      while (startTime < toTime) {
+        const balanceChangesResponses = await providers.subgraph.querySubgraph(
+          this.configs.graphEndpoint,
+          `
+            {
+              balanceChanges(first: 1000, where: {asset: "${normalizeAddress(
+                asset.id
+              )}", timestamp_gte: ${startTime}}, orderBy: timestamp, orderDirection: asc) {
+                timestamp,
+                amountUsd,
+              }
+            }
+          `
+        );
+
+        const balanceChanges: Array<any> =
+          balanceChangesResponses && balanceChangesResponses['balanceChanges']
+            ? balanceChangesResponses['balanceChanges']
+            : [];
+
+        for (const balanceChange of balanceChanges) {
+          tokens[normalizeAddress(asset.id)].volumeInUseUSD += new BigNumber(balanceChange.amountUsd)
+            .dividedBy(1e18)
+            .toNumber();
+          tokens[normalizeAddress(asset.id)].volumeInUseUSD += 1;
+        }
+
+        if (balanceChanges.length > 0) {
+          startTime = Number(balanceChanges[balanceChanges.length - 1]['timestamp']) + 1;
+        } else {
+          // no more records
+          break;
+        }
+      }
+    }
+
+    for (const [, token] of Object.entries(tokens)) {
+      tokenData.push(token);
+    }
+
+    return tokenData;
+  }
+
+  public async getDataInTimeFrame(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {
+    const data: ProtocolData = {
+      revenueUSD: 0,
+      totalValueLockedUSD: 0,
+      volumeInUseUSD: 0,
+      userCount: 0,
+      transactionCount: 0,
+
+      detail: {
+        tokens: [],
+      },
+    };
+
+    const overviewData: ProtocolData = await this.queryOverviewData(providers, fromTime, toTime);
+
+    data.revenueUSD = overviewData.revenueUSD;
+    data.totalValueLockedUSD = overviewData.totalValueLockedUSD;
+    data.volumeInUseUSD = overviewData.volumeInUseUSD;
+    data.transactionCount = overviewData.transactionCount;
+
+    if (data.detail) {
+      data.detail.tokens = await this.queryTokenData(providers, fromTime, toTime);
+    }
 
     return data;
   }
