@@ -56,7 +56,7 @@ export const AlpacaConfigs: AlpacaProtocolConfig = {
       'binance',
       '0x08FC9Ba2cAc74742177e0afC3dC8Aed6961c24e7',
       GenesisBlocks['binance'],
-      DefaultTokenList.WBTC
+      DefaultTokenList.BTCB
     ),
     getAlpacaPoolConfig(
       'binance',
