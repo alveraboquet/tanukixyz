@@ -7,7 +7,7 @@ import { AlpacaProtocolConfig } from '../../../../configs/protocols/alpaca';
 import { getHistoryTokenPriceFromCoingecko, normalizeAddress } from '../../../../lib/helper';
 import { ShareProviders } from '../../../../lib/types';
 import { CollectorProvider } from '../../collector';
-import { ProtocolData } from '../../types';
+import { ProtocolData, ProtocolTokenData } from '../../types';
 
 export class AlpacaProvider extends CollectorProvider {
   public readonly name: string = 'collector.alpaca';
@@ -23,6 +23,10 @@ export class AlpacaProvider extends CollectorProvider {
       volumeInUseUSD: 0,
       userCount: 0,
       transactionCount: 0,
+
+      detail: {
+        tokens: [],
+      },
     };
 
     const eventCollection = await providers.database.getCollection(envConfig.database.collections.globalContractEvents);
@@ -30,10 +34,12 @@ export class AlpacaProvider extends CollectorProvider {
     const addresses: any = {};
     const transactions: any = {};
     const historyPrices: any = {};
+    const tokens: { [key: string]: ProtocolTokenData } = {};
 
-    for (let poolConfig of this.configs.lendingPools) {
+    for (const poolConfig of this.configs.lendingPools) {
       const events = await eventCollection
         .find({
+          chain: poolConfig.chainConfig.name,
           contract: normalizeAddress(poolConfig.contractAddress),
           timestamp: {
             $gte: fromTime,
@@ -42,6 +48,18 @@ export class AlpacaProvider extends CollectorProvider {
         })
         .sort({ timestamp: -1 }) // get the latest event by index 0
         .toArray();
+
+      const tokenAddress: string = normalizeAddress(poolConfig.underlying.chains[poolConfig.chainConfig.name].address);
+      tokens[tokenAddress] = {
+        chain: poolConfig.chainConfig.name,
+        address: tokenAddress,
+        symbol: poolConfig.underlying.symbol.toUpperCase(),
+        decimals: poolConfig.underlying.chains[poolConfig.chainConfig.name].decimals,
+
+        volumeInUseUSD: 0,
+        totalValueLockedUSD: 0,
+        transactionCount: 0,
+      };
 
       // get history price
       let historyPrice: number;
@@ -56,6 +74,7 @@ export class AlpacaProvider extends CollectorProvider {
         // count transaction
         if (!transactions[event.transactionId.split(':')[0]]) {
           data.transactionCount += 1;
+          tokens[tokenAddress].transactionCount += 1;
           transactions[event.transactionId.split(':')[0]] = true;
         }
 
@@ -105,6 +124,7 @@ export class AlpacaProvider extends CollectorProvider {
             }
 
             data.volumeInUseUSD += volume;
+            tokens[tokenAddress].volumeInUseUSD += volume;
           }
         }
       }
@@ -125,10 +145,19 @@ export class AlpacaProvider extends CollectorProvider {
       );
       const balance = await underlyingContract.methods.balanceOf(poolConfig.contractAddress).call(blockAtTimestamp);
 
-      data.totalValueLockedUSD += new BigNumber(balance.toString())
+      const tvl = new BigNumber(balance.toString())
         .dividedBy(new BigNumber(10).pow(poolConfig.underlying.chains[poolConfig.chainConfig.name].decimals))
         .multipliedBy(historyPrice)
         .toNumber();
+
+      data.totalValueLockedUSD += tvl;
+      tokens[tokenAddress].totalValueLockedUSD = tvl;
+    }
+
+    if (data.detail) {
+      for (const [, token] of Object.entries(tokens)) {
+        data.detail.tokens.push(token);
+      }
     }
 
     return data;
