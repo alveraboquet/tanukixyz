@@ -15,6 +15,10 @@ const ALPACA_TOKEN: TokenConfig = {
       decimals: 18,
       address: '0x8f0528ce5ef7b51152a59745befdd91d97091d2f',
     },
+    fantom: {
+      decimals: 18,
+      address: '0xad996a45fd2373ed0b10efa4a8ecb9de445a4302',
+    },
   },
 };
 
@@ -22,6 +26,7 @@ export const AlpacaConfigs: AlpacaProtocolConfig = {
   name: 'alpaca',
   tokenomics: ALPACA_TOKEN,
   lendingPools: [
+    // binance
     getAlpacaPoolConfig(
       'binance',
       '0xd7D069493685A581d27824Fc46EdA46B7EfC0063',
@@ -76,5 +81,20 @@ export const AlpacaConfigs: AlpacaProtocolConfig = {
       GenesisBlocks['binance'],
       DefaultTokenList.CAKE
     ),
+
+    // fantom
+    getAlpacaPoolConfig(
+      'fantom',
+      '0xc1018f4Bba361A1Cc60407835e156595e92EF7Ad',
+      GenesisBlocks['fantom'],
+      DefaultTokenList.FTM
+    ),
+    getAlpacaPoolConfig(
+      'fantom',
+      '0x831332f94C4A0092040b28ECe9377AfEfF34B25a',
+      GenesisBlocks['fantom'],
+      DefaultTokenList.USDC
+    ),
+    getAlpacaPoolConfig('fantom', '0x2E7f32e38EA5a5fcb4494d9B626d2d393B176B1E', GenesisBlocks['fantom'], ALPACA_TOKEN),
   ],
 };

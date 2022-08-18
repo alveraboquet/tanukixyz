@@ -277,7 +277,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
       },
       fantom: {
         decimals: 6,
-        address: '',
+        address: '0x04068da6c83afcfa0e13ba15a6696662335d5b75',
       },
       binance: {
         decimals: 18,
@@ -561,7 +561,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
     chains: {
       fantom: {
         decimals: 18,
-        address: '',
+        address: '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83',
       },
       ethereum: {
         decimals: 18,
