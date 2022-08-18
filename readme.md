@@ -10,13 +10,11 @@ Tanuki is a blockchain and defi data and analytic platform. For more information
 
 ## Modules
 
-| Name          | What does it do?                                                       | Docs                              |
-|---------------|------------------------------------------------------------------------|-----------------------------------|
-| API           | Http rest API server serve all data queries on the platform            | [API Docs](./docs/readme.md)      |
-| Event Indexer | Index contract events from blockchains                                 | [Documentation](./docs/readme.md) |
-| Blockscan     | Tracks blockchain metrics such as blocks, addresses, transactions, ... | [Documentation](./docs/readme.md) |
-| Collector     | Collect DeFi protocol metrics such liquidity, volume, fees, ...        | [Documentation](./docs/readme.md) |
-| Registry      | Collect DeFi protocol transaction & address data                       | [Documentation](./docs/readme.md) |
+| Name      | What does it do?                                                | Docs                                         |
+|-----------|-----------------------------------------------------------------|----------------------------------------------|
+| API       | Http rest API server serve all data queries on the platform     | [API Docs](https://docs.tanukixyz.com/)      |
+| Indexer   | Index contract events from blockchains                          | [Documentation](https://docs.tanukixyz.com/) |
+| Collector | Collect DeFi protocol metrics such liquidity, volume, fees, ... | [Documentation](https://docs.tanukixyz.com/) |
 
 ## Getting Start
 
@@ -30,3 +28,21 @@ yarn compile
 # get start
 yarn start --help
 ```
+
+## Data Sources
+
+| Protocol                | Data Source              |
+|-------------------------|--------------------------|
+| Uniswap V3              | Subgraph                 |
+| Uniswap V2 & Forks      | Subgraph                 |
+| Compound & Forks        | On-chain contract events |
+| AAVE v1, v2, v3 & Forks | On-chain contract events |
+| Euler Finance           | Subgraph                 |
+| Balancer v1, v2 & Forks | Subgraph                 |
+| Alpaca Finance          | On-chain contract events |
+| Abracadabra             | On-chain contract events |
+| Convex Finance          | Subgraph                 |
+| Curve Fi                | Curve API                |
+| Dodoex                  | Dodo API                 |
+| Liquity                 | On-chain contract events |
+| Ribbon Finance          | Subgraph                 |
