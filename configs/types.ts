@@ -117,7 +117,8 @@ export interface BalancerProtocolConfig {
   }>;
 }
 
+export type CurvePoolType = 'meta' | 'wrap3Pool' | 'wrap2Btc' | 'aave';
 export interface CurvePoolConfig extends EventIndexConfig {
-  poolType: 'meta' | 'lending';
+  poolType: CurvePoolType;
   tokens: Array<TokenConfig>;
 }

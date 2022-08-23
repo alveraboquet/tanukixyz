@@ -11,6 +11,7 @@
     "start": "node build/cmd/index.js"
   },
   "dependencies": {
+    "@ethersproject/abi": "^5.7.0",
     "@polkadot/api": "^8.3.1",
     "@trivago/prettier-plugin-sort-imports": "^3.2.0",
     "@types/chai": "^4.3.1",

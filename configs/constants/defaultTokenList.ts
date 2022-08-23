@@ -515,7 +515,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
     chains: {
       ethereum: {
         decimals: 18,
-        address: '',
+        address: '0x4fabb145d64652a948d72533023f6e7a623c7c53',
       },
       binance: {
         decimals: 18,
@@ -529,7 +529,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
     chains: {
       ethereum: {
         decimals: 18,
-        address: '',
+        address: '0x99d8a9c45b2eca8864373a26d1459e3dff1e17f3',
       },
       avalanche: {
         decimals: 18,
@@ -593,7 +593,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
     chains: {
       ethereum: {
         decimals: 18,
-        address: '',
+        address: '0x853d955acef822db058eb8505911ed77f175b99e',
       },
       fantom: {
         decimals: 18,

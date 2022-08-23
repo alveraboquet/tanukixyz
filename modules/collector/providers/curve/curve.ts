@@ -1,7 +1,7 @@
-import axios from 'axios';
+import Web3 from 'web3';
 
 import { CurveProtocolConfig } from '../../../../configs/protocols/curve';
-import logger from '../../../../lib/logger';
+import { Call, multicallv2 } from '../../../../lib/multicall';
 import { CollectorProvider, GetProtocolDataProps } from '../../collector';
 import { ProtocolData } from '../../types';
 
@@ -13,7 +13,7 @@ export class CurveProvider extends CollectorProvider {
   }
 
   public async getDailyData(props: GetProtocolDataProps): Promise<ProtocolData> {
-    const { providers, date } = props;
+    // const { providers, date } = props;
 
     const data: ProtocolData = {
       revenueUSD: 0,
@@ -24,117 +24,24 @@ export class CurveProvider extends CollectorProvider {
     };
 
     const configs: CurveProtocolConfig = this.configs;
-    const volumeApis: Array<string> = [
-      'https://api.curve.fi/api/getAllPoolsVolume/ethereum',
-      'https://api.curve.fi/api/getAllPoolsVolume/fantom',
-      'https://api.curve.fi/api/getAllPoolsVolume/polygon',
-      'https://api.curve.fi/api/getAllPoolsVolume/avalanche',
-      'https://api.curve.fi/api/getAllPoolsVolume/xdai',
-    ];
-    for (let i = 0; i < volumeApis.length; i++) {
-      try {
-        const response = await axios.get(volumeApis[i]);
-        if (response.data && response.data.data && response.data.data.totalVolume) {
-          data.volumeInUseUSD += Number(response.data.data.totalVolume);
-        }
-      } catch (e: any) {
-        logger.onWarn({
-          source: this.name,
-          message: 'failed to query api',
-          props: {
-            endpoint: volumeApis[i],
-            error: e.message,
-          },
+
+    for (const [, factory] of Object.entries(configs.factories)) {
+      const web3 = new Web3(factory.chainConfig.nodeRpcs.default);
+      const factoryContract = new web3.eth.Contract(factory.contractAbi, factory.contractAddress);
+      const poolCount = await factoryContract.methods.pool_count().call();
+
+      const calls: Array<Call> = [];
+
+      for (let i = 0; i < Number(poolCount); i++) {
+        calls.push({
+          address: factory.contractAddress,
+          name: 'pool_list',
+          params: [i],
         });
       }
-    }
 
-    // curve charge 0.04% on every swap
-    // source: https://curve.fi/rootfaq
-    data.revenueUSD = (data.volumeInUseUSD * 0.04) / 100;
-
-    const tvlApis: Array<string> = [
-      // ethereum
-      'https://api.curve.fi/api/getTVL',
-      'https://api.curve.fi/api/getPools/ethereum/factory',
-      'https://api.curve.fi/api/getFactoryCryptoPools/ethereum',
-      'https://api.curve.fi/api/getTVLCrypto',
-
-      'https://api.curve.fi/api/getTVLPolygon',
-      'https://api.curve.fi/api/getTVLAurora',
-      'https://api.curve.fi/api/getTVLFantom',
-      'https://api.curve.fi/api/getTVLxDai',
-      'https://api.curve.fi/api/getTVLArbitrum',
-      'https://api.curve.fi/api/getTVLAvalanche',
-      'https://api.curve.fi/api/getTVLHarmony',
-      'https://api.curve.fi/api/getTVLOptimism',
-      'https://api.curve.fi/api/getTVLMoonbeam',
-    ];
-    for (let i = 0; i < tvlApis.length; i++) {
-      try {
-        const response = await axios.get(tvlApis[i]);
-        if (response.data && response.data.data && response.data.data.tvl) {
-          data.totalValueLockedUSD += Number(response.data.data.tvl);
-        }
-      } catch (e: any) {
-        logger.onWarn({
-          source: this.name,
-          message: 'failed to query api',
-          props: {
-            endpoint: tvlApis[i],
-            error: e.message,
-          },
-        });
-      }
-    }
-
-    // count transaction and user
-    const addresses: any = {};
-    const transactions: any = {};
-    let startTime = date - 24 * 60 * 60;
-    while (startTime <= date) {
-      try {
-        const query = `
-            {
-              swaps(first: 1000, where: {timestamp_gte: ${startTime}}, orderBy: timestamp, orderDirection: asc) {
-                timestamp
-                user {
-                  id
-                }
-                transaction {
-                  id
-                }
-              }
-            }
-          `;
-        const response = await providers.subgraph.querySubgraph(configs.subgraph, query);
-        const events = response.swaps && response.swaps.length > 0 ? response.swaps : [];
-        for (let i = 0; i < events.length; i++) {
-          if (!transactions[events[i].transaction.id.split('-')[0]]) {
-            data.transactionCount += 1;
-            transactions[events[i].transaction.id.split('-')[0]] = true;
-          }
-          if (!addresses[events[i].user.id.split('-')[0]]) {
-            data.userCount += 1;
-            addresses[events[i].user.id.split('-')[0]] = true;
-          }
-        }
-
-        if (events.length > 0) {
-          startTime = Number(events[events.length - 1].timestamp) + 1;
-        } else {
-          break;
-        }
-      } catch (e: any) {
-        logger.onDebug({
-          source: this.name,
-          message: 'failed to count daily users, txs',
-          props: {
-            name: configs.name,
-            error: e.message,
-          },
-        });
-      }
+      const results: Array<string> = await multicallv2(factory.chainConfig.name, factory.contractAbi, calls);
+      console.info(results);
     }
 
     return data;

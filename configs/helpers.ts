@@ -7,7 +7,7 @@ import curvePoolMetaAbi from './abi/curve/PoolSwapMeta.json';
 import { getChainConfig } from './chains';
 import { DefaultTokenLists } from './constants/tokenLists';
 import { AbracadabraMarketConfig } from './protocols/abracadabra';
-import { CompoundLendingPoolConfig, CurvePoolConfig, TokenConfig } from './types';
+import { CompoundLendingPoolConfig, CurvePoolConfig, CurvePoolType, TokenConfig } from './types';
 
 export function getCompoundPoolConfig(
   chain: string,
@@ -59,7 +59,7 @@ export function getCurvePoolConfig(
   chain: string,
   address: string,
   genesisBlock: number,
-  type: 'meta' | 'lending',
+  type: CurvePoolType,
   tokens: Array<TokenConfig>
 ): CurvePoolConfig {
   if (type === 'meta') {

@@ -217,4 +217,16 @@ export class EvmEventIndexer implements Provider {
       await this.startWithConfig(this.configs[i], props);
     }
   }
+
+  public async test(): Promise<void> {
+    for (const config of this.configs) {
+      await this.getEvents({
+        config,
+        fromBlock: config.contractBirthday,
+        toBlock: config.contractBirthday + 1,
+      });
+    }
+
+    return Promise.resolve();
+  }
 }
