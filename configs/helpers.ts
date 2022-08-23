@@ -2,10 +2,12 @@ import { normalizeAddress } from '../lib/helper';
 import CauldronV3 from './abi/abracadabra/CauldronV3.json';
 import ibTokenAbi from './abi/alpaca/ibToken.json';
 import cTokenAbi from './abi/compound/cToken.json';
+import curvePoolLendingAbi from './abi/curve/PoolSwapLending.json';
+import curvePoolMetaAbi from './abi/curve/PoolSwapMeta.json';
 import { getChainConfig } from './chains';
 import { DefaultTokenLists } from './constants/tokenLists';
 import { AbracadabraMarketConfig } from './protocols/abracadabra';
-import { CompoundLendingPoolConfig, TokenConfig } from './types';
+import { CompoundLendingPoolConfig, CurvePoolConfig, TokenConfig } from './types';
 
 export function getCompoundPoolConfig(
   chain: string,
@@ -51,6 +53,43 @@ export function getAlpacaPoolConfig(
     events: ['Transfer', 'AddDebt', 'RemoveDebt', 'Work', 'Kill', 'AddCollateral'],
     underlying: token,
   };
+}
+
+export function getCurvePoolConfig(
+  chain: string,
+  address: string,
+  genesisBlock: number,
+  type: 'meta' | 'lending',
+  tokens: Array<TokenConfig>
+): CurvePoolConfig {
+  if (type === 'meta') {
+    return {
+      chainConfig: getChainConfig(chain),
+      contractAbi: curvePoolMetaAbi,
+      contractAddress: address,
+      contractBirthday: genesisBlock,
+      events: ['AddLiquidity', 'RemoveLiquidity', 'TokenExchange', 'RemoveLiquidityOne', 'RemoveLiquidityImbalance'],
+      poolType: type,
+      tokens: tokens,
+    };
+  } else {
+    return {
+      chainConfig: getChainConfig(chain),
+      contractAbi: curvePoolLendingAbi,
+      contractAddress: address,
+      contractBirthday: genesisBlock,
+      events: [
+        'AddLiquidity',
+        'RemoveLiquidity',
+        'TokenExchange',
+        'TokenExchangeUnderlying',
+        'RemoveLiquidityOne',
+        'RemoveLiquidityImbalance',
+      ],
+      poolType: type,
+      tokens: tokens,
+    };
+  }
 }
 
 export function getDefaultTokenAddresses(chain: string): Array<string> {
