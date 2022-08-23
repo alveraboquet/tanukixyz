@@ -19,5 +19,10 @@ export const BeetsConfigs: BalancerProtocolConfig = {
       chainConfig: getChainConfig('fantom'),
       exchange: 'https://api.thegraph.com/subgraphs/name/beethovenxfi/beethovenx',
     },
+    {
+      version: 2,
+      chainConfig: getChainConfig('optimism'),
+      exchange: 'https://api.thegraph.com/subgraphs/name/beethovenxfi/beethovenx-optimism',
+    },
   ],
 };
