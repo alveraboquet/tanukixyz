@@ -173,18 +173,6 @@ export class CurveProvider extends CollectorProvider {
 
         const tokenDecimals: number = token.chains[pool.chainConfig.name].decimals;
         const tokenAddress: string = normalizeAddress(token.chains[pool.chainConfig.name].address);
-        if (!tokens[tokenAddress]) {
-          tokens[tokenAddress] = {
-            chain: pool.chainConfig.name,
-            symbol: token.symbol,
-            address: tokenAddress,
-            decimals: tokenDecimals,
-
-            volumeInUseUSD: 0,
-            totalValueLockedUSD: 0,
-            transactionCount: 0,
-          };
-        }
 
         const blockAtTimestamp: number = await providers.subgraph.queryBlockAtTimestamp(
           pool.chainConfig.subgraph?.blockSubgraph as string,
@@ -194,15 +182,41 @@ export class CurveProvider extends CollectorProvider {
           pool.chainConfig.nodeRpcs.archive ? pool.chainConfig.nodeRpcs.archive : pool.chainConfig.nodeRpcs.default
         );
 
-        const tokenContract = new web3.eth.Contract(ERC20Abi as any, tokenAddress);
-        const tokenBalance = await tokenContract.methods.balanceOf(pool.contractAddress).call(blockAtTimestamp);
+        try {
+          const tokenContract = new web3.eth.Contract(ERC20Abi as any, tokenAddress);
+          const tokenBalance = await tokenContract.methods.balanceOf(pool.contractAddress).call(blockAtTimestamp);
 
-        const tvl = new BigNumber(tokenBalance)
-          .dividedBy(new BigNumber(10).pow(tokenDecimals))
-          .multipliedBy(historyPrice)
-          .toNumber();
-        data.totalValueLockedUSD += tvl;
-        tokens[tokenAddress].totalValueLockedUSD += tvl;
+          if (!tokens[tokenAddress]) {
+            tokens[tokenAddress] = {
+              chain: pool.chainConfig.name,
+              symbol: token.symbol,
+              address: tokenAddress,
+              decimals: tokenDecimals,
+
+              volumeInUseUSD: 0,
+              totalValueLockedUSD: 0,
+              transactionCount: 0,
+            };
+          }
+
+          const tvl = new BigNumber(tokenBalance)
+            .dividedBy(new BigNumber(10).pow(tokenDecimals))
+            .multipliedBy(historyPrice)
+            .toNumber();
+          data.totalValueLockedUSD += tvl;
+          tokens[tokenAddress].totalValueLockedUSD += tvl;
+        } catch (e: any) {
+          logger.onError({
+            source: this.name,
+            message: 'failed to query token balance',
+            props: {
+              token: tokenAddress,
+              pool: normalizeAddress(pool.contractAddress),
+              block: blockAtTimestamp,
+            },
+            error: e.message,
+          });
+        }
       }
     }
 
