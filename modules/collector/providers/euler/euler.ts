@@ -135,7 +135,9 @@ export class EulerProvider extends CollectorProvider {
         decimals: Number(asset.decimals),
 
         volumeInUseUSD: 0,
-        totalValueLockedUSD: new BigNumber(asset.totalBalancesUsd).dividedBy(1e18).toNumber(),
+        totalValueLockedUSD: new BigNumber(asset.totalBalancesUsd)
+          .dividedBy(new BigNumber(10).pow(asset.decimals))
+          .toNumber(),
         transactionCount: 0,
       };
 
