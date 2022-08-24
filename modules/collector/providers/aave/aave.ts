@@ -237,8 +237,8 @@ export class AaveProvider extends CollectorProvider {
             address: reserveAddress,
             decimals: reserveConfig.chains[poolConfig.chainConfig.name].decimals,
 
-            volumeInUseUSD: reserveAmount,
-            totalValueLockedUSD: 0,
+            volumeInUseUSD: 0,
+            totalValueLockedUSD: reserveAmount,
             transactionCount: 0,
           };
         }
