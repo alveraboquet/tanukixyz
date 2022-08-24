@@ -131,7 +131,7 @@ export class EulerProvider extends CollectorProvider {
       tokens[normalizeAddress(asset.id)] = {
         chain: this.configs.chainConfig.name,
         address: normalizeAddress(asset.id),
-        symbol: asset.symbol.toUpperCase(),
+        symbol: asset.symbol === 'FTX Token' ? 'FTX' : asset.symbol.toUpperCase(),
         decimals: Number(asset.decimals),
 
         volumeInUseUSD: 0,
