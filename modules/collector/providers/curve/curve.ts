@@ -193,10 +193,7 @@ export class CurveProvider extends CollectorProvider {
         const web3 = new Web3(
           pool.chainConfig.nodeRpcs.archive ? pool.chainConfig.nodeRpcs.archive : pool.chainConfig.nodeRpcs.default
         );
-        console.info({
-          token: token.symbol,
-          address: tokenAddress,
-        });
+        
         const tokenContract = new web3.eth.Contract(ERC20Abi as any, tokenAddress);
         const tokenBalance = await tokenContract.methods.balanceOf(pool.contractAddress).call(blockAtTimestamp);
         data.totalValueLockedUSD += new BigNumber(tokenBalance)
