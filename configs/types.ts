@@ -12,6 +12,7 @@ export interface EnvConfig {
   apiKeys: {
     alchemy: string;
     getblock: string;
+    nodereal: string;
   };
   env: {
     timezone: string;

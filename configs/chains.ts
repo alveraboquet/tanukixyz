@@ -4,6 +4,7 @@ import envConfig from './env';
 import { ChainConfig } from './types';
 
 const ALCHEMY_KEY = envConfig.apiKeys.alchemy;
+const NODEREAL_KEY = envConfig.apiKeys.nodereal;
 
 export const Blockchains: Array<ChainConfig> = [
   {
@@ -68,7 +69,7 @@ export const Blockchains: Array<ChainConfig> = [
     name: 'binance',
     nodeRpcs: {
       default: 'https://bscrpc.com',
-      archive: AnkrPublicNodes.binance,
+      archive: `https://bsc-mainnet.nodereal.io/v1/${NODEREAL_KEY}`,
     },
     subgraph: {
       blockSubgraph: BlockSubgraphs.binance,

@@ -20,6 +20,7 @@ const envConfig: EnvConfig = {
   apiKeys: {
     alchemy: String(process.env.TANUKI_ALCHEMY_API_KEY),
     getblock: String(process.env.TANUKI_GETBLOCK_API_KEY),
+    nodereal: String(process.env.TANUKI_NODEREAL_API_KEY),
   },
   env: {
     timezone: String(process.env.TANUKI_TZ),
