@@ -147,7 +147,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
     chains: {
       ethereum: {
         decimals: 18,
-        address: '',
+        address: '0x514910771af9ca656af840dff83e8264ecf986ca',
       },
       avalanche: {
         decimals: 18,
@@ -445,7 +445,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
     chains: {
       ethereum: {
         decimals: 18,
-        address: '',
+        address: '0xD533a949740bb3306d119CC777fa900bA034cd52',
       },
       polygon: {
         decimals: 18,
@@ -843,6 +843,10 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
     symbol: 'renBTC',
     coingeckoId: 'bitcoin',
     chains: {
+      ethereum: {
+        decimals: 8,
+        address: '0xeb4c2781e4eba804ce9a9803c67d0893436bb27d',
+      },
       binance: {
         decimals: 8,
         address: '',

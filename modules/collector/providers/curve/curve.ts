@@ -1,9 +1,15 @@
+import BigNumber from 'bignumber.js';
 import Web3 from 'web3';
 
+import ERC20Abi from '../../../../configs/abi/ERC20.json';
+import envConfig from '../../../../configs/env';
 import { CurveProtocolConfig } from '../../../../configs/protocols/curve';
-import { Call, multicallv2 } from '../../../../lib/multicall';
-import { CollectorProvider, GetProtocolDataProps } from '../../collector';
-import { ProtocolData } from '../../types';
+import { TokenConfig } from '../../../../configs/types';
+import { getHistoryTokenPriceFromCoingecko, normalizeAddress } from '../../../../lib/helper';
+import logger from '../../../../lib/logger';
+import { ShareProviders } from '../../../../lib/types';
+import { CollectorProvider } from '../../collector';
+import { ProtocolData, ProtocolTokenData } from '../../types';
 
 export class CurveProvider extends CollectorProvider {
   public readonly name: string = 'collector.curve';
@@ -12,48 +18,200 @@ export class CurveProvider extends CollectorProvider {
     super(configs);
   }
 
-  public async getDailyData(props: GetProtocolDataProps): Promise<ProtocolData> {
-    // const { providers, date } = props;
-
+  public async getDataInTimeFrame(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {
     const data: ProtocolData = {
       revenueUSD: 0,
       totalValueLockedUSD: 0,
       volumeInUseUSD: 0,
       userCount: 0,
       transactionCount: 0,
+      detail: {
+        tokens: [],
+      },
     };
 
     const configs: CurveProtocolConfig = this.configs;
 
-    for (const [, factory] of Object.entries(configs.factories)) {
-      const web3 = new Web3(factory.chainConfig.nodeRpcs.default);
-      const factoryContract = new web3.eth.Contract(factory.contractAbi, factory.contractAddress);
-      const poolCount = await factoryContract.methods.pool_count().call();
+    const eventCollection = await providers.database.getCollection(envConfig.database.collections.globalContractEvents);
 
-      const calls: Array<Call> = [];
+    const addresses: any = {};
+    const transactions: any = {};
+    const tokens: { [key: string]: ProtocolTokenData } = {};
+    const historyPrices: any = {};
 
-      for (let i = 0; i < Number(poolCount); i++) {
-        calls.push({
-          address: factory.contractAddress,
-          name: 'pool_list',
-          params: [i],
-        });
+    for (const pool of configs.pools) {
+      const events = await eventCollection
+        .find({
+          contract: normalizeAddress(pool.contractAddress),
+          timestamp: {
+            $gte: fromTime,
+            $lt: toTime,
+          },
+        })
+        .sort({ timestamp: -1 }) // get the latest event by index 0
+        .toArray();
+
+      for (const event of events) {
+        // count transaction
+        if (!transactions[event.transactionId.split(':')[0]]) {
+          data.transactionCount += 1;
+          transactions[event.transactionId.split(':')[0]] = true;
+        }
+
+        // count user
+        if (event.returnValues['buyer'] && !addresses[normalizeAddress(event.returnValues['buyer'])]) {
+          data.userCount += 1;
+          addresses[normalizeAddress(event.returnValues['buyer'])] = true;
+        }
+
+        if (event.event === 'TokenExchange' || event.event === 'TokenExchangeUnderlying') {
+          let soldToken: TokenConfig | null = null;
+          let boughtToken: TokenConfig | null = null;
+          try {
+            soldToken = pool.tokens[Number(event.returnValues.sold_id)];
+          } catch (e: any) {
+            logger.onDebug({
+              source: this.name,
+              message: 'curve sold_id token not found',
+              props: {
+                poolAddress: normalizeAddress(pool.contractAddress),
+                soldID: Number(event.returnValues.sold_id),
+              },
+            });
+          }
+          try {
+            boughtToken = pool.tokens[Number(event.returnValues.bought_id)];
+          } catch (e: any) {
+            logger.onDebug({
+              source: this.name,
+              message: 'curve bought_id token not found',
+              props: {
+                poolAddress: normalizeAddress(pool.contractAddress),
+                boughtID: Number(event.returnValues.bought_id),
+              },
+            });
+          }
+
+          if (soldToken) {
+            let historyPrice: number = 0;
+            if (historyPrices[soldToken.coingeckoId]) {
+              historyPrice = historyPrices[soldToken.coingeckoId];
+            } else {
+              historyPrice = await getHistoryTokenPriceFromCoingecko(soldToken.coingeckoId, fromTime);
+              historyPrices[soldToken.coingeckoId] = historyPrice;
+            }
+
+            const tokenDecimals: number = soldToken.chains[pool.chainConfig.name].decimals;
+            const tokenAddress: string = normalizeAddress(soldToken.chains[pool.chainConfig.name].address);
+            if (!tokens[tokenAddress]) {
+              tokens[tokenAddress] = {
+                chain: pool.chainConfig.name,
+                symbol: soldToken.symbol,
+                address: tokenAddress,
+                decimals: tokenDecimals,
+
+                volumeInUseUSD: 0,
+                totalValueLockedUSD: 0,
+                transactionCount: 0,
+              };
+            }
+
+            // calculate volume
+            const volume: number = new BigNumber(event.returnValues.tokens_sold.toString())
+              .dividedBy(new BigNumber(10).pow(tokenDecimals))
+              .multipliedBy(historyPrice)
+              .toNumber();
+
+            tokens[tokenAddress].volumeInUseUSD += volume;
+            data.volumeInUseUSD += volume;
+          }
+
+          if (boughtToken) {
+            let historyPrice: number = 0;
+            if (historyPrices[boughtToken.coingeckoId]) {
+              historyPrice = historyPrices[boughtToken.coingeckoId];
+            } else {
+              historyPrice = await getHistoryTokenPriceFromCoingecko(boughtToken.coingeckoId, fromTime);
+              historyPrices[boughtToken.coingeckoId] = historyPrice;
+            }
+
+            const tokenDecimals: number = boughtToken.chains[pool.chainConfig.name].decimals;
+            const tokenAddress: string = normalizeAddress(boughtToken.chains[pool.chainConfig.name].address);
+            if (!tokens[tokenAddress]) {
+              tokens[tokenAddress] = {
+                chain: pool.chainConfig.name,
+                symbol: boughtToken.symbol,
+                address: tokenAddress,
+                decimals: tokenDecimals,
+
+                volumeInUseUSD: 0,
+                totalValueLockedUSD: 0,
+                transactionCount: 0,
+              };
+            }
+
+            // calculate volume
+            const volume: number = new BigNumber(event.returnValues.tokens_bought.toString())
+              .dividedBy(new BigNumber(10).pow(tokenDecimals))
+              .multipliedBy(historyPrice)
+              .toNumber();
+
+            tokens[tokenAddress].volumeInUseUSD += volume;
+            data.volumeInUseUSD += volume;
+          }
+        }
       }
 
-      const results: Array<string> = await multicallv2(factory.chainConfig.name, factory.contractAbi, calls);
-      console.info(results);
+      for (const token of pool.tokens) {
+        let historyPrice: number = 0;
+        if (historyPrices[token.coingeckoId]) {
+          historyPrice = historyPrices[token.coingeckoId];
+        } else {
+          historyPrice = await getHistoryTokenPriceFromCoingecko(token.coingeckoId, fromTime);
+          historyPrices[token.coingeckoId] = historyPrice;
+        }
+
+        const tokenDecimals: number = token.chains[pool.chainConfig.name].decimals;
+        const tokenAddress: string = normalizeAddress(token.chains[pool.chainConfig.name].address);
+        if (!tokens[tokenAddress]) {
+          tokens[tokenAddress] = {
+            chain: pool.chainConfig.name,
+            symbol: token.symbol,
+            address: tokenAddress,
+            decimals: tokenDecimals,
+
+            volumeInUseUSD: 0,
+            totalValueLockedUSD: 0,
+            transactionCount: 0,
+          };
+        }
+
+        const blockAtTimestamp: number = await providers.subgraph.queryBlockAtTimestamp(
+          pool.chainConfig.subgraph?.blockSubgraph as string,
+          fromTime
+        );
+        const web3 = new Web3(
+          pool.chainConfig.nodeRpcs.archive ? pool.chainConfig.nodeRpcs.archive : pool.chainConfig.nodeRpcs.default
+        );
+        console.info({
+          token: token.symbol,
+          address: tokenAddress,
+        });
+        const tokenContract = new web3.eth.Contract(ERC20Abi as any, tokenAddress);
+        const tokenBalance = await tokenContract.methods.balanceOf(pool.contractAddress).call(blockAtTimestamp);
+        data.totalValueLockedUSD += new BigNumber(tokenBalance)
+          .dividedBy(new BigNumber(10).pow(tokenDecimals))
+          .multipliedBy(historyPrice)
+          .toNumber();
+      }
+    }
+
+    if (data.detail) {
+      for (const [, token] of Object.entries(tokens)) {
+        data.detail.tokens.push(token);
+      }
     }
 
     return data;
-  }
-
-  public async getDateData(props: GetProtocolDataProps): Promise<ProtocolData> {
-    return {
-      revenueUSD: 0,
-      totalValueLockedUSD: 0,
-      volumeInUseUSD: 0,
-      userCount: 0,
-      transactionCount: 0,
-    };
   }
 }

@@ -31,21 +31,21 @@ export const CurveConfigs: CurveProtocolConfig = {
   pools: [
     // USDT - WETH - WBTC
     getCurvePoolConfig('ethereum', '0xD51a44d3FaE010294C616388b506AcdA1bfAAE46', GenesisBlocks['ethereum'], 'meta', [
-      DefaultTokenList.ETH,
-      DefaultTokenList.WBTC,
       DefaultTokenList.USDT,
+      DefaultTokenList.WBTC,
+      DefaultTokenList.ETH,
     ]),
     // DAI - USDT - USDC
     getCurvePoolConfig('ethereum', '0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7', GenesisBlocks['ethereum'], 'meta', [
       DefaultTokenList.DAI,
-      DefaultTokenList.USDT,
       DefaultTokenList.USDC,
+      DefaultTokenList.USDT,
     ]),
     // DAI, USDT, USDC, sUSD
     getCurvePoolConfig('ethereum', '0xA5407eAE9Ba41422680e2e00537571bcC53efBfD', GenesisBlocks['ethereum'], 'meta', [
       DefaultTokenList.DAI,
-      DefaultTokenList.USDT,
       DefaultTokenList.USDC,
+      DefaultTokenList.USDT,
       {
         symbol: 'sUSD',
         coingeckoId: 'nusd',
@@ -57,16 +57,16 @@ export const CurveConfigs: CurveProtocolConfig = {
         },
       },
     ]),
-    // ETH - stETH
+    // ETH - sETH
     getCurvePoolConfig('ethereum', '0xc5424b857f758e906013f3555dad202e4bdb4567', GenesisBlocks['ethereum'], 'meta', [
       DefaultTokenList.ETH,
       {
-        symbol: 'stETH',
-        coingeckoId: 'staked-ether',
+        symbol: 'sETH',
+        coingeckoId: 'seth',
         chains: {
           ethereum: {
             decimals: 18,
-            address: '0xae7ab96520de3a18e5e111b5eaab095312d7fe84',
+            address: '0x5e74c9036fb86bd7ecdcb084a0673efc32ea31cb',
           },
         },
       },
@@ -100,14 +100,13 @@ export const CurveConfigs: CurveProtocolConfig = {
         chains: {
           ethereum: {
             decimals: 18,
-            address: '0xfe18be6b3bd88a2d2a7f928d00292e7a9963cfc6',
+            address: '0xfE18be6b3Bd88A2D2A7f928d00292E7a9963CfC6',
           },
         },
       },
     ]),
     // HBTC - WBTC
     getCurvePoolConfig('ethereum', '0x4CA9b3063Ec5866A4B82E437059D2C43d1be596F', GenesisBlocks['ethereum'], 'meta', [
-      DefaultTokenList.WBTC,
       {
         symbol: 'HBTC',
         coingeckoId: 'huobi-btc',
@@ -118,19 +117,10 @@ export const CurveConfigs: CurveProtocolConfig = {
           },
         },
       },
+      DefaultTokenList.WBTC,
     ]),
     // EURS - sEUR
     getCurvePoolConfig('ethereum', '0x0Ce6a5fF5217e38315f87032CF90686C96627CAA', GenesisBlocks['ethereum'], 'meta', [
-      {
-        symbol: 'sEUR',
-        coingeckoId: 'seur',
-        chains: {
-          ethereum: {
-            decimals: 18,
-            address: '0xd71ecff9342a5ced620049e616c5035f1db98620',
-          },
-        },
-      },
       {
         symbol: 'EURS',
         coingeckoId: 'stasis-eurs',
@@ -138,6 +128,16 @@ export const CurveConfigs: CurveProtocolConfig = {
           ethereum: {
             decimals: 2,
             address: '0xdb25f211ab05b1c97d595516f45794528a807ad8',
+          },
+        },
+      },
+      {
+        symbol: 'sEUR',
+        coingeckoId: 'seur',
+        chains: {
+          ethereum: {
+            decimals: 18,
+            address: '0xd71ecff9342a5ced620049e616c5035f1db98620',
           },
         },
       },
@@ -164,6 +164,16 @@ export const CurveConfigs: CurveProtocolConfig = {
     // LINK - sLINK
     getCurvePoolConfig('ethereum', '0xF178C0b5Bb7e7aBF4e12A4838C7b7c5bA2C623c0', GenesisBlocks['ethereum'], 'meta', [
       DefaultTokenList.LINK,
+      {
+        symbol: 'sLINK',
+        coingeckoId: 'chainlink',
+        chains: {
+          ethereum: {
+            decimals: 18,
+            address: '0xbBC455cb4F1B9e4bFC4B73970d360c8f032EfEE6',
+          },
+        },
+      },
     ]),
     // GUSD - 3Pool
     getCurvePoolConfig(
@@ -172,9 +182,6 @@ export const CurveConfigs: CurveProtocolConfig = {
       GenesisBlocks['ethereum'],
       'wrap3Pool',
       [
-        DefaultTokenList.DAI,
-        DefaultTokenList.USDC,
-        DefaultTokenList.USDT,
         {
           symbol: 'GUSD',
           coingeckoId: 'gemini-dollar',
@@ -194,9 +201,6 @@ export const CurveConfigs: CurveProtocolConfig = {
       GenesisBlocks['ethereum'],
       'wrap3Pool',
       [
-        DefaultTokenList.DAI,
-        DefaultTokenList.USDC,
-        DefaultTokenList.USDT,
         {
           symbol: 'HUSD',
           coingeckoId: 'husd',
@@ -216,9 +220,6 @@ export const CurveConfigs: CurveProtocolConfig = {
       GenesisBlocks['ethereum'],
       'wrap3Pool',
       [
-        DefaultTokenList.DAI,
-        DefaultTokenList.USDC,
-        DefaultTokenList.USDT,
         {
           symbol: 'USDK',
           coingeckoId: 'usdk',
@@ -238,9 +239,6 @@ export const CurveConfigs: CurveProtocolConfig = {
       GenesisBlocks['ethereum'],
       'wrap3Pool',
       [
-        DefaultTokenList.DAI,
-        DefaultTokenList.USDC,
-        DefaultTokenList.USDT,
         {
           symbol: 'USDN',
           coingeckoId: 'neutrino',
@@ -260,9 +258,6 @@ export const CurveConfigs: CurveProtocolConfig = {
       GenesisBlocks['ethereum'],
       'wrap3Pool',
       [
-        DefaultTokenList.DAI,
-        DefaultTokenList.USDC,
-        DefaultTokenList.USDT,
         {
           symbol: 'mUSD',
           coingeckoId: 'musd',
@@ -281,7 +276,7 @@ export const CurveConfigs: CurveProtocolConfig = {
       '0xecd5e75afb02efa118af914515d6521aabd189f1',
       GenesisBlocks['ethereum'],
       'wrap3Pool',
-      [DefaultTokenList.DAI, DefaultTokenList.USDC, DefaultTokenList.USDT, DefaultTokenList.TUSD]
+      [DefaultTokenList.TUSD]
     ),
     // FRAX - 3Pool
     getCurvePoolConfig(
@@ -289,7 +284,7 @@ export const CurveConfigs: CurveProtocolConfig = {
       '0xd632f22692FaC7611d2AA1C0D552930D43CAEd3B',
       GenesisBlocks['ethereum'],
       'wrap3Pool',
-      [DefaultTokenList.DAI, DefaultTokenList.USDC, DefaultTokenList.USDT, DefaultTokenList.FRAX]
+      [DefaultTokenList.FRAX]
     ),
     // LUSD - 3Pool
     getCurvePoolConfig(
@@ -298,9 +293,6 @@ export const CurveConfigs: CurveProtocolConfig = {
       GenesisBlocks['ethereum'],
       'wrap3Pool',
       [
-        DefaultTokenList.DAI,
-        DefaultTokenList.USDC,
-        DefaultTokenList.USDT,
         {
           symbol: 'LUSD',
           coingeckoId: 'liquity-usd',
@@ -320,9 +312,6 @@ export const CurveConfigs: CurveProtocolConfig = {
       GenesisBlocks['ethereum'],
       'wrap3Pool',
       [
-        DefaultTokenList.DAI,
-        DefaultTokenList.USDC,
-        DefaultTokenList.USDT,
         {
           symbol: 'alUSD',
           coingeckoId: 'alchemix-usd',
@@ -341,7 +330,7 @@ export const CurveConfigs: CurveProtocolConfig = {
       '0x4807862AA8b2bF68830e4C8dc86D0e9A998e085a',
       GenesisBlocks['ethereum'],
       'wrap3Pool',
-      [DefaultTokenList.DAI, DefaultTokenList.USDC, DefaultTokenList.USDT, DefaultTokenList.BUSD]
+      [DefaultTokenList.BUSD]
     ),
     // MIM - 3Pool
     getCurvePoolConfig(
@@ -349,7 +338,7 @@ export const CurveConfigs: CurveProtocolConfig = {
       '0x5a6A4D54456819380173272A5E8E9B9904BdF41B',
       GenesisBlocks['ethereum'],
       'wrap3Pool',
-      [DefaultTokenList.DAI, DefaultTokenList.USDC, DefaultTokenList.USDT, DefaultTokenList.MIM]
+      [DefaultTokenList.MIM]
     ),
     // RAI - 3Pool
     getCurvePoolConfig(
@@ -358,9 +347,6 @@ export const CurveConfigs: CurveProtocolConfig = {
       GenesisBlocks['ethereum'],
       'wrap3Pool',
       [
-        DefaultTokenList.DAI,
-        DefaultTokenList.USDC,
-        DefaultTokenList.USDT,
         {
           symbol: 'RAI',
           coingeckoId: 'rai',
@@ -380,9 +366,6 @@ export const CurveConfigs: CurveProtocolConfig = {
       GenesisBlocks['ethereum'],
       'wrap3Pool',
       [
-        DefaultTokenList.DAI,
-        DefaultTokenList.USDC,
-        DefaultTokenList.USDT,
         {
           symbol: 'EURT',
           coingeckoId: 'tether-eurt',
@@ -402,8 +385,6 @@ export const CurveConfigs: CurveProtocolConfig = {
       GenesisBlocks['ethereum'],
       'wrap2Btc',
       [
-        DefaultTokenList.renBTC,
-        DefaultTokenList.WBTC,
         {
           symbol: 'tBTC',
           coingeckoId: 'tbtc',
@@ -423,8 +404,6 @@ export const CurveConfigs: CurveProtocolConfig = {
       GenesisBlocks['ethereum'],
       'wrap2Btc',
       [
-        DefaultTokenList.renBTC,
-        DefaultTokenList.WBTC,
         {
           symbol: 'pBTC',
           coingeckoId: 'ptokens-btc-2',
@@ -444,8 +423,6 @@ export const CurveConfigs: CurveProtocolConfig = {
       GenesisBlocks['ethereum'],
       'wrap2Btc',
       [
-        DefaultTokenList.renBTC,
-        DefaultTokenList.WBTC,
         {
           symbol: 'BBTC',
           coingeckoId: 'binance-wrapped-btc',
@@ -465,8 +442,6 @@ export const CurveConfigs: CurveProtocolConfig = {
       GenesisBlocks['ethereum'],
       'wrap2Btc',
       [
-        DefaultTokenList.renBTC,
-        DefaultTokenList.WBTC,
         {
           symbol: 'oBTC',
           coingeckoId: 'boringdao-btc',
@@ -479,11 +454,19 @@ export const CurveConfigs: CurveProtocolConfig = {
         },
       ]
     ),
-    // Aave aDAI - aUSDT - aUSDC
+    // Aave aDAI - asUSD
     getCurvePoolConfig('ethereum', '0xEB16Ae0052ed37f479f7fe63849198Df1765a733', GenesisBlocks['ethereum'], 'aave', [
       DefaultTokenList.DAI,
-      DefaultTokenList.USDT,
-      DefaultTokenList.USDC,
+      {
+        symbol: 'sUSD',
+        coingeckoId: 'nusd',
+        chains: {
+          ethereum: {
+            decimals: 18,
+            address: '0x57ab1ec28d129707052df4df418d58a2d46d5f51',
+          },
+        },
+      },
     ]),
   ],
 };
