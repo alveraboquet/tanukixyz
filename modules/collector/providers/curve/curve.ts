@@ -63,6 +63,10 @@ export class CurveProvider extends CollectorProvider {
           data.userCount += 1;
           addresses[normalizeAddress(event.returnValues['buyer'])] = true;
         }
+        if (event.returnValues['provider'] && !addresses[normalizeAddress(event.returnValues['provider'])]) {
+          data.userCount += 1;
+          addresses[normalizeAddress(event.returnValues['provider'])] = true;
+        }
 
         if (event.event === 'TokenExchange' || event.event === 'TokenExchangeUnderlying') {
           let soldToken: TokenConfig | null = null;
@@ -152,6 +156,42 @@ export class CurveProvider extends CollectorProvider {
 
             // calculate volume
             const volume: number = new BigNumber(event.returnValues.tokens_bought.toString())
+              .dividedBy(new BigNumber(10).pow(tokenDecimals))
+              .multipliedBy(historyPrice)
+              .toNumber();
+
+            tokens[tokenAddress].volumeInUseUSD += volume;
+            data.volumeInUseUSD += volume;
+          }
+        } else if (event.event === 'AddLiquidity' || event.event === 'RemoveLiquidity') {
+          for (let coinId = 0; coinId < event.returnValues.token_amounts.length; coinId++) {
+            const token: TokenConfig = pool.tokens[coinId];
+            const tokenDecimals: number = token.chains[pool.chainConfig.name].decimals;
+            const tokenAddress: string = normalizeAddress(token.chains[pool.chainConfig.name].address);
+
+            if (!tokens[tokenAddress]) {
+              tokens[tokenAddress] = {
+                chain: pool.chainConfig.name,
+                symbol: token.symbol,
+                address: tokenAddress,
+                decimals: tokenDecimals,
+
+                volumeInUseUSD: 0,
+                totalValueLockedUSD: 0,
+                transactionCount: 0,
+              };
+            }
+
+            let historyPrice: number = 0;
+            if (historyPrices[token.coingeckoId]) {
+              historyPrice = historyPrices[token.coingeckoId];
+            } else {
+              historyPrice = await getHistoryTokenPriceFromCoingecko(token.coingeckoId, fromTime);
+              historyPrices[token.coingeckoId] = historyPrice;
+            }
+
+            // calculate volume
+            const volume: number = new BigNumber(event.returnValues.token_amounts[coinId].toString())
               .dividedBy(new BigNumber(10).pow(tokenDecimals))
               .multipliedBy(historyPrice)
               .toNumber();
