@@ -133,6 +133,10 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
         decimals: 18,
         address: '',
       },
+      optimism: {
+        decimals: 18,
+        address: '',
+      },
       harmony: {
         decimals: 18,
         address: '',
