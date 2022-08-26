@@ -468,5 +468,142 @@ export const CurveConfigs: CurveProtocolConfig = {
         },
       },
     ]),
+    // STG - USDC
+    getCurvePoolConfig('ethereum', '0x3211C6cBeF1429da3D0d58494938299C92Ad5860', GenesisBlocks['ethereum'], 'meta', [
+      {
+        symbol: 'STG',
+        coingeckoId: 'stargate-finance',
+        chains: {
+          ethereum: {
+            decimals: 18,
+            address: '0xaf5191b0de278c7286d6c7cc6ab6bb8a73ba2cd6',
+          },
+        },
+      },
+      DefaultTokenList.USDC,
+    ]),
+    // CRV - cvxCRV
+    getCurvePoolConfig('ethereum', '0x9D0464996170c6B9e75eED71c68B99dDEDf279e8', GenesisBlocks['ethereum'], 'meta', [
+      DefaultTokenList.CRV,
+      {
+        symbol: 'CVXCRV',
+        coingeckoId: 'convex-crv',
+        chains: {
+          ethereum: {
+            decimals: 18,
+            address: '0x62B9c7356A2Dc64a1969e19C23e4f579F9810Aa7',
+          },
+        },
+      },
+    ]),
+    // CVX - ETH
+    getCurvePoolConfig('ethereum', '0xB576491F1E6e5E62f1d8F26062Ee822B40B0E0d4', GenesisBlocks['ethereum'], 'meta', [
+      DefaultTokenList.ETH,
+      {
+        symbol: 'CVX',
+        coingeckoId: 'convex-finance',
+        chains: {
+          ethereum: {
+            decimals: 18,
+            address: '0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B',
+          },
+        },
+      },
+    ]),
+    // FRAX - USDC
+    getCurvePoolConfig('ethereum', '0xDcEF968d416a41Cdac0ED8702fAC8128A64241A2', GenesisBlocks['ethereum'], 'meta', [
+      DefaultTokenList.FRAX,
+      DefaultTokenList.USDC,
+    ]),
+    // YFI - ETH
+    getCurvePoolConfig('ethereum', '0xC26b89A667578ec7b3f11b2F98d6Fd15C07C54ba', GenesisBlocks['ethereum'], 'meta', [
+      DefaultTokenList.ETH,
+      DefaultTokenList.YFI,
+    ]),
+    // AGEUR - EURT - EURS
+    getCurvePoolConfig('ethereum', '0xb9446c4Ef5EBE66268dA6700D26f96273DE3d571', GenesisBlocks['ethereum'], 'meta', [
+      {
+        symbol: 'AGEUR',
+        coingeckoId: 'ageur',
+        chains: {
+          ethereum: {
+            decimals: 18,
+            address: '0x1a7e4e63778b4f12a199c062f3efdd288afcbce8',
+          },
+        },
+      },
+      {
+        symbol: 'EURT',
+        coingeckoId: 'tether-eurt',
+        chains: {
+          ethereum: {
+            decimals: 6,
+            address: '0xC581b735A1688071A1746c968e0798D642EDE491',
+          },
+        },
+      },
+      {
+        symbol: 'EURS',
+        coingeckoId: 'stasis-eurs',
+        chains: {
+          ethereum: {
+            decimals: 2,
+            address: '0xdB25f211AB05b1c97D595516F45794528a807ad8',
+          },
+        },
+      },
+    ]),
+    // FRAX - FPI
+    getCurvePoolConfig('ethereum', '0xf861483fa7E511fbc37487D91B6FAa803aF5d37c', GenesisBlocks['ethereum'], 'meta', [
+      DefaultTokenList.FRAX,
+      {
+        symbol: 'FPI',
+        coingeckoId: 'frax-price-index-share',
+        chains: {
+          ethereum: {
+            decimals: 18,
+            address: '0x5Ca135cB8527d76e932f34B5145575F9d8cbE08E',
+          },
+        },
+      },
+    ]),
+    // DOLA - 3Pool
+    getCurvePoolConfig(
+      'ethereum',
+      '0xAA5A67c256e27A5d80712c51971408db3370927D',
+      GenesisBlocks['ethereum'],
+      'wrap3Pool',
+      [
+        {
+          symbol: 'DOLA',
+          coingeckoId: 'dola-usd',
+          chains: {
+            ethereum: {
+              decimals: 18,
+              address: '0x865377367054516e17014ccded1e7d814edc9ce4',
+            },
+          },
+        },
+      ]
+    ),
+    // USDD - 3Pool
+    getCurvePoolConfig(
+      'ethereum',
+      '0xe6b5CC1B4b47305c58392CE3D359B10282FC36Ea',
+      GenesisBlocks['ethereum'],
+      'wrap3Pool',
+      [
+        {
+          symbol: 'USDD',
+          coingeckoId: 'usdd',
+          chains: {
+            ethereum: {
+              decimals: 18,
+              address: '0x0C10bF8FcB7Bf5412187A595ab97a3609160b5c6',
+            },
+          },
+        },
+      ]
+    ),
   ],
 };
