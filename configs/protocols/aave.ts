@@ -78,5 +78,12 @@ export const AaveConfigs: AaveProtocolConfig = {
       contractBirthday: GenesisBlocks['arbitrum'],
       events: ['Supply', 'Borrow', 'Withdraw', 'Repay', 'LiquidationCall'],
     },
+    {
+      chainConfig: getChainConfig('optimism'),
+      contractAbi: AaveV3Abi,
+      contractAddress: '0x794a61358D6845594F94dc1DB02A252b5b4814aD',
+      contractBirthday: 4365693, // Mar-11-2022 01:47:59 PM +UTC
+      events: ['Supply', 'Borrow', 'Withdraw', 'Repay', 'LiquidationCall'],
+    },
   ],
 };

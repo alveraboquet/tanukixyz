@@ -294,4 +294,23 @@ export const ReserveMap: { [key: string]: TokenConfig } = {
   '0x3095c7557bcb296ccc6e363de01b760ba031f2d9': DefaultTokenList.WBTC,
   '0x3c2b8be99c50593081eaa2a724f0b8285f5aba8f': DefaultTokenList.USDT,
   '0xcf323aad9e522b93f11c352caa519ad0e14eb40f': DefaultTokenList.AAVE,
+
+  // optimism
+  // '0xda10009cbd5d07dd0cecc66161fc93d7c9000da1': DefaultTokenList.DAI,
+  '0x350a791bfc2c21f9ed5d10980dad2e2638ffa7f6': DefaultTokenList.LINK,
+  '0x7f5c764cbc14f9669b88837ca1490cca17c31607': DefaultTokenList.USDC,
+  '0x68f180fcce6836688e9084f035309e29bf0a2095': DefaultTokenList.WBTC,
+  '0x4200000000000000000000000000000000000006': DefaultTokenList.ETH,
+  '0x94b008aa00579c1307b0ef2c499ad98a8ce58e58': DefaultTokenList.USDT,
+  '0x76fb31fb4af56892a25e32cfc43de717950c9278': DefaultTokenList.AAVE,
+  '0x8c6f28f2f1a3c87f0f938b96d27520d9751ec8d9': {
+    symbol: 'sUSD',
+    coingeckoId: 'nusd',
+    chains: {
+      optimism: {
+        decimals: 18,
+        address: '',
+      },
+    },
+  },
 };

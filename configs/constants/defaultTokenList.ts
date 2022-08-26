@@ -33,6 +33,10 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
         decimals: 18,
         address: '',
       },
+      optimism: {
+        decimals: 18,
+        address: '',
+      },
       harmony: {
         decimals: 18,
         address: '',
@@ -64,6 +68,10 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
         address: '',
       },
       arbitrum: {
+        decimals: 18,
+        address: '',
+      },
+      optimism: {
         decimals: 18,
         address: '',
       },
@@ -166,6 +174,10 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
         address: '',
       },
       arbitrum: {
+        decimals: 18,
+        address: '',
+      },
+      optimism: {
         decimals: 18,
         address: '',
       },
@@ -295,6 +307,10 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
         decimals: 6,
         address: '',
       },
+      optimism: {
+        decimals: 6,
+        address: '',
+      },
       harmony: {
         decimals: 6,
         address: '',
@@ -343,6 +359,10 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
         decimals: 6,
         address: '',
       },
+      optimism: {
+        decimals: 6,
+        address: '',
+      },
       harmony: {
         decimals: 6,
         address: '',
@@ -378,6 +398,10 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
         address: '',
       },
       arbitrum: {
+        decimals: 8,
+        address: '',
+      },
+      optimism: {
         decimals: 8,
         address: '',
       },
