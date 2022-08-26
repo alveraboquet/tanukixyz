@@ -9,7 +9,7 @@ import { BastionConfigs } from '../configs/protocols/bastion';
 import { BeetsConfigs } from '../configs/protocols/beets';
 import { BenqiConfigs } from '../configs/protocols/benqi';
 import { BiswapConfigs } from '../configs/protocols/biswap';
-import { CompoundConfigs } from '../configs/protocols/compound';
+import { Compound3Configs, CompoundConfigs } from '../configs/protocols/compound';
 import { ConvexConfigs } from '../configs/protocols/convex';
 import { CreamConfigs } from '../configs/protocols/cream';
 import { CurveConfigs } from '../configs/protocols/curve';
@@ -42,7 +42,7 @@ import { AaveAdapter } from './adapters/aave';
 import { AbracadabraAdapter } from './adapters/abracadabra';
 import { AlpacaAdapter } from './adapters/alpaca';
 import { BalancerAdapter } from './adapters/balancer';
-import { CompoundAdapter } from './adapters/compound';
+import { Compound3Adapter, CompoundAdapter } from './adapters/compound';
 import { ConvexAdapter } from './adapters/convex';
 import { CurveAdapter } from './adapters/curve';
 import { DodoexAdapter } from './adapters/dodoex';
@@ -91,6 +91,8 @@ export function getAdapter(protocol: string, providers: ShareProviders): DefiAda
     // compound and forks
     case 'compound':
       return new CompoundAdapter(CompoundConfigs, providers);
+    case 'compound3':
+      return new Compound3Adapter(Compound3Configs, providers);
     case 'ironbank':
       return new CompoundAdapter(IronBankConfigs, providers);
     case 'cream':

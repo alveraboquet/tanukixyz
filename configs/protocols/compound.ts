@@ -1,8 +1,9 @@
+import Compound3PoolAbi from '../abi/compound/v3Pool.json';
 import { getChainConfig } from '../chains';
 import { DefaultTokenList } from '../constants/defaultTokenList';
 import { GenesisBlocks } from '../constants/genesisBlocks';
 import { getCompoundPoolConfig } from '../helpers';
-import { CompoundProtocolConfig } from '../types';
+import { CompoundProtocolConfig, EventIndexConfig, ProtocolConfig, TokenConfig } from '../types';
 
 export const CompoundConfigs: CompoundProtocolConfig = {
   name: 'compound',
@@ -134,5 +135,28 @@ export const CompoundConfigs: CompoundProtocolConfig = {
       GenesisBlocks['ethereum'],
       DefaultTokenList.ZRX
     ),
+  ],
+};
+
+export interface Compound3PoolConfig extends EventIndexConfig {
+  underlying: TokenConfig;
+}
+
+export interface Compound3ProtocolConfig extends ProtocolConfig {
+  pools: Array<Compound3PoolConfig>;
+}
+
+export const Compound3Configs: Compound3ProtocolConfig = {
+  name: 'compound3',
+  tokenomics: DefaultTokenList.COMP,
+  pools: [
+    {
+      chainConfig: getChainConfig('ethereum'),
+      contractAbi: Compound3PoolAbi,
+      contractAddress: '0xc3d688B66703497DAA19211EEdff47f25384cdc3',
+      contractBirthday: 15331586,
+      underlying: DefaultTokenList.USDC,
+      events: ['Supply', 'Withdraw', 'SupplyCollateral', 'WithdrawCollateral', 'AbsorbDebt', 'AbsorbCollateral'],
+    },
   ],
 };
