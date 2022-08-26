@@ -24,6 +24,7 @@ import { RefFinanceConfigs } from '../configs/protocols/reffinance';
 import { RibbonConfigs } from '../configs/protocols/ribbon';
 import { RoninKatanaConfigs } from '../configs/protocols/ronin';
 import { SpookyswapConfigs } from '../configs/protocols/spookyswap';
+import { StargateConfigs } from '../configs/protocols/stargate';
 import { SushiswapConfigs } from '../configs/protocols/sushiswap';
 import { TraderJoeExchangeConfigs, TraderJoeLendingConfigs } from '../configs/protocols/traderjoe';
 import { UniswapConfigs } from '../configs/protocols/uniswap';
@@ -49,6 +50,7 @@ import { EulerAdapter } from './adapters/euler';
 import { LiquityAdapter } from './adapters/liquity';
 import { RefFinanceAdapter } from './adapters/reffinance';
 import { RibbonAdapter } from './adapters/ribbon';
+import { StargateAdapter } from './adapters/stargate';
 import { TraderJoeAdapter } from './adapters/traderjoe';
 import { UniswapAdapter } from './adapters/uniswap';
 
@@ -125,6 +127,8 @@ export function getAdapter(protocol: string, providers: ShareProviders): DefiAda
       return new EulerAdapter(EulerConfigs, providers);
     case 'alpaca':
       return new AlpacaAdapter(AlpacaConfigs, providers);
+    case 'stargate':
+      return new StargateAdapter(StargateConfigs, providers);
 
     // use API
     case 'curve':
