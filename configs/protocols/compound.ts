@@ -140,6 +140,7 @@ export const CompoundConfigs: CompoundProtocolConfig = {
 
 export interface Compound3PoolConfig extends EventIndexConfig {
   underlying: TokenConfig;
+  collaterals: Array<TokenConfig>;
 }
 
 export interface Compound3ProtocolConfig extends ProtocolConfig {
@@ -156,6 +157,13 @@ export const Compound3Configs: Compound3ProtocolConfig = {
       contractAddress: '0xc3d688B66703497DAA19211EEdff47f25384cdc3',
       contractBirthday: 15331586,
       underlying: DefaultTokenList.USDC,
+      collaterals: [
+        DefaultTokenList.ETH,
+        DefaultTokenList.COMP,
+        DefaultTokenList.UNI,
+        DefaultTokenList.WBTC,
+        DefaultTokenList.LINK,
+      ],
       events: ['Supply', 'Withdraw', 'SupplyCollateral', 'WithdrawCollateral', 'AbsorbDebt', 'AbsorbCollateral'],
     },
   ],
