@@ -493,6 +493,10 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
         decimals: 18,
         address: '',
       },
+      optimism: {
+        decimals: 18,
+        address: '',
+      },
       fantom: {
         decimals: 18,
         address: '',

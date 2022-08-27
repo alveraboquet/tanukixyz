@@ -397,5 +397,33 @@ export const IronBankConfigs: CompoundProtocolConfig = {
       GenesisBlocks['fantom'],
       DefaultTokenList.TUSD
     ), // TUSD
+
+    // optimism
+    getCompoundPoolConfig('optimism', '0x17533a1bDe957979E3977EbbFBC31E6deeb25C7d', 12664210, DefaultTokenList.ETH),
+    getCompoundPoolConfig('optimism', '0x1d073cf59Ae0C169cbc58B6fdD518822ae89173a', 12664210, DefaultTokenList.USDC),
+    getCompoundPoolConfig('optimism', '0x874C01c2d1767EFA01Fa54b2Ac16be96fAd5a742', 12664210, DefaultTokenList.USDT),
+    getCompoundPoolConfig('optimism', '0x049E04bEE77cFfB055f733A138a2F204D3750283', 12664210, DefaultTokenList.DAI),
+    getCompoundPoolConfig('optimism', '0xcdb9b4db65C913aB000b40204248C8A53185D14D', 12664210, DefaultTokenList.WBTC),
+    getCompoundPoolConfig('optimism', '0x4645e0952678E9566FB529D9313f5730E4e1C412', 12664210, {
+      symbol: 'OP',
+      coingeckoId: 'optimism',
+      chains: {
+        optimism: {
+          decimals: 18,
+          address: '0x4200000000000000000000000000000000000042',
+        },
+      },
+    }),
+    getCompoundPoolConfig('optimism', '0xE724FfA5D30782499086682C8362CB3673bF69ae', 12664210, DefaultTokenList.SNX),
+    getCompoundPoolConfig('optimism', '0x04F0fd3CD03B17a3E5921c0170ca6dD3952841cA', 12664210, {
+      symbol: 'sUSD',
+      coingeckoId: 'nusd',
+      chains: {
+        optimism: {
+          decimals: 18,
+          address: '0x8c6f28f2f1a3c87f0f938b96d27520d9751ec8d9',
+        },
+      },
+    }),
   ],
 };
