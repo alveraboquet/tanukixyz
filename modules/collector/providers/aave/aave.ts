@@ -8,7 +8,7 @@ import { getHistoryTokenPriceFromCoingecko, normalizeAddress } from '../../../..
 import logger from '../../../../lib/logger';
 import { ShareProviders } from '../../../../lib/types';
 import { CollectorProvider } from '../../collector';
-import { ProtocolData, ProtocolTokenData } from '../../types';
+import { ProtocolData, ProtocolLendingActionData, ProtocolTokenData } from '../../types';
 import { getReserveConfig } from './helpers';
 
 export class AaveProvider extends CollectorProvider {
@@ -38,6 +38,13 @@ export class AaveProvider extends CollectorProvider {
     const transactions: any = {};
     const historyPrices: any = {};
     const tokens: any = {};
+    const actions: ProtocolLendingActionData = {
+      supplyVolumeUSD: 0,
+      withdrawVolumeUSD: 0,
+      borrowVolumeUSD: 0,
+      repayVolumeUSD: 0,
+      liquidateVolumeUSD: 0,
+    };
 
     for (const poolConfig of configs.pools) {
       const events = await eventCollection
@@ -72,9 +79,14 @@ export class AaveProvider extends CollectorProvider {
         }
 
         if (!reserveConfig.chains[poolConfig.chainConfig.name]) {
-          console.info(poolConfig);
-          console.info(reserveConfig);
-          console.info(event);
+          logger.onDebug({
+            source: this.name,
+            message: 'reserve address not found',
+            props: {
+              pool: normalizeAddress(poolConfig.contractAddress),
+              reserve: normalizeAddress(reserveAddress),
+            },
+          });
         }
 
         // count transaction
@@ -152,6 +164,27 @@ export class AaveProvider extends CollectorProvider {
             new BigNumber(event.returnValues['amount'])
               .dividedBy(new BigNumber(10).pow(reserveConfig.chains[event.chain].decimals))
               .toNumber() * historyPrice;
+        }
+
+        switch (event.event) {
+          case 'Deposit':
+          case 'Supply': {
+            actions.supplyVolumeUSD += volume;
+            break;
+          }
+          case 'RedeemUnderlying':
+          case 'Withdraw': {
+            actions.withdrawVolumeUSD += volume;
+            break;
+          }
+          case 'Borrow': {
+            actions.borrowVolumeUSD += volume;
+            break;
+          }
+          case 'Repay': {
+            actions.repayVolumeUSD += volume;
+            break;
+          }
         }
 
         if (tokens[`${poolConfig.chainConfig.name}:${normalizeAddress(reserveAddress)}`]) {
@@ -247,8 +280,12 @@ export class AaveProvider extends CollectorProvider {
       }
     }
 
-    for (const [, token] of Object.entries(tokens)) {
-      data.detail?.tokens.push(token as ProtocolTokenData);
+    if (data.detail) {
+      for (const [, token] of Object.entries(tokens)) {
+        data.detail.tokens.push(token as ProtocolTokenData);
+      }
+
+      data.detail.actions = actions;
     }
 
     return data;

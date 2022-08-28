@@ -54,6 +54,12 @@ export function getRouter(providers: ShareProviders): Router {
 
       data.date = removeIdFields(dateData);
 
+      for (let i = 0; i < data.date.length; i++) {
+        if (data.date[i].detail && data.date[i].detail.tokens) {
+          delete data.date[i].detail.tokens;
+        }
+      }
+
       writeResponseData(response, {
         status: 200,
         data: data,
@@ -64,7 +70,7 @@ export function getRouter(providers: ShareProviders): Router {
       setCache(cacheKey, removeIdFields(data));
     } catch (e: any) {
       logger.onError({
-        source: 'router.metrics',
+        source: 'router.protocol',
         message: 'failed to serve api request',
         props: {
           path: request.path,

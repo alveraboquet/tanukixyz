@@ -9,7 +9,7 @@ import { getHistoryTokenPriceFromCoingecko, normalizeAddress } from '../../../..
 import logger from '../../../../lib/logger';
 import { ShareProviders } from '../../../../lib/types';
 import { CollectorProvider } from '../../collector';
-import { ProtocolData, ProtocolTokenData } from '../../types';
+import { ProtocolData, ProtocolLendingActionData, ProtocolTokenData } from '../../types';
 
 export class CompoundProvider extends CollectorProvider {
   public readonly name: string = 'collector.compound';
@@ -36,6 +36,13 @@ export class CompoundProvider extends CollectorProvider {
     const addresses: any = {};
     const transactions: any = {};
     const historyPrices: any = {};
+    const actions: ProtocolLendingActionData = {
+      supplyVolumeUSD: 0,
+      withdrawVolumeUSD: 0,
+      borrowVolumeUSD: 0,
+      repayVolumeUSD: 0,
+      liquidateVolumeUSD: 0,
+    };
 
     for (const poolConfig of this.configs.pools) {
       const underlyingAddress = normalizeAddress(poolConfig.underlying.chains[poolConfig.chainConfig.name].address);
@@ -117,6 +124,7 @@ export class CompoundProvider extends CollectorProvider {
               .dividedBy(new BigNumber(10).pow(poolConfig.underlying.chains[poolConfig.chainConfig.name].decimals))
               .multipliedBy(historyPrice)
               .toNumber();
+            actions.supplyVolumeUSD += volume;
             break;
           }
           case 'Redeem': {
@@ -124,6 +132,7 @@ export class CompoundProvider extends CollectorProvider {
               .dividedBy(new BigNumber(10).pow(poolConfig.underlying.chains[poolConfig.chainConfig.name].decimals))
               .multipliedBy(historyPrice)
               .toNumber();
+            actions.withdrawVolumeUSD += volume;
             break;
           }
           case 'Borrow': {
@@ -131,6 +140,7 @@ export class CompoundProvider extends CollectorProvider {
               .dividedBy(new BigNumber(10).pow(poolConfig.underlying.chains[poolConfig.chainConfig.name].decimals))
               .multipliedBy(historyPrice)
               .toNumber();
+            actions.borrowVolumeUSD += volume;
             break;
           }
           case 'RepayBorrow': {
@@ -138,6 +148,8 @@ export class CompoundProvider extends CollectorProvider {
               .dividedBy(new BigNumber(10).pow(poolConfig.underlying.chains[poolConfig.chainConfig.name].decimals))
               .multipliedBy(historyPrice)
               .toNumber();
+            actions.repayVolumeUSD += volume;
+            break;
           }
         }
 
@@ -171,6 +183,10 @@ export class CompoundProvider extends CollectorProvider {
       }
 
       data.detail?.tokens.push(tokenData);
+    }
+
+    if (data.detail) {
+      data.detail.actions = actions;
     }
 
     return data;

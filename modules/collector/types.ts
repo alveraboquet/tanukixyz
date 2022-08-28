@@ -14,6 +14,20 @@ export interface ProtocolTokenData {
   transactionCount: number;
 }
 
+export interface ProtocolExchangeActionData {
+  swapVolumeUSD: number;
+  addLiquidityVolumeUSD: number;
+  removeLiquidityVolumeUSD: number;
+}
+
+export interface ProtocolLendingActionData {
+  supplyVolumeUSD: number;
+  withdrawVolumeUSD: number;
+  borrowVolumeUSD: number;
+  repayVolumeUSD: number;
+  liquidateVolumeUSD: number;
+}
+
 export interface ProtocolData {
   revenueUSD: number;
   totalValueLockedUSD: number;
@@ -30,5 +44,6 @@ export interface ProtocolData {
   // every protocol have diff type of data
   detail?: {
     tokens: Array<ProtocolTokenData>;
+    actions?: ProtocolExchangeActionData | ProtocolLendingActionData;
   };
 }
