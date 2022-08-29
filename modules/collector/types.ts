@@ -46,4 +46,12 @@ export interface ProtocolData {
     tokens: Array<ProtocolTokenData>;
     actions?: ProtocolExchangeActionData | ProtocolLendingActionData;
   };
+
+  changes24Hours?: {
+    revenueUSD: number;
+    totalValueLockedUSD: number;
+    volumeInUseUSD: number;
+    userCount: number;
+    transactionCount: number;
+  }
 }

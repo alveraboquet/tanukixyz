@@ -32,7 +32,20 @@ export class CollectorProvider implements Provider {
 
   public async getDailyData(argv: GetProtocolDataProps): Promise<ProtocolData> {
     const { providers, date } = argv;
-    return await this.getDataInTimeFrame(providers, date - 24 * 60 * 60, date);
+
+    const data = await this.getDataInTimeFrame(providers, date - 24 * 60 * 60, date);
+    const data24 = await this.getDataInTimeFrame(providers, date - 48 * 60 * 60, date - 24 * 60 * 60);
+
+    return {
+      ...data,
+      changes24Hours: {
+        volumeInUseUSD: (data.volumeInUseUSD - data24.volumeInUseUSD) / data24.volumeInUseUSD * 100,
+        transactionCount: (data.transactionCount - data24.transactionCount) / data24.transactionCount * 100,
+        revenueUSD: (data.revenueUSD - data24.revenueUSD) / data24.revenueUSD * 100,
+        userCount: (data.userCount - data24.userCount) / data24.userCount * 100,
+        totalValueLockedUSD: (data.totalValueLockedUSD - data24.totalValueLockedUSD) / data24.totalValueLockedUSD * 100,
+      }
+    }
   }
 
   public async getDateData(argv: GetProtocolDataProps): Promise<any> {
