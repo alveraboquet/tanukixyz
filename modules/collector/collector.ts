@@ -39,13 +39,14 @@ export class CollectorProvider implements Provider {
     return {
       ...data,
       changes24Hours: {
-        volumeInUseUSD: (data.volumeInUseUSD - data24.volumeInUseUSD) / data24.volumeInUseUSD * 100,
-        transactionCount: (data.transactionCount - data24.transactionCount) / data24.transactionCount * 100,
-        revenueUSD: (data.revenueUSD - data24.revenueUSD) / data24.revenueUSD * 100,
-        userCount: (data.userCount - data24.userCount) / data24.userCount * 100,
-        totalValueLockedUSD: (data.totalValueLockedUSD - data24.totalValueLockedUSD) / data24.totalValueLockedUSD * 100,
-      }
-    }
+        volumeInUseUSD: ((data.volumeInUseUSD - data24.volumeInUseUSD) / data24.volumeInUseUSD) * 100,
+        transactionCount: ((data.transactionCount - data24.transactionCount) / data24.transactionCount) * 100,
+        revenueUSD: ((data.revenueUSD - data24.revenueUSD) / data24.revenueUSD) * 100,
+        userCount: ((data.userCount - data24.userCount) / data24.userCount) * 100,
+        totalValueLockedUSD:
+          ((data.totalValueLockedUSD - data24.totalValueLockedUSD) / data24.totalValueLockedUSD) * 100,
+      },
+    };
   }
 
   public async getDateData(argv: GetProtocolDataProps): Promise<any> {

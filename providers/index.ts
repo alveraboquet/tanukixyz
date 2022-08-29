@@ -13,14 +13,12 @@ import { Compound3Configs, CompoundConfigs } from '../configs/protocols/compound
 import { ConvexConfigs } from '../configs/protocols/convex';
 import { CreamConfigs } from '../configs/protocols/cream';
 import { CurveConfigs } from '../configs/protocols/curve';
-import { DodoexConfigs } from '../configs/protocols/dodoex';
 import { EulerConfigs } from '../configs/protocols/euler';
 import { IronBankConfigs } from '../configs/protocols/ironbank';
 import { LiquityConfigs } from '../configs/protocols/liquity';
 import { MmfinanceConfigs } from '../configs/protocols/mmfinance';
 import { PancakeswapConfigs } from '../configs/protocols/pancakeswap';
 import { QuickswapConfigs } from '../configs/protocols/quickswap';
-import { RefFinanceConfigs } from '../configs/protocols/reffinance';
 import { RibbonConfigs } from '../configs/protocols/ribbon';
 import { RoninKatanaConfigs } from '../configs/protocols/ronin';
 import { SpookyswapConfigs } from '../configs/protocols/spookyswap';
@@ -45,10 +43,8 @@ import { BalancerAdapter } from './adapters/balancer';
 import { Compound3Adapter, CompoundAdapter } from './adapters/compound';
 import { ConvexAdapter } from './adapters/convex';
 import { CurveAdapter } from './adapters/curve';
-import { DodoexAdapter } from './adapters/dodoex';
 import { EulerAdapter } from './adapters/euler';
 import { LiquityAdapter } from './adapters/liquity';
-import { RefFinanceAdapter } from './adapters/reffinance';
 import { RibbonAdapter } from './adapters/ribbon';
 import { StargateAdapter } from './adapters/stargate';
 import { TraderJoeAdapter } from './adapters/traderjoe';
@@ -135,10 +131,6 @@ export function getAdapter(protocol: string, providers: ShareProviders): DefiAda
     // use API
     case 'curve':
       return new CurveAdapter(CurveConfigs, providers);
-    case 'dodoex':
-      return new DodoexAdapter(DodoexConfigs, providers);
-    case 'reffinance':
-      return new RefFinanceAdapter(RefFinanceConfigs, providers);
     default:
       return null;
   }

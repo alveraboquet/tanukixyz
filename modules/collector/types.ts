@@ -53,5 +53,5 @@ export interface ProtocolData {
     volumeInUseUSD: number;
     userCount: number;
     transactionCount: number;
-  }
+  };
 }

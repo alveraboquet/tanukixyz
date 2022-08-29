@@ -42,7 +42,6 @@ yarn start --help
 | Alpaca Finance          | On-chain contract events |
 | Abracadabra             | On-chain contract events |
 | Convex Finance          | Subgraph                 |
-| Curve Fi                | Curve API                |
-| Dodoex                  | Dodo API                 |
+| Curve Fi                | On-chain contract events |
 | Liquity                 | On-chain contract events |
 | Ribbon Finance          | Subgraph                 |
