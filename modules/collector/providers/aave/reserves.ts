@@ -177,6 +177,16 @@ export const ReserveMap: { [key: string]: TokenConfig } = {
       },
     },
   },
+  '0x5f98805a4e8be255a32880fdec7f6728c6568ba': {
+    symbol: 'LUSD',
+    coingeckoId: 'liquity-usd',
+    chains: {
+      ethereum: {
+        decimals: 18,
+        address: '',
+      },
+    },
+  },
 
   // polygon
   '0x8f3cf7ad23cd3cadbd9735aff958023239c6a063': DefaultTokenList.DAI,
@@ -224,6 +234,16 @@ export const ReserveMap: { [key: string]: TokenConfig } = {
   '0xe0b52e49357fd4daf2c15e02058dce6bc0057db4': {
     symbol: 'agEUR',
     coingeckoId: 'ageur',
+    chains: {
+      polygon: {
+        decimals: 18,
+        address: '',
+      },
+    },
+  },
+  '0xa3fa99a148fa48d14ed51d610c367c61876997f1': {
+    symbol: 'miMATIC',
+    coingeckoId: 'mimatic',
     chains: {
       polygon: {
         decimals: 18,
