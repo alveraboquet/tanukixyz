@@ -14,7 +14,7 @@ export const UniswapConfigs: UniswapProtocolConfig = {
     {
       version: 3,
       chainConfig: getChainConfig('ethereum'),
-      exchange: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-subgraph',
+      exchange: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3',
     },
     {
       version: 3,
