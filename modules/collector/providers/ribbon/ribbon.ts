@@ -22,7 +22,7 @@ export class RibbonProvider extends CollectorProvider {
 
   public async getDataByEvents(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {
     const data: ProtocolData = {
-      revenueUSD: 0,
+      feeUSD: 0,
       totalValueLockedUSD: 0,
       volumeInUseUSD: 0,
       userCount: 0,
@@ -125,7 +125,7 @@ export class RibbonProvider extends CollectorProvider {
 
   public async getDataBySubgraphs(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {
     const data: ProtocolData = {
-      revenueUSD: 0,
+      feeUSD: 0,
       totalValueLockedUSD: 0,
       volumeInUseUSD: 0,
       userCount: 0,

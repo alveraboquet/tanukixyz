@@ -22,7 +22,7 @@ export class BalancerProvider extends CollectorProvider {
     toBlock: number
   ): Promise<ProtocolData> {
     const data: ProtocolData = {
-      revenueUSD: 0,
+      feeUSD: 0,
       totalValueLockedUSD: 0,
       volumeInUseUSD: 0,
       userCount: 0,
@@ -56,8 +56,7 @@ export class BalancerProvider extends CollectorProvider {
       response['endDate'] &&
       response['endDate'].length > 0
     ) {
-      data.revenueUSD +=
-        Number(response['endDate'][0]['totalSwapFee']) - Number(response['startDate'][0]['totalSwapFee']);
+      data.feeUSD += Number(response['endDate'][0]['totalSwapFee']) - Number(response['startDate'][0]['totalSwapFee']);
       data.volumeInUseUSD +=
         Number(response['endDate'][0]['totalSwapVolume']) - Number(response['startDate'][0]['totalSwapVolume']);
       data.transactionCount +=
@@ -169,7 +168,7 @@ export class BalancerProvider extends CollectorProvider {
 
   public async getDataInTimeFrame(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {
     const data: ProtocolData = {
-      revenueUSD: 0,
+      feeUSD: 0,
       totalValueLockedUSD: 0,
       volumeInUseUSD: 0,
       userCount: 0,
@@ -201,7 +200,7 @@ export class BalancerProvider extends CollectorProvider {
         blockNumberEndDate
       );
 
-      data.revenueUSD += overviewData.revenueUSD;
+      data.feeUSD += overviewData.feeUSD;
       data.totalValueLockedUSD += overviewData.totalValueLockedUSD;
       data.volumeInUseUSD += overviewData.volumeInUseUSD;
       data.userCount += overviewData.userCount;

@@ -16,7 +16,7 @@ export class EnsProvider extends CollectorProvider {
 
   private async getDataInRange(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {
     const data: ProtocolData = {
-      revenueUSD: 0,
+      feeUSD: 0,
       totalValueLockedUSD: 0,
       volumeInUseUSD: 0,
       userCount: 0,
@@ -53,7 +53,7 @@ export class EnsProvider extends CollectorProvider {
             .dividedBy(1e18)
             .multipliedBy(ethPrice)
             .toNumber();
-          data.revenueUSD += cost;
+          data.feeUSD += cost;
           data.volumeInUseUSD += cost;
 
           if (!transactions[registers[i]['transactionID']]) {

@@ -20,7 +20,7 @@ export class AaveProvider extends CollectorProvider {
 
   public async getDataInTimeFrame(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {
     const data: ProtocolData = {
-      revenueUSD: 0,
+      feeUSD: 0,
       totalValueLockedUSD: 0,
       volumeInUseUSD: 0,
       userCount: 0,

@@ -17,7 +17,7 @@ export class LiquityProvider extends CollectorProvider {
 
   public async getDataInTimeFrame(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {
     const dateData: ProtocolData = {
-      revenueUSD: 0,
+      feeUSD: 0,
       totalValueLockedUSD: 0,
       volumeInUseUSD: 0,
       userCount: 0,
@@ -91,7 +91,7 @@ export class LiquityProvider extends CollectorProvider {
           break;
         }
         case 'LUSDBorrowingFeePaid': {
-          dateData.revenueUSD += new BigNumber(events[i].returnValues['_LUSDFee']).dividedBy(1e18).toNumber();
+          dateData.feeUSD += new BigNumber(events[i].returnValues['_LUSDFee']).dividedBy(1e18).toNumber();
           break;
         }
       }

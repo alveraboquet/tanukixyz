@@ -75,7 +75,7 @@ export class UniswapProvider extends CollectorProvider {
     toBlockNumber: number
   ): Promise<ProtocolData> {
     const factoryData: ProtocolData = {
-      revenueUSD: 0,
+      feeUSD: 0,
       totalValueLockedUSD: 0,
       volumeInUseUSD: 0,
       userCount: 0,
@@ -118,7 +118,7 @@ export class UniswapProvider extends CollectorProvider {
 
     if (parsed && parsed24) {
       const volumeUSD = Number(parsed[filters.totalVolume]) - Number(parsed24[filters.totalVolume]);
-      factoryData.revenueUSD =
+      factoryData.feeUSD =
         subgraph.version === 2
           ? (volumeUSD * 0.3) / 100
           : Number(parsed[filters.totalFee]) - Number(parsed24[filters.totalFee]);
@@ -220,7 +220,7 @@ export class UniswapProvider extends CollectorProvider {
 
   public async getDataInTimeFrame(providers: ShareProviders, fromTime: number, toTime: number): Promise<ProtocolData> {
     const data: ProtocolData = {
-      revenueUSD: 0,
+      feeUSD: 0,
       totalValueLockedUSD: 0,
       volumeInUseUSD: 0,
       userCount: 0,
@@ -258,7 +258,7 @@ export class UniswapProvider extends CollectorProvider {
         blockNumberFromTime,
         blockNumberToTime
       );
-      data.revenueUSD += factoryData.revenueUSD;
+      data.feeUSD += factoryData.feeUSD;
       data.totalValueLockedUSD += factoryData.totalValueLockedUSD;
       data.volumeInUseUSD += factoryData.volumeInUseUSD;
       data.userCount += factoryData.userCount;

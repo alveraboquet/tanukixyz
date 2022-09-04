@@ -92,7 +92,7 @@ export class TraderjoeProvider extends CollectorProvider {
 
     return {
       tokenomics: lendingData.tokenomics,
-      revenueUSD: exchangeData.revenueUSD + lendingData.revenueUSD,
+      feeUSD: exchangeData.feeUSD + lendingData.feeUSD,
       totalValueLockedUSD: exchangeData.totalValueLockedUSD + lendingData.totalValueLockedUSD,
       volumeInUseUSD: exchangeData.volumeInUseUSD + lendingData.volumeInUseUSD,
       userCount: exchangeData.userCount + lendingData.userCount,

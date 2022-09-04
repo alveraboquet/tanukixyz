@@ -29,7 +29,7 @@ export interface ProtocolLendingActionData {
 }
 
 export interface ProtocolData {
-  revenueUSD: number;
+  feeUSD: number;
   totalValueLockedUSD: number;
   volumeInUseUSD: number;
   userCount: number;
@@ -48,7 +48,7 @@ export interface ProtocolData {
   };
 
   changes24Hours?: {
-    revenueUSD: number;
+    feeUSD: number;
     totalValueLockedUSD: number;
     volumeInUseUSD: number;
     userCount: number;

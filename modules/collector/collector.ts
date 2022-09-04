@@ -41,7 +41,7 @@ export class CollectorProvider implements Provider {
       changes24Hours: {
         volumeInUseUSD: ((data.volumeInUseUSD - data24.volumeInUseUSD) / data24.volumeInUseUSD) * 100,
         transactionCount: ((data.transactionCount - data24.transactionCount) / data24.transactionCount) * 100,
-        revenueUSD: ((data.revenueUSD - data24.revenueUSD) / data24.revenueUSD) * 100,
+        feeUSD: ((data.feeUSD - data24.feeUSD) / data24.feeUSD) * 100,
         userCount: ((data.userCount - data24.userCount) / data24.userCount) * 100,
         totalValueLockedUSD:
           ((data.totalValueLockedUSD - data24.totalValueLockedUSD) / data24.totalValueLockedUSD) * 100,
@@ -95,7 +95,7 @@ export class CollectorProvider implements Provider {
       message: 'collected protocol daily data',
       props: {
         protocol: this.configs.name,
-        revenueUSD: dailyData.revenueUSD.toFixed(2),
+        feeUSD: dailyData.feeUSD.toFixed(2),
         tvlUSD: dailyData.totalValueLockedUSD.toFixed(2),
         volumeUSD: dailyData.volumeInUseUSD.toFixed(2),
         userCount: dailyData.userCount.toFixed(2),
@@ -167,7 +167,7 @@ export class CollectorProvider implements Provider {
         props: {
           protocol: this.configs.name,
           date: new Date(startDate * 1000).toISOString().split('T')[0],
-          revenueUSD: dateData.revenueUSD.toFixed(2),
+          feeUSD: dateData.feeUSD.toFixed(2),
           tvlUSD: dateData.totalValueLockedUSD.toFixed(2),
           volumeUSD: dateData.volumeInUseUSD.toFixed(2),
           elapsed: `${elapsed}s`,
