@@ -28,6 +28,7 @@ import { TraderJoeExchangeConfigs, TraderJoeLendingConfigs } from '../configs/pr
 import { UniswapConfigs } from '../configs/protocols/uniswap';
 import { VenusConfigs } from '../configs/protocols/venus';
 import { VvsfinanceConfigs } from '../configs/protocols/vvsfinance';
+import { WombatConfigs } from '../configs/protocols/wombat';
 import { ShareProviders } from '../lib/types';
 import { RoninKatanaProvider } from '../modules/collector/providers/katana/katana';
 import { MmfinanceProvider } from '../modules/collector/providers/mmfinance/mmfinance';
@@ -49,6 +50,7 @@ import { RibbonAdapter } from './adapters/ribbon';
 import { StargateAdapter } from './adapters/stargate';
 import { TraderJoeAdapter } from './adapters/traderjoe';
 import { UniswapAdapter } from './adapters/uniswap';
+import { WombatAdapter } from './adapters/wombat';
 
 export function getAdapter(protocol: string, providers: ShareProviders): DefiAdapter | null {
   switch (protocol) {
@@ -127,10 +129,10 @@ export function getAdapter(protocol: string, providers: ShareProviders): DefiAda
       return new AlpacaAdapter(AlpacaConfigs, providers);
     case 'stargate':
       return new StargateAdapter(StargateConfigs, providers);
-
-    // use API
     case 'curve':
       return new CurveAdapter(CurveConfigs, providers);
+    case 'wombat':
+      return new WombatAdapter(WombatConfigs, providers);
     default:
       return null;
   }
