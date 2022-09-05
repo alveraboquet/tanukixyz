@@ -128,6 +128,36 @@ export class UniswapProvider extends CollectorProvider {
         Number(parsed[filters.totalTransaction]) - Number(parsed24[filters.totalTransaction]);
     }
 
+    // uniswap-v3 subgraph has an issue with totalValueLockedUSD
+    // we collect tvl by sum pool tvl
+    if (subgraph.exchange === 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3') {
+      factoryData.totalValueLockedUSD = 0;
+      const sizeLimit = 1000;
+      let lastPoolId = '';
+      let pools: Array<any>;
+      do {
+        const poolResponse = await providers.subgraph.querySubgraph(
+          subgraph.exchange,
+          `
+          {
+            pools(first: 1000, where: {id_gt: "${lastPoolId}"}) {
+              id
+              totalValueLockedUSD
+            }
+          }
+        `
+        );
+        pools = poolResponse && poolResponse.pools ? poolResponse.pools : [];
+
+        for (const pool of pools) {
+          if (normalizeAddress(pool.id) === '0xa850478adaace4c08fc61de44d8cf3b64f359bec') continue;
+          factoryData.totalValueLockedUSD += Number(pool.totalValueLockedUSD);
+        }
+
+        lastPoolId = pools.length > 0 ? pools[pools.length - 1].id : '';
+      } while (pools.length === sizeLimit);
+    }
+
     return factoryData;
   }
 
