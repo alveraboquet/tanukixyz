@@ -127,13 +127,20 @@ export class StargateProvider extends CollectorProvider {
           ? poolConfig.chainConfig.nodeRpcs.archive
           : poolConfig.chainConfig.nodeRpcs.default
       );
-      const contract = new web3.eth.Contract(poolConfig.contractAbi, poolConfig.contractAddress);
-      let balance;
-      try {
-        balance = await contract.methods.totalLiquidity().call(blockAtTimestamp);
-      } catch (e: any) {
-        balance = await contract.methods.totalLiquidity().call();
+
+      let balance = 0;
+      if (stargateLPConfig.token.symbol === 'ETH') {
+        const contract = new web3.eth.Contract(poolConfig.contractAbi, poolConfig.contractAddress);
+        try {
+          balance = await contract.methods.totalLiquidity().call(blockAtTimestamp);
+        } catch (e: any) {}
+      } else {
+        const contract = new web3.eth.Contract(poolConfig.contractAbi, tokenAddress);
+        try {
+          balance = await contract.methods.balanceOf(poolConfig.contractAddress).call(blockAtTimestamp);
+        } catch (e: any) {}
       }
+
       const tvl = new BigNumber(balance.toString())
         .dividedBy(new BigNumber(10).pow(tokenDecimals))
         .multipliedBy(historyPrice)

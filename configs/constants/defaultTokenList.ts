@@ -309,11 +309,11 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
       },
       arbitrum: {
         decimals: 6,
-        address: '',
+        address: '0xff970a61a04b1ca14834a43f5de4533ebddb5cc8',
       },
       optimism: {
         decimals: 6,
-        address: '',
+        address: '0x7f5c764cbc14f9669b88837ca1490cca17c31607',
       },
       harmony: {
         decimals: 6,
@@ -353,7 +353,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
       },
       polygon: {
         decimals: 6,
-        address: '',
+        address: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f',
       },
       aurora: {
         decimals: 6,
@@ -361,11 +361,11 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
       },
       arbitrum: {
         decimals: 6,
-        address: '',
+        address: '0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9',
       },
       optimism: {
         decimals: 6,
-        address: '',
+        address: '0x94b008aa00579c1307b0ef2c499ad98a8ce58e58',
       },
       harmony: {
         decimals: 6,
