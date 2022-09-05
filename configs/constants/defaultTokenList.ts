@@ -289,7 +289,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
       },
       avalanche: {
         decimals: 6,
-        address: '',
+        address: '0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e',
       },
       fantom: {
         decimals: 6,
@@ -301,7 +301,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
       },
       polygon: {
         decimals: 6,
-        address: '',
+        address: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',
       },
       aurora: {
         decimals: 6,
@@ -341,7 +341,7 @@ export const DefaultTokenList: { [key: string]: TokenConfig } = {
       },
       avalanche: {
         decimals: 6,
-        address: '',
+        address: '0x9702230a8ea53601f5cd2dc00fdbc13d4df4a8c7',
       },
       fantom: {
         decimals: 6,
