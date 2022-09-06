@@ -96,7 +96,8 @@ export class StargateProvider extends CollectorProvider {
         }
 
         const volume = new BigNumber(event.returnValues.amountSD)
-          .dividedBy(1e6) // stargate use default 6 decimals value
+          // stargate use default 6 decimals value for BUSD
+          .dividedBy(stargateLPConfig.token.symbol === 'BUSD' ? 1e16 : new BigNumber(10).pow(tokenDecimals))
           .multipliedBy(historyPrice)
           .toNumber();
         switch (event.event) {
